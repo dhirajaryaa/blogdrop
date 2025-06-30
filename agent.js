@@ -16,7 +16,7 @@ async function callAIagent() {
         messages: messageArray,
         model: "llama-3.3-70b-versatile",
     })
-    console.log(JSON.stringify(completion.choices[0], null, 2));
+    console.log(JSON.stringify(completion.choices[0].message.content, null, 2));
 }
 
 callAIagent();
