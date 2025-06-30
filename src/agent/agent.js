@@ -1,7 +1,7 @@
 import Groq from "groq-sdk";
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
-async function callAIagent() {
+export async function callAIagent() {
     const messageArray = [
         {
   "role": "system",
@@ -15,8 +15,7 @@ async function callAIagent() {
     const completion = await groq.chat.completions.create({
         messages: messageArray,
         model: "llama-3.3-70b-versatile",
+        tools: []
     })
     console.log(JSON.stringify(completion.choices[0].message.content, null, 2));
 }
-
-callAIagent();

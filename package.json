@@ -1,9 +1,9 @@
 {
   "name": "blogdrop",
-  "module": "agent.js",
+  "module": "src/index.js",
   "type": "module",
   "scripts": {
-    "dev": "node --env-file=.env agent.js"
+    "dev": "node --env-file=.env src/index.js"
   },
   "devDependencies": {
     "@types/bun": "latest"
