@@ -12,6 +12,8 @@
     "typescript": "^5"
   },
   "dependencies": {
-    "groq-sdk": "^0.26.0"
+    "groq-sdk": "^0.26.0",
+    "marked": "^16.0.0",
+    "resend": "^4.6.0"
   }
 }

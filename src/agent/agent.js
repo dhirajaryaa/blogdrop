@@ -1,4 +1,6 @@
 import Groq from "groq-sdk";
+import { sendEmail } from "../helper/sendEmail.js";
+
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 //* user selected relevant categories *//
@@ -20,7 +22,7 @@ const messageArray = [
 export async function callAIagent(topic = "") {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic on "${topic}". then search on web related to topic view different site ,then Summarize the blog content in 700-800 words, include examples or real-world simulations if possible, always add reference links, then send the complete content to my email.`
+        content: `Choose a single blog topic on "${topic}". then search on web related to topic view different site ,then Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to my email. return content must be MD-format and avoid add any email related information.`
     });
 
     while (true) {
@@ -28,7 +30,7 @@ export async function callAIagent(topic = "") {
             messages: messageArray,
             model: "llama-3.3-70b-versatile",
             tools: [
-                //! generate blog topic tool  
+                //! 1.  generate blog topic tool  
                 {
                     type: 'function',
                     function: {
@@ -46,14 +48,9 @@ export async function callAIagent(topic = "") {
                         }
                     }
                 },
-                //! search on web related to given topic tool
-                // {
-                //     type: 'function',
-                //     function: {
-                //         name: "searchOnWeb",
-                //         description: "fated related to given topic engineering blogs & articles and references."
-                //     }
-                // }
+                //! 2. search on web related to given topic tool
+                //! 3. send email
+                
             ]
         });
         messageArray.push(completion.choices[0].message);
@@ -61,7 +58,11 @@ export async function callAIagent(topic = "") {
 
         if (!toolCalls) {
             // in reality send user email on this content 
-            console.log(`Blog post generated => ${completion.choices[0].message.content}`);
+            // console.log(`Blog post generated => ${completion.choices[0].message.content}`);
+            //! send email
+            console.log("email sending");
+            
+            await sendEmail("Today Blog Post for You 📝.",completion.choices[0].message.content);
             break;
         };
         //? check tool calling 
@@ -80,9 +81,6 @@ export async function callAIagent(topic = "") {
             });
 
         }
-
-        console.log("====================================");
-        console.log("messages", messageArray);
     }
 }
 
@@ -99,11 +97,3 @@ async function blogTopicSelector({ categories }) {
     return completion.choices[0].message.content
 };
 
-
-
-
-async function searchOnWeb(query) {
-    console.log("search on web....");
-    return "this is search on web result"
-};
-// console.log("log",messageArray);
