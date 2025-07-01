@@ -106,7 +106,6 @@ export async function callAIagent({topic = "", userEmail}) {
 
         }
     }
-    console.log(messageArray);
     
 }
 
