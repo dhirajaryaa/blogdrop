@@ -17,91 +17,91 @@ const messageArray = [
 }`
     }
 ];
-export async function callAIagent(topic) {
+export async function callAIagent(topic = "") {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic on "${topic || categories}". then search on web related to topic view different site ,then Summarize the blog content in 700-800 words, include examples or real-world simulations if possible, always add reference links, then send the complete content to my email.`
+        content: `Choose a single blog topic on "${topic}". then search on web related to topic view different site ,then Summarize the blog content in 700-800 words, include examples or real-world simulations if possible, always add reference links, then send the complete content to my email.`
     });
-    const completion = await groq.chat.completions.create({
-        messages: messageArray,
-        model: "llama-3.3-70b-versatile",
-        tools: [
-            //! generate blog topic tool  
-            {
-                type: 'function',
-                function: {
-                    name: "blogTopicSelector",
-                    description: `if user topic not given so make pic one categories on those categories and then generate a realistic and meaningful blog & arctics topic, then search on given topic on different site.`,
-                    parameters: {
-                        type: "object",
-                        properties: {
-                    categories: {
-                        type: 'array',
-                        items: { type: "string" },
-                        description: "List of categories based on user's interests. Use this if topic is missing."
+
+    while (true) {
+        const completion = await groq.chat.completions.create({
+            messages: messageArray,
+            model: "llama-3.3-70b-versatile",
+            tools: [
+                //! generate blog topic tool  
+                {
+                    type: 'function',
+                    function: {
+                        name: "blogTopicSelector",
+                        description: `generate a realistic and meaningful blog & arctics topic based on those ${categories.join()}.`,
+                        parameters: {
+                            type: "object",
+                            properties: {
+                                categories: {
+                                    type: 'array',
+                                    items: { type: "string" },
+                                    description: "List of categories based on user's interests."
+                                }
+                            }
+                        }
                     }
                 },
-                        required : [] // this is parameters options if required empty.
-                    }
-                }
-            },
-             //! search on web related to given topic tool
-            {
-                type: 'function',
-                function: {
-                    name: "searchOnWeb",
-                    description: "fated related to given topic engineering blogs & articles and references."
-                }
-            }
-        ]
-    });
-    //* result log 
-    console.log(JSON.stringify(completion.choices, null, 2));
+                //! search on web related to given topic tool
+                // {
+                //     type: 'function',
+                //     function: {
+                //         name: "searchOnWeb",
+                //         description: "fated related to given topic engineering blogs & articles and references."
+                //     }
+                // }
+            ]
+        });
+        messageArray.push(completion.choices[0].message);
+        const toolCalls = completion.choices[0].message.tool_calls;
 
-    messageArray.push(completion.choices[0].message);
+        if (!toolCalls) {
+            // in reality send user email on this content 
+            console.log(`Blog post generated => ${completion.choices[0].message.content}`);
+            break;
+        };
+        //? check tool calling 
+        for (const tool of toolCalls) {
+            const functionName = tool.function.name;
+            const functionArgs = tool.function.arguments;
+            // blogTopicSelector tool run 
+            let result = "";
+            if (functionName === "blogTopicSelector") {
+                result = await blogTopicSelector(JSON.parse(functionArgs));
+            };
+            messageArray.push({
+                role: 'tool',
+                content: result,
+                tool_call_id: tool.id
+            });
 
-    const toolCalls = completion.choices[0].message.tool_calls;
-
-    if(!toolCalls){
-        // in reality send user email on this content 
-        console.log(`Blog post generated => ${completion.choices[0].message.content}`);
-        return ;
-    };
-    //? check tool calling 
-    for (const tool of toolCalls){
-        const functionName = tool.function.name;
-        const functionArgs = tool.function.arguments;
-        // blogTopicSelector tool run 
-        let result = "";
-        if(functionName === "blogTopicSelector"){
-            result = await blogTopicSelector(JSON.parse(functionArgs));            
         }
-        messageArray.push({
-            role:'tool',
-            content: result,
-            tool_calls_id :tool.id
-        }); 
-    }
 
-    console.log("====================================");
-    console.log("messages",messageArray);
-    
-    
+        console.log("====================================");
+        console.log("messages", messageArray);
+    }
 }
 
 //? blog topic selector function 
-async function blogTopicSelector({categories}) {    
+async function blogTopicSelector({ categories }) {
     console.log("generating topic ....");
-    messageArray.push({
-        role: "user",
-        content: `Select one category randomly from the following: ${categories?.join()}.No duplicate,always chose different category, Suggest a single, specific, high-quality engineering blog topic (just the topic title, no explanation) that would be valuable for software engineers. Only return the topic title.`
+    const completion = await groq.chat.completions.create({
+        messages: [{
+            role: "user",
+            content: `Select one category randomly from the following: ${categories?.join()}.No duplicate,always chose different category, Suggest a single, specific, high-quality engineering blog topic (just the topic title, no explanation) that would be valuable for software engineers. Only return the topic title.`
+        }],
+        model: "llama-3.3-70b-versatile",
     });
-const completion = await groq.chat.completions.create({
-    messages: messageArray,
-    model: "llama-3.3-70b-versatile",
-});
     return completion.choices[0].message.content
 };
+
+
+
+
 async function searchOnWeb(query) {
     console.log("search on web....");
     return "this is search on web result"
