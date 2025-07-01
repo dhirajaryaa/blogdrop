@@ -5,9 +5,9 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 //* user selected relevant categories *//
 const categories = [
+    "System Design",
     "MERN",
     "AI",
-    "System Design",
     "Interview Preparation"
 ];
 
@@ -19,10 +19,10 @@ const messageArray = [
 }`
     }
 ];
-export async function callAIagent(topic = "") {
+export async function callAIagent({topic = "", userEmail}) {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic on "${topic}". then search on web related to topic view different site ,then Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to my email. return content must be MD-format and avoid add any email related information.`
+        content: `Choose a single blog topic on "${topic}". then search on web related to topic view different site ,then Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send.`
     });
 
     while (true) {
@@ -50,29 +50,53 @@ export async function callAIagent(topic = "") {
                 },
                 //! 2. search on web related to given topic tool
                 //! 3. send email
+                {
+                    type : 'function',
+                    function : {
+                        name: "sendEmail",
+                        description : `send blog post in this ${userEmail} email address. i use resend for this.`,
+                        parameters : {
+                            properties : {
+                                userEmail: {
+                                    type:"string",
+                                    description : "user email to deliver this blog post to that address"
+                                },
+                                subject : {
+                                    type: 'string',
+                                    description : "blog post title with today date and app name 'BlogDrop-'. (e.x: BlogDrop - test blog title, 24 may 2025) "
+                                },
+                                htmlContent : {
+                                    type: 'string',
+                                    description : "my full blog content here with reference link"
+                                }
+                            }
+                        }
+                    }
+                }
                 
             ]
         });
         messageArray.push(completion.choices[0].message);
         const toolCalls = completion.choices[0].message.tool_calls;
 
-        if (!toolCalls) {
-            // in reality send user email on this content 
+        if (!toolCalls) {            
             // console.log(`Blog post generated => ${completion.choices[0].message.content}`);
-            //! send email
-            console.log("email sending");
-            
-            await sendEmail("Today Blog Post for You 📝.",completion.choices[0].message.content);
+            // //! send email
+            console.log("email sended..");
             break;
         };
         //? check tool calling 
         for (const tool of toolCalls) {
             const functionName = tool.function.name;
             const functionArgs = tool.function.arguments;
+            
             // blogTopicSelector tool run 
             let result = "";
             if (functionName === "blogTopicSelector") {
                 result = await blogTopicSelector(JSON.parse(functionArgs));
+            };
+            if (functionName === "sendEmail") {
+                result = await sendEmail(JSON.parse(functionArgs));
             };
             messageArray.push({
                 role: 'tool',
@@ -82,6 +106,8 @@ export async function callAIagent(topic = "") {
 
         }
     }
+    console.log(messageArray);
+    
 }
 
 //? blog topic selector function 

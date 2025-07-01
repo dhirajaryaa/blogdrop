@@ -1,3 +1,3 @@
 import { callAIagent } from "./agent/agent.js";
 
-callAIagent();
+callAIagent({ userEmail: "draj22779@gmail.com" });
