@@ -9,18 +9,19 @@ const categories = [
     "Interview Preparation"
 ];
 
+const messageArray = [
+    // defined role and work. 
+    {
+        "role": "system",
+        "content": `You are BlogDrop, an expert AI assistant specialized in discovering and analyzing high-quality software engineering blogs. Your task is to help the user find insightful engineering content—such as deep system breakdowns, behind-the-scenes architecture, problem-solving case studies, and real-world engineering challenges—from platforms like Medium, Dev.to, Hacker News, engineering team blogs, and more. Your goal is to boost the user’s technical knowledge and skill set as an aspiring software engineer. currentDate: ${new Date().toISOString()}
+}`
+    }
+];
 export async function callAIagent(topic) {
-    const messageArray = [
-        // defined role and work. 
-        {
-            "role": "system",
-            "content": `You are BlogDrop, an expert AI assistant specialized in discovering and analyzing high-quality software engineering blogs. Your task is to help the user find insightful engineering content—such as deep system breakdowns, behind-the-scenes architecture, problem-solving case studies, and real-world engineering challenges—from platforms like Medium, Dev.to, Hacker News, engineering team blogs, and more. Your goal is to boost the user’s technical knowledge and skill set as an aspiring software engineer. currentDate: ${new Date().getUTCDate()}`
-        }
-        , {
-            role: "user",
-            content: `generate blog on ${topic || categories}`
-        }
-    ];
+    messageArray.push({
+        role: "user",
+        content: `Choose a single blog topic on "${topic || categories}". then search on web related to topic view different site ,then Summarize the blog content in 700-800 words, include examples or real-world simulations if possible, always add reference links, then send the complete content to my email.`
+    });
     const completion = await groq.chat.completions.create({
         messages: messageArray,
         model: "llama-3.3-70b-versatile",
@@ -30,14 +31,10 @@ export async function callAIagent(topic) {
                 type: 'function',
                 function: {
                     name: "blogTopicSelector",
-                    description: `if user topic not given so make pic one categories on those categories and then generate a realistic and meaningful blog & arctics topic`,
+                    description: `if user topic not given so make pic one categories on those categories and then generate a realistic and meaningful blog & arctics topic, then search on given topic on different site.`,
                     parameters: {
                         type: "object",
                         properties: {
-                    topic: {
-                        type: 'string',
-                        description: "Topic provided by the user. If present, use this for blog & articles."
-                    },
                     categories: {
                         type: 'array',
                         items: { type: "string" },
@@ -59,9 +56,12 @@ export async function callAIagent(topic) {
         ]
     });
     //* result log 
-    // console.log(JSON.stringify(completion.choices, null, 2));
-    
+    console.log(JSON.stringify(completion.choices, null, 2));
+
+    messageArray.push(completion.choices[0].message);
+
     const toolCalls = completion.choices[0].message.tool_calls;
+
     if(!toolCalls){
         // in reality send user email on this content 
         console.log(`Blog post generated => ${completion.choices[0].message.content}`);
@@ -71,29 +71,39 @@ export async function callAIagent(topic) {
     for (const tool of toolCalls){
         const functionName = tool.function.name;
         const functionArgs = tool.function.arguments;
+        // blogTopicSelector tool run 
+        let result = "";
         if(functionName === "blogTopicSelector"){
-            // function run for generating relevant blog topic
-            const res = await blogTopicSelector(JSON.parse(functionArgs));
-            console.log(JSON.stringify(res,null,2));
-            
+            result = await blogTopicSelector(JSON.parse(functionArgs));            
         }
+        messageArray.push({
+            role:'tool',
+            content: result,
+            tool_calls_id :tool.id
+        }); 
     }
+
+    console.log("====================================");
+    console.log("messages",messageArray);
+    
+    
 }
 
-
-async function blogTopicSelector({topic, categories}) {
+//? blog topic selector function 
+async function blogTopicSelector({categories}) {    
     console.log("generating topic ....");
-const completion = await groq.chat.completions.create({
-    messages: [{
+    messageArray.push({
         role: "user",
-        content: `Select one category from the following: ${categories}. Suggest a single, specific, high-quality engineering blog topic (just the topic title, no explanation) that would be valuable for software engineers. Only return the topic title.`
-    }],
+        content: `Select one category randomly from the following: ${categories?.join()}.No duplicate,always chose different category, Suggest a single, specific, high-quality engineering blog topic (just the topic title, no explanation) that would be valuable for software engineers. Only return the topic title.`
+    });
+const completion = await groq.chat.completions.create({
+    messages: messageArray,
     model: "llama-3.3-70b-versatile",
 });
     return completion.choices[0].message.content
-
 };
 async function searchOnWeb(query) {
     console.log("search on web....");
-    return query
+    return "this is search on web result"
 };
+// console.log("log",messageArray);
