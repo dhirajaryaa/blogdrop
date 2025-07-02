@@ -12,8 +12,10 @@
     "typescript": "^5"
   },
   "dependencies": {
+    "@postlight/parser": "^2.2.3",
     "groq-sdk": "^0.26.0",
     "marked": "^16.0.0",
-    "resend": "^4.6.0"
+    "resend": "^4.6.0",
+    "serpapi": "^2.1.0"
   }
 }
