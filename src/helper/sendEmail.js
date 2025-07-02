@@ -12,9 +12,5 @@ export async function sendEmail({userEmail, subject, htmlContent}) {
     subject: subject,
     html: marked(htmlContent || ""),
   });
-
-  if (error) {
-    return console.error({ error });
-  }
-  return `Email send ✅, email_id is ${data?.id || "OK"}`
+  return `Email send ✅`
 }

@@ -16,10 +16,10 @@ export async function searchOnWeb({query}) {
     let blogContents = [];
     console.log("Read web page...");
     for (const link of blogLinks) {
-        const result = await Parser.parse(link, { contentType: 'markdown' });
+        const result = await Parser.parse(link);
         blogContents.push({ content: result.content, source: result.url });
-    }
-    return JSON.stringify(blogContents)
+    };    
+    return blogContents;
 
 }
 

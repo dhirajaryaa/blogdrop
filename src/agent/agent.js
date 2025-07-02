@@ -23,7 +23,7 @@ const messageArray = [
 export async function callAIagent({ userEmail }) {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic. then search on web related to topic view different site ,then web result Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send.`
+        content: `Choose a single blog topic. then search on web related to blog topic,then web result include source and content so based on write blog content, you include examples or real-world simulations if possible, always add original reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send. then exit.`
     });
 
     while (true) {
