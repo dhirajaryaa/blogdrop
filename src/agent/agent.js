@@ -5,10 +5,10 @@ const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
 //* user selected relevant categories *//
 const categories = [
-    "System Design",
-    "MERN",
-    "AI",
-    "Interview Preparation"
+    " System Design",
+    "Scalable Architecture",
+    "Distributed Systems",
+    "Real-World Engineering Case Studies"
 ];
 
 const messageArray = [
@@ -19,10 +19,10 @@ const messageArray = [
 }`
     }
 ];
-export async function callAIagent({topic = "", userEmail}) {
+export async function callAIagent({ userEmail }) {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic on "${topic}". then search on web related to topic view different site ,then Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send.`
+        content: `Choose a single blog topic. then search on web related to topic view different site ,then Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send.`
     });
 
     while (true) {
@@ -51,35 +51,35 @@ export async function callAIagent({topic = "", userEmail}) {
                 //! 2. search on web related to given topic tool
                 //! 3. send email
                 {
-                    type : 'function',
-                    function : {
+                    type: 'function',
+                    function: {
                         name: "sendEmail",
-                        description : `send blog post in this ${userEmail} email address. i use resend for this.`,
-                        parameters : {
-                            properties : {
+                        description: `send blog post in this ${userEmail} email address. i use resend for this.`,
+                        parameters: {
+                            properties: {
                                 userEmail: {
-                                    type:"string",
-                                    description : "user email to deliver this blog post to that address"
+                                    type: "string",
+                                    description: "user email to deliver this blog post to that address"
                                 },
-                                subject : {
+                                subject: {
                                     type: 'string',
-                                    description : "blog post title with today date and app name 'BlogDrop-'. (e.x: BlogDrop - test blog title, 24 may 2025) "
+                                    description: "blog post title with today date and app name 'BlogDrop-'. (e.x: BlogDrop - test blog title, 24 may 2025) "
                                 },
-                                htmlContent : {
+                                htmlContent: {
                                     type: 'string',
-                                    description : "my full blog content here with reference link"
+                                    description: "my full blog content here with reference link"
                                 }
                             }
                         }
                     }
                 }
-                
+
             ]
         });
         messageArray.push(completion.choices[0].message);
         const toolCalls = completion.choices[0].message.tool_calls;
 
-        if (!toolCalls) {            
+        if (!toolCalls) {
             // console.log(`Blog post generated => ${completion.choices[0].message.content}`);
             // //! send email
             console.log("email sended..");
@@ -89,7 +89,7 @@ export async function callAIagent({topic = "", userEmail}) {
         for (const tool of toolCalls) {
             const functionName = tool.function.name;
             const functionArgs = tool.function.arguments;
-            
+
             // blogTopicSelector tool run 
             let result = "";
             if (functionName === "blogTopicSelector") {
@@ -106,19 +106,35 @@ export async function callAIagent({topic = "", userEmail}) {
 
         }
     }
-    
+
 }
 
 //? blog topic selector function 
-async function blogTopicSelector({ categories }) {
+export async function blogTopicSelector({ categories }) {
     console.log("generating topic ....");
+
+    function pickRandomCategory() {
+        const index = Math.floor(Math.random() * categories.length);
+        return categories[index];
+    }
     const completion = await groq.chat.completions.create({
         messages: [{
             role: "user",
-            content: `Select one category randomly from the following: ${categories?.join()}.No duplicate,always chose different category, Suggest a single, specific, high-quality engineering blog topic (just the topic title, no explanation) that would be valuable for software engineers. Only return the topic title.`
+            content: `You are a top-tier trend expert and technical content strategist for software engineers.
+Selected category: ${pickRandomCategory()}
+Generate 1 unique and trending blog title that:
+- Reflects real-world engineering challenges
+- Includes system breakdowns, infrastructure case studies, or deep technical insights
+- Sounds like a title you'd find on Medium, Dev.to, or engineering blogs from Netflix, Uber, Stripe, etc.
+- Is specific, not generic
+- Matches current trends (2024-${new Date().getFullYear()})
+Return the blog title only.
+`
         }],
         model: "llama-3.3-70b-versatile",
     });
+    console.log(completion.choices[0].message.content);
+
     return completion.choices[0].message.content
 };
 
