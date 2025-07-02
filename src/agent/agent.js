@@ -1,5 +1,6 @@
 import Groq from "groq-sdk";
 import { sendEmail } from "../helper/sendEmail.js";
+import { searchOnWeb } from "../helper/webSearch.js";
 
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 
@@ -22,13 +23,13 @@ const messageArray = [
 export async function callAIagent({ userEmail }) {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic. then search on web related to topic view different site ,then Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send.`
+        content: `Choose a single blog topic. then search on web related to topic view different site ,then web result Summarize the blog content, include examples or real-world simulations if possible, always add reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send.`
     });
 
     while (true) {
         const completion = await groq.chat.completions.create({
             messages: messageArray,
-            model: "llama-3.3-70b-versatile",
+            model: "llama-3.1-8b-instant",
             tools: [
                 //! 1.  generate blog topic tool  
                 {
@@ -49,6 +50,22 @@ export async function callAIagent({ userEmail }) {
                     }
                 },
                 //! 2. search on web related to given topic tool
+                {
+                    type: 'function',
+                    function: {
+                        name: "searchOnWeb",
+                        description: "Search the web in real time for the given blog content. Return a concise summary of the most relevant blog posts, articles, or case studies found also if possible addon example, including reference links. Focus on high-quality engineering content from reputable sources.",
+                        parameters: {
+                            type: "object",
+                            properties: {
+                                query: {
+                                    type: 'string',
+                                    description: "blog topic search on web then return relevant content."
+                                }
+                            }
+                        }
+                    }
+                },
                 //! 3. send email
                 {
                     type: 'function',
@@ -73,7 +90,6 @@ export async function callAIagent({ userEmail }) {
                         }
                     }
                 }
-
             ]
         });
         messageArray.push(completion.choices[0].message);
@@ -97,6 +113,9 @@ export async function callAIagent({ userEmail }) {
             };
             if (functionName === "sendEmail") {
                 result = await sendEmail(JSON.parse(functionArgs));
+            };
+            if (functionName === "searchOnWeb") {
+                result = await searchOnWeb(JSON.parse(functionArgs));
             };
             messageArray.push({
                 role: 'tool',
@@ -131,7 +150,7 @@ Generate 1 unique and trending blog title that:
 Return the blog title only.
 `
         }],
-        model: "llama-3.3-70b-versatile",
+        model: "llama-3.1-8b-instant",
     });
     console.log(completion.choices[0].message.content);
 
