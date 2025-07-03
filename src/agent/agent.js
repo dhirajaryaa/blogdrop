@@ -23,106 +23,121 @@ const messageArray = [
 export async function callAIagent({ userEmail }) {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic. then search on web related to blog topic,then web result include source and content so based on write blog content, you include examples or real-world simulations if possible, always add original reference links, then send the complete content to user this ${userEmail} email address . return content must be MD-format and avoid, any email related information and only one email send. then exit.`
+        content: `Choose a single blog topic. then search on web related to blog topic,then web result include source and content so based on write blog content, you include examples or real-world simulations if possible, always add original reference links, then send the complete blog content to user this ${userEmail} email address .and avoid, any email related information and only one email send. blog content must me md format`
     });
 
     while (true) {
-        const completion = await groq.chat.completions.create({
-            messages: messageArray,
-            model: "llama-3.1-8b-instant",
-            tools: [
-                //! 1.  generate blog topic tool  
-                {
-                    type: 'function',
-                    function: {
-                        name: "blogTopicSelector",
-                        description: `generate a realistic and meaningful blog & arctics topic based on those ${categories.join()}.`,
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                categories: {
-                                    type: 'array',
-                                    items: { type: "string" },
-                                    description: "List of categories based on user's interests."
-                                }
-                            }
-                        }
-                    }
-                },
-                //! 2. search on web related to given topic tool
-                {
-                    type: 'function',
-                    function: {
-                        name: "searchOnWeb",
-                        description: "Search the web in real time for the given blog content. Return a concise summary of the most relevant blog posts, articles, or case studies found also if possible addon example, including reference links. Focus on high-quality engineering content from reputable sources.",
-                        parameters: {
-                            type: "object",
-                            properties: {
-                                query: {
-                                    type: 'string',
-                                    description: "blog topic search on web then return relevant content."
-                                }
-                            }
-                        }
-                    }
-                },
-                //! 3. send email
-                {
-                    type: 'function',
-                    function: {
-                        name: "sendEmail",
-                        description: `send blog post in this ${userEmail} email address. i use resend for this.`,
-                        parameters: {
-                            properties: {
-                                userEmail: {
-                                    type: "string",
-                                    description: "user email to deliver this blog post to that address"
+        try {
+            const completion = await groq.chat.completions.create({
+                messages: messageArray,
+                model: "llama-3.1-8b-instant",
+                tools: [
+                    //! 1. blog topic selector tool
+                    {
+                        type: "function",
+                        function: {
+                            name: "blogTopicSelector",
+                            description: `Generate a realistic and meaningful blog topic based on categories: ${categories.join(", ")}.`,
+                            parameters: {
+                                type: "object",
+                                properties: {
+                                    categories: {
+                                        type: "array",
+                                        items: { type: "string" },
+                                        description: "User-selected blog categories"
+                                    }
                                 },
-                                subject: {
-                                    type: 'string',
-                                    description: "blog post title with today date and app name 'BlogDrop-'. (e.x: BlogDrop - test blog title, 24 may 2025) "
+                                required: ["categories"]
+                            }
+                        }
+                    },
+                    //! 2. search on web tool
+                    {
+                        type: "function",
+                        function: {
+                            name: "searchOnWeb",
+                            description: "Search the web in real time for the given blog topic and return a detailed summary including reference links.",
+                            parameters: {
+                                type: "object",
+                                properties: {
+                                    query: {
+                                        type: "string",
+                                        description: "Topic to search on the web"
+                                    }
                                 },
-                                htmlContent: {
-                                    type: 'string',
-                                    description: "my full blog content here with reference link"
-                                }
+                                required: ["query"]
+                            }
+                        }
+                    },
+                    //! 3. send user email tool
+                    {
+                        type: "function",
+                        function: {
+                            name: "sendEmail",
+                            description: `Send the generated blog post to this ${userEmail} using Resend.`,
+                            parameters: {
+                                type: "object",
+                                properties: {
+                                    userEmail: {
+                                        type: "string",
+                                        description: "User email address"
+                                    },
+                                    subject: {
+                                        type: "string",
+                                        description: "Subject like: BlogDrop - <Title>, <date>"
+                                    },
+                                    htmlContent: {
+                                        type: "string",
+                                        description: "Full blog content with reference links"
+                                    }
+                                },
+                                required: ["userEmail", "subject", "htmlContent"]
                             }
                         }
                     }
-                }
-            ]
-        });
-        messageArray.push(completion.choices[0].message);
-        const toolCalls = completion.choices[0].message.tool_calls;
-
-        if (!toolCalls) {
-            // console.log(`Blog post generated => ${completion.choices[0].message.content}`);
-            // //! send email
-            console.log("email sended..");
-            break;
-        };
-        //? check tool calling 
-        for (const tool of toolCalls) {
-            const functionName = tool.function.name;
-            const functionArgs = tool.function.arguments;
-
-            // blogTopicSelector tool run 
-            let result = "";
-            if (functionName === "blogTopicSelector") {
-                result = await blogTopicSelector(JSON.parse(functionArgs));
-            };
-            if (functionName === "sendEmail") {
-                result = await sendEmail(JSON.parse(functionArgs));
-            };
-            if (functionName === "searchOnWeb") {
-                result = await searchOnWeb(JSON.parse(functionArgs));
-            };
-            messageArray.push({
-                role: 'tool',
-                content: result,
-                tool_call_id: tool.id
+                ]
             });
+            messageArray.push(completion.choices[0].message);
+            const toolCalls = completion.choices[0].message.tool_calls;
 
+            if (!toolCalls) {
+                // console.log(`Blog post generated => ${completion.choices[0].message.content}`);
+                console.log("All work done");
+                break;
+            };
+            //? check tool calling 
+            for (const tool of toolCalls) {
+                const functionName = tool.function.name;
+                const functionArgs = tool.function.arguments || {};
+
+                // blogTopicSelector tool run 
+                let result = "";
+
+                try {
+                    if (functionName === "blogTopicSelector") {
+                        result = await blogTopicSelector(JSON.parse(functionArgs));
+                    }
+                    if (functionName === "searchOnWeb") {
+                        result = await searchOnWeb(JSON.parse(functionArgs));
+                    };
+                    if (functionName === "sendEmail") {
+                        result = await sendEmail(JSON.parse(functionArgs));
+                    }
+
+                } catch (toolError) {
+                    console.error(`❌ Tool ${functionName} failed:`, toolError);
+                    result = `Tool ${functionName} failed to execute`;
+                }
+                messageArray.push({
+                    role: 'tool',
+                    content: JSON.stringify(result),
+                    tool_call_id: tool.id
+                });
+
+            }
+        } catch (error) {
+            console.error("Groq Error:", error);
+            break;
         }
     }
 
@@ -152,8 +167,7 @@ Return the blog title only.
         }],
         model: "llama-3.1-8b-instant",
     });
-    console.log(completion.choices[0].message.content);
 
-    return completion.choices[0].message.content
+    return completion.choices[0].message.content.trim();
 };
 

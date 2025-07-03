@@ -3,9 +3,8 @@ import { getJson } from "serpapi";
 
 const apiKey = process.env.SERP_API_KEY
 
-export async function searchOnWeb({query}) {
+export async function searchOnWeb({ query }) {
     console.log("Search on web...");
-    
     const response = await getJson({
         engine: "google",
         api_key: apiKey,
@@ -16,11 +15,10 @@ export async function searchOnWeb({query}) {
     let blogContents = [];
     console.log("Read web page...");
     for (const link of blogLinks) {
-        const result = await Parser.parse(link);
+        const result = await Parser.parse(link, { contentType: 'text' });
         blogContents.push({ content: result.content, source: result.url });
     };    
-    return blogContents;
-
+    return JSON.stringify(blogContents);
 }
 
 
