@@ -23,7 +23,7 @@ const messageArray = [
 export async function callAIagent({ userEmail }) {
     messageArray.push({
         role: "user",
-        content: `Choose a single blog topic. then search on web related to blog topic,then web result include source and content so based on write blog content, you include examples or real-world simulations if possible, always add original reference links, then send the complete blog content to user this ${userEmail} email address .and avoid, any email related information and only one email send. blog content must me md format`
+        content: `Choose a single blog topic. then search on web related to blog topic,then web result include source and content so based on write blog summary, you include examples or real-world simulations if possible, below addon read full blog link to my related blog link to user get read this full blog. always add original working reference links provided by blog content, then send the complete blog content to user this ${userEmail} email address .and avoid, any email related information and only one email send. blog content must me md format`
     });
 
     while (true) {
@@ -121,7 +121,7 @@ export async function callAIagent({ userEmail }) {
                         result = await searchOnWeb(JSON.parse(functionArgs));
                     };
                     if (functionName === "sendEmail") {
-                        result = await sendEmail(JSON.parse(functionArgs));
+                         result = await sendEmail(JSON.parse(functionArgs))
                     }
 
                 } catch (toolError) {
