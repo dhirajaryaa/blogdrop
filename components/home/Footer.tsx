@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { IconBrandTabler, IconBrandGithub, IconBrandX } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
+import { githubRepoLink, twitterLink } from "@/config/constant"
 
 const footerLinks = {
   Product: ["Features", "Roadmap", "Pricing"],
@@ -53,10 +54,10 @@ export default function Footer() {
             &copy; {new Date().getFullYear()} BlogDrop. All rights reserved.
           </p>
           <div className="flex items-center gap-4">
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="GitHub">
+            <a href={githubRepoLink} target="_blank" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="GitHub">
               <IconBrandGithub className="size-4" />
             </a>
-            <a href="#" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Twitter">
+            <a href={twitterLink} target="_blank" className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Twitter">
               <IconBrandX className="size-4" />
             </a>
           </div>

@@ -1,9 +1,10 @@
 "use client"
 
 import { motion } from "motion/react"
-import { IconArrowRight, IconBrandGithub, IconStar, IconBookmark, IconTrendingUp, IconClock } from "@tabler/icons-react"
+import { IconArrowRight, IconBrandGithub, IconStar, IconBookmark, IconTrendingUp, IconClock, IconSparkles2 } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import GlowBadge from "@/components/common/GlowBadge"
+import { earlyAccessFormLink, githubRepoLink } from "@/config/constant"
 
 const trendingTopics = [
   "System Design", "Kubernetes", "Rust", "AI/ML", "Performance"
@@ -32,7 +33,7 @@ const topArticles = [
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden pt-24 pb-16 px-4">
+    <section className="relative flex flex-col items-center justify-center overflow-hidden pt-24 pb-16 md:pb-24 px-4">
       <div className="absolute inset-0 .bg-\[radial-gradient\(ellipse_at_top\,_var\(--tw-gradient-stops\)\)\] {
  background-image: radial-gradient(ellipse at top, var(--tw-gradient-stops));
 } from-primary/10 via-transparent to-transparent pointer-events-none" />
@@ -45,9 +46,10 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
-className="mb-6 mt-10"
+          className="mb-6 mt-10"
         >
-          <GlowBadge className="px-4 py-1.5  text-xs font-medium">
+          <GlowBadge className="py-3 px-5 text-xs  font-medium [&>svg]:size-5!">
+            <IconSparkles2 className="" />
             AI-Powered Engineering Blog Aggregator
           </GlowBadge>
         </motion.div>
@@ -56,7 +58,7 @@ className="mb-6 mt-10"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.4, 0.25, 1] }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-bold tracking-tight leading-[1.1] mb-6 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text"
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.1] mb-6 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text "
         >
           Every Engineering Blog.
           <br />
@@ -78,13 +80,17 @@ className="mb-6 mt-10"
           transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
           className="flex flex-col sm:flex-row gap-4 mb-16"
         >
-          <Button size="lg" className="h-12 px-6 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 shadow-glow hover:shadow-glow-lg transition-shadow duration-300">
-            Get Early Access
-            <IconArrowRight className="size-4 ml-1" />
+          <Button size="lg" className="h-12 px-6 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 shadow-glow hover:shadow-glow-lg transition-shadow duration-300" asChild>
+            <a href={earlyAccessFormLink} target="_blank">
+              Get Early Access
+              <IconArrowRight className="size-4 ml-1" />
+            </a>
           </Button>
-          <Button size="lg" variant="outline" className="h-12 px-6 text-base rounded-xl border-border hover:bg-muted/50 hover:shadow-glow-foreground transition-shadow duration-300">
-            <IconBrandGithub className="size-4 mr-2" />
-            View Sources
+          <Button size="lg" variant="outline" className="h-12 px-6 text-base rounded-xl border-border hover:bg-muted/50 hover:shadow-glow-foreground transition-shadow duration-300" asChild>
+            <a href={githubRepoLink} target="_blank">
+              <IconBrandGithub className="size-4 mr-2" />
+              View Sources
+            </a>
           </Button>
         </motion.div>
 
@@ -107,11 +113,10 @@ className="mb-6 mt-10"
                 ].map((item) => (
                   <div
                     key={item.label}
-                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${
-                      item.active
+                    className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${item.active
                         ? "bg-primary/10 text-primary font-medium"
                         : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                    }`}
+                      }`}
                   >
                     <item.icon className="size-4" />
                     {item.label}
