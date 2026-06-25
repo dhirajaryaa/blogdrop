@@ -45,8 +45,9 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
+class name="mb-6 mt-10"
         >
-          <GlowBadge className="px-4 py-1.5 text-xs font-medium">
+          <GlowBadge className="px-4 py-1.5  text-xs font-medium">
             AI-Powered Engineering Blog Aggregator
           </GlowBadge>
         </motion.div>
