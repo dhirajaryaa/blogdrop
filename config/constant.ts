@@ -1,10 +1,10 @@
-const earlyAccessFormLink = `https://forms.gle/d4tk9RwVmGqHcjTk8`
+const earlyAccessFormLink = `https://forms.gle/d4tk9RwVmGqHcjTk8`;
 
-const githubRepoLink = `https://github.com/dhirajaryaa/blogdrop`
+const githubRepoLink = `https://github.com/dhirajaryaa/blogdrop`;
 
-const twitterLink = `https://x.com/dhirajarya01`
+const twitterLink = `https://x.com/dhirajarya01`;
 
-const authCallbackPath = '/app/feed'
+const authCallbackPath = '/feed';
 
 
-export { earlyAccessFormLink, githubRepoLink,twitterLink,authCallbackPath }
+export { earlyAccessFormLink, githubRepoLink,twitterLink,authCallbackPath };

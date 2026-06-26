@@ -4,7 +4,6 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
-import Navbar from "@/components/common/Navbar";
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 

@@ -8,12 +8,12 @@ import FeaturesGrid from "@/components/home/FeaturesGrid";
 import Testimonials from "@/components/home/Testimonials";
 import FinalCTA from "@/components/home/FinalCTA";
 import Footer from "@/components/home/Footer";
-import Navbar from "@/components/common/Navbar";
+import Header from "@/components/common/Header";
 
 export default function Home() {
   return (
     <>
-    <Navbar />
+    <Header />
     <main className="flex-1">
       <HeroSection />
       <TrustedSources />

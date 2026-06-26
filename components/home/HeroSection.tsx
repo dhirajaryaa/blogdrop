@@ -34,6 +34,7 @@ const topArticles = [
 export default function HeroSection() {
   return (
     <section className="relative flex flex-col items-center justify-center overflow-hidden pt-24 pb-16 md:pb-24 px-4">
+      
       <div className="absolute inset-0 .bg-\[radial-gradient\(ellipse_at_top\,_var\(--tw-gradient-stops\)\)\] {
  background-image: radial-gradient(ellipse at top, var(--tw-gradient-stops));
 } from-primary/10 via-transparent to-transparent pointer-events-none" />
