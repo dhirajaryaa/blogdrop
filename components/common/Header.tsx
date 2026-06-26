@@ -6,10 +6,17 @@ import Link from "next/link";
 async function Header() {
     const user = await getCurrentUser();
 
-    const navLinks = [
+
+
+    const privateNavLinks = [
+        { label: "My Feed", href: "/feed" },
+        { label: "Explore", href: "/explore" },
+        { label: "Bookmarks", href: "/bookmark" },
+    ]
+
+    const publicNavLinks = [
         { label: "Features", href: "#features" },
         { label: "Sources", href: "#sources" },
-        { label: "My Feed", href: "/feed" },
     ]
 
     return (
@@ -18,14 +25,19 @@ async function Header() {
                 <div className="flex gap-4 items-center flex-1">
                     <Logo />
                     <nav className="hidden md:flex items-center gap-4 ml-4">
-                        {!user && (
-                            <>
-                                <Link href="#features" className="text-base text-muted-foreground hover:text-foreground transition-colors">Features</Link>
-                                <Link href="#sources" className="text-base text-muted-foreground hover:text-foreground transition-colors">Sources</Link>
-                            </>
-                        )}
-
-                        {user && <Link href="/feed" className="text-base text-muted-foreground hover:text-foreground transition-colors">My Feed</Link>}
+                        {
+                            user ? (
+                                privateNavLinks.map((link, index) => (
+                                    <Link key={`${link.href}-${index}`} href={link.href} className={`text-base text-muted-foreground hover:text-foreground/80 transition-colors`}>
+                                        {link.label}
+                                    </Link>))
+                            ) : (
+                                publicNavLinks.map((link, index) => (
+                                    <Link key={`${link.href}-${index}`} href={link.href} className={`text-base text-muted-foreground hover:text-foreground/80 transition-colors`}>
+                                        {link.label}
+                                    </Link>))
+                            )
+                        }
                     </nav>
                 </div>
                 <UserProfile />
