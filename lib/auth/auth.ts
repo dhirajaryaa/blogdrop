@@ -9,6 +9,12 @@ export const auth = betterAuth({
     }),
     user: {
         additionalFields: {
+            onboarded: {
+                type: "boolean",
+                required: true,
+                input: false,
+                defaultValue: false
+            },
             about: {
                 type: "string",
                 required: false,
@@ -35,7 +41,7 @@ export const auth = betterAuth({
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }
     },
-       logger: {
+    logger: {
         level: "debug",
     },
 });
