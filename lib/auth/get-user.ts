@@ -1,22 +1,26 @@
 "use server";
 
-import { headers } from "next/headers";
 import { auth } from "./auth";
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
-export const ensureAuthUser = async () => {
+export async function getCurrentUser() {
     const session = await auth.api.getSession({
-        headers: await headers()
+        headers: await headers(),
     });
 
-    if (!session?.user) {
-       redirect("/login")
-    };
+    return session?.user;
+};
 
-    if (!session.user.onboarded) {
-        redirect("/app/onboarding")
+
+export async function ensureAuthUser() {
+    const user = await getCurrentUser();
+
+    if (!user) redirect("/login");
+
+    if (!user.onboarded) {
+        redirect("/onboarding");
     }
 
-    return session.user;
-
-}
+    return user;
+};

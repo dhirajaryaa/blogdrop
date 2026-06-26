@@ -18,12 +18,20 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import { useRouter } from "next/navigation";
 
 function UserProfile() {
   const { data: session, isPending } = authClient.useSession();
+  const router = useRouter();
 
   const handleLogout = async () => {
-    await authClient.signOut();
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.refresh();
+        },
+      },
+    });
   };
 
 
@@ -55,8 +63,8 @@ function UserProfile() {
                 <DropdownMenuSeparator />
                 <DropdownMenuItem asChild>
                   <Button onClick={handleLogout} variant={"destructive"} className="w-full">
-                  <IconLogout />
-                  Sign Out
+                    <IconLogout />
+                    Sign Out
                   </Button>
                 </DropdownMenuItem>
               </DropdownMenuContent>

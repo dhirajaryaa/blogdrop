@@ -1,7 +1,10 @@
+import { getCurrentUser } from "@/lib/auth/get-user";
 import Logo from "./Logo";
 import UserProfile from "./UserProfile";
+import Link from "next/link";
 
-function Header() {
+async function Header() {
+    const user = await getCurrentUser();
 
     const navLinks = [
         { label: "Features", href: "#features" },
@@ -15,15 +18,14 @@ function Header() {
                 <div className="flex gap-4 items-center flex-1">
                     <Logo />
                     <nav className="hidden md:flex items-center gap-4 ml-4">
-                        {navLinks.map((link) => (
-                            <a
-                                key={link.href}
-                                href={link.href}
-                                className="text-base text-muted-foreground hover:text-foreground transition-colors"
-                            >
-                                {link.label}
-                            </a>
-                        ))}
+                        {!user && (
+                            <>
+                                <Link href="#features" className="text-base text-muted-foreground hover:text-foreground transition-colors">Features</Link>
+                                <Link href="#sources" className="text-base text-muted-foreground hover:text-foreground transition-colors">Sources</Link>
+                            </>
+                        )}
+
+                        {user && <Link href="/feed" className="text-base text-muted-foreground hover:text-foreground transition-colors">My Feed</Link>}
                     </nav>
                 </div>
                 <UserProfile />

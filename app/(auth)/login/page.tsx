@@ -1,9 +1,11 @@
 import type { Metadata } from "next"
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton"
-import { IconBrandTabler } from "@tabler/icons-react"
-import { ensureAuthUser } from "@/lib/auth/get-user";
+import { IconArrowLeft, IconBrandTabler } from "@tabler/icons-react"
+import { getCurrentUser } from "@/lib/auth/get-user";
 import { redirect } from "next/navigation";
 import { authCallbackPath } from "@/config/constant";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
 
 export const metadata: Metadata = {
   title: "Login — BlogDrop",
@@ -19,14 +21,17 @@ export const metadata: Metadata = {
 }
 
 export default async function LoginPage() {
-  const user = await ensureAuthUser();
+  const user = await getCurrentUser();
 
-  if(user){
+  if (user) {
     redirect(authCallbackPath);
   };
 
   return (
     <main className="flex-1 flex items-center justify-center px-4">
+      <Link href={"/"} className={buttonVariants({ variant: "secondary", className: "rounded-lg absolute top-2 left-2" })}>
+    <IconArrowLeft/> Back
+      </Link>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="flex justify-center">

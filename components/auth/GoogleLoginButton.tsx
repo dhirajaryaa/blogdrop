@@ -11,10 +11,10 @@ export default function GoogleLoginButton() {
 
   const handleLogin = async () => {
     setLoading(true);
-    await authClient.signIn.social({ provider: "google", callbackURL: authCallbackPath },{
-      onError:(err)=>{
+    await authClient.signIn.social({ provider: "google", callbackURL: authCallbackPath }, {
+      onError: (err) => {
         toast.error("Login Failed! Try Again");
-        console.error("Login Error:",err);
+        console.error("Login Error:", err);
       }
     })
     setLoading(false);

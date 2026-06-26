@@ -1,6 +1,8 @@
-import React from 'react'
+import { ensureAuthUser } from '@/lib/auth/get-user'
 
-function FeedPage() {
+async function FeedPage() {
+  await ensureAuthUser()
+  
   return (
     <div>
       feed page

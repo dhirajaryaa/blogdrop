@@ -33,8 +33,8 @@ const topArticles = [
 
 export default function HeroSection() {
   return (
-    <section className="relative flex flex-col items-center justify-center overflow-hidden pt-24 pb-16 md:pb-24 px-4">
-      
+    <section className="relative flex flex-col items-center justify-center overflow-hidden  py-16 md:pb-24 px-4">
+
       <div className="absolute inset-0 .bg-\[radial-gradient\(ellipse_at_top\,_var\(--tw-gradient-stops\)\)\] {
  background-image: radial-gradient(ellipse at top, var(--tw-gradient-stops));
 } from-primary/10 via-transparent to-transparent pointer-events-none" />
@@ -115,8 +115,8 @@ export default function HeroSection() {
                   <div
                     key={item.label}
                     className={`flex items-center gap-2.5 px-3 py-2 rounded-lg text-sm transition-colors ${item.active
-                        ? "bg-primary/10 text-primary font-medium"
-                        : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
+                      ? "bg-primary/10 text-primary font-medium"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
                       }`}
                   >
                     <item.icon className="size-4" />
