@@ -4,7 +4,7 @@ const githubRepoLink = `https://github.com/dhirajaryaa/blogdrop`
 
 const twitterLink = `https://x.com/dhirajarya01`
 
-const authCallbackPath = '/app'
+const authCallbackPath = '/app/feed'
 
 
 export { earlyAccessFormLink, githubRepoLink,twitterLink,authCallbackPath }

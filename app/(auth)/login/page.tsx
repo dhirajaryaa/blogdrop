@@ -1,6 +1,9 @@
 import type { Metadata } from "next"
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton"
 import { IconBrandTabler } from "@tabler/icons-react"
+import { ensureAuthUser } from "@/lib/auth/get-user";
+import { redirect } from "next/navigation";
+import { authCallbackPath } from "@/config/constant";
 
 export const metadata: Metadata = {
   title: "Login — BlogDrop",
@@ -15,7 +18,13 @@ export const metadata: Metadata = {
   },
 }
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const user = await ensureAuthUser();
+
+  if(user){
+    redirect(authCallbackPath);
+  };
+
   return (
     <main className="flex-1 flex items-center justify-center px-4">
       <div className="w-full max-w-md space-y-8">

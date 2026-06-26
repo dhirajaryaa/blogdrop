@@ -10,8 +10,12 @@ export const ensureAuthUser = async () => {
     });
 
     if (!session?.user) {
-        redirect("/login")
+       redirect("/login")
     };
+
+    if (!session.user.onboarded) {
+        redirect("/app/onboarding")
+    }
 
     return session.user;
 
