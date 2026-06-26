@@ -69,8 +69,7 @@ export default function RootLayout({
           enableSystem={false}
           forcedTheme="dark"
         >
-          <Navbar />
-          <main className="flex-1">{children}</main>
+          {children}
           <Toaster richColors closeButton position="top-right" />
         </ThemeProvider>
       </body>

@@ -8,10 +8,13 @@ import FeaturesGrid from "@/components/home/FeaturesGrid";
 import Testimonials from "@/components/home/Testimonials";
 import FinalCTA from "@/components/home/FinalCTA";
 import Footer from "@/components/home/Footer";
+import Navbar from "@/components/common/Navbar";
 
 export default function Home() {
   return (
     <>
+    <Navbar />
+    <main className="flex-1">
       <HeroSection />
       <TrustedSources />
       <ProblemSection />
@@ -22,6 +25,7 @@ export default function Home() {
       <Testimonials />
       <FinalCTA />
       <Footer />
+    </main>
     </>
   );
 }
