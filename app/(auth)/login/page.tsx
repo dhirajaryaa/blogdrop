@@ -1,11 +1,40 @@
-import React from 'react'
+import type { Metadata } from "next"
+import GoogleLoginButton from "@/components/auth/GoogleLoginButton"
+import { IconBrandTabler } from "@tabler/icons-react"
 
-function LoginPage() {
-  return (
-    <div>
-      login page
-    </div>
-  )
+export const metadata: Metadata = {
+  title: "Login — BlogDrop",
+  description: "Sign in to BlogDrop with your Google account to access your personalized engineering blog feed.",
+  openGraph: {
+    title: "Login — BlogDrop",
+    description: "Sign in to BlogDrop with your Google account.",
+  },
+  twitter: {
+    title: "Login — BlogDrop",
+    description: "Sign in to BlogDrop with your Google account.",
+  },
 }
 
-export default LoginPage
+export default function LoginPage() {
+  return (
+    <main className="flex-1 flex items-center justify-center px-4">
+      <div className="w-full max-w-md space-y-8">
+        <div className="text-center space-y-2">
+          <div className="flex justify-center">
+            <div className="size-12 rounded-xl bg-linear-to-br from-primary to-primary/50 flex items-center justify-center shadow-lg">
+              <IconBrandTabler className="size-7 text-white" />
+            </div>
+          </div>
+          <h1 className="text-2xl font-bold tracking-tight">Welcome to BlogDrop</h1>
+          <p className="text-sm text-muted-foreground">
+            Sign in to follow engineering blogs from Netflix, Stripe, Uber, and more.
+          </p>
+        </div>
+        <GoogleLoginButton />
+        <p className="text-xs text-center text-muted-foreground">
+          By continuing, you agree to BlogDrop&apos;s Terms of Service and Privacy Policy.
+        </p>
+      </div>
+    </main>
+  )
+}

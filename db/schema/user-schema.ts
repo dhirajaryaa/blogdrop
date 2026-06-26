@@ -8,6 +8,7 @@ export const user = pgTable("user", {
     image: text("image"),
 
     about: text("about"),
+    onboarded : boolean("onboarded").default(false),
     userInterests: text("user_interest").array(),
     experienceLevel: text("experience_level").default("mid"), // [ junior / mid / senior]
 
