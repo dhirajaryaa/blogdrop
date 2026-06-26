@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { authClient } from "@/lib/auth-client"
+import { authClient } from "@/lib/auth/auth-client"
 import { Button } from "@/components/ui/button"
 import { authCallbackPath } from "@/config/constant"
 import { toast } from "sonner"
