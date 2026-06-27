@@ -1,11 +1,18 @@
-import React from 'react'
+import { OnboardingForm } from "@/components/onboard/onboarding-form";
+import { getCurrentUser } from "@/lib/auth/get-user";
+import { redirect } from "next/navigation";
 
-function OnBoardingPage() {
+async function OnboardingPage() {
+  const user = await getCurrentUser();
+
+  if (!user) redirect("/login")
+  if (user.onboarded) redirect("/feed");
+
   return (
-    <div>
-      i am onboarding
+    <div className="max-w-2xl mx-auto py-8">
+      <OnboardingForm />
     </div>
   )
 }
 
-export default OnBoardingPage
+export default OnboardingPage;
