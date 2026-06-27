@@ -139,10 +139,6 @@
   }
 }
 
-html {
-  scroll-behavior: smooth;
-}
-
 ::selection {
   background: var(--primary) / 0.3;
 }
