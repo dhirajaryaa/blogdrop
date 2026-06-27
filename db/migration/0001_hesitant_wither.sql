@@ -1,0 +1,1 @@
+ALTER TABLE "article" ADD CONSTRAINT "article_original_url_unique" UNIQUE("original_url");

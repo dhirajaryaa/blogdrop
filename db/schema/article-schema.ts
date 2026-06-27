@@ -4,7 +4,7 @@ import { source } from "./source-schema";
 export const article = pgTable("article", {
     id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
-    originalUrl: text("original_url").notNull(),
+    originalUrl: text("original_url").notNull().unique(),
     sourceId: uuid("source_id")
         .notNull()
         .references(() => source.id),
