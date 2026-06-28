@@ -54,13 +54,17 @@ function UserProfile() {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" >
                   <DropdownMenuGroup>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={"/profile"}>
                       <IconUser />
                       Profile
+                      </Link>
                     </DropdownMenuItem>
-                    <DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link href={"/settings"}> 
                       <IconSettings />
                       Settings
+                      </Link>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
