@@ -392,7 +392,7 @@ export const MVP_SOURCES = [
         id: "supabase-blog",
         name: "Supabase Blog",
         category: "infrastructure",
-        rssUrl: "https://supabase.com/blog/rss.xml",
+        rssUrl: "https://supabase.com/rss.xml",
         sitemapUrl: "https://supabase.com/sitemap.xml",
         siteUrl: "https://supabase.com/blog",
         priority: 10
@@ -1393,7 +1393,7 @@ export const VERIFIED_SOURCES: InputSource[] = [
         id: "supabase-blog",
         name: "Supabase Blog",
         category: "infrastructure",
-        rssUrl: "https://supabase.com/blog/rss.xml",
+        rssUrl: "https://supabase.com/rss.xml",
         sitemapUrl: "https://supabase.com/sitemap.xml",
         siteUrl: "https://supabase.com/blog",
         priority: 10
