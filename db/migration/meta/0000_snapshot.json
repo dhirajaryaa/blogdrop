@@ -1,5 +1,5 @@
 {
-  "id": "6907636d-14a8-46e2-b082-15f9fdc1c474",
+  "id": "f5299a10-8ad5-43ae-b0db-48c040f9f124",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -559,7 +559,7 @@
         },
         "content": {
           "name": "content",
-          "type": "varchar(5000)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "default": "''"
@@ -598,7 +598,53 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "article_source_idx": {
+          "name": "article_source_idx",
+          "columns": [
+            {
+              "expression": "source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "article_published_idx": {
+          "name": "article_published_idx",
+          "columns": [
+            {
+              "expression": "public_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "article_url_idx": {
+          "name": "article_url_idx",
+          "columns": [
+            {
+              "expression": "original_url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "article_source_id_source_id_fk": {
           "name": "article_source_id_source_id_fk",
@@ -615,7 +661,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "article_original_url_unique": {
+          "name": "article_original_url_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "original_url"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

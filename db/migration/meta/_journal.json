@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1782523639514,
-      "tag": "0000_strong_chameleon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1782603102085,
-      "tag": "0001_hesitant_wither",
+      "when": 1782698571602,
+      "tag": "0000_wooden_weapon_omega",
       "breakpoints": true
     }
   ]

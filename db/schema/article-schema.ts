@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, varchar, timestamp, jsonb } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex } from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
 
 export const article = pgTable("article", {
@@ -8,13 +8,19 @@ export const article = pgTable("article", {
     sourceId: uuid("source_id")
         .notNull()
         .references(() => source.id),
-    content: varchar("content", { length: 5000 }).default(""),
+    content: text("content").default(""),
     author: text("author").notNull(),
     publicAt: text("public_at").notNull(),
     imageUrl: text("image_url").default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
-});
+},
+
+    (table) => [
+        index("article_source_idx").on(table.sourceId),
+        index("article_published_idx").on(table.publicAt),
+        uniqueIndex("article_url_idx").on(table.originalUrl),
+    ]);
 
 
 export const articleMetaData = pgTable("article_metadata", {
