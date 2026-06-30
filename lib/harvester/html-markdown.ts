@@ -1,15 +1,31 @@
-import TurndownService from "turndown";
+import { unified } from 'unified';
+import rehypeParse from 'rehype-parse';
+import rehypeRemark from 'rehype-remark';
+import remarkGfm from 'remark-gfm';
+import remarkStringify from 'remark-stringify';
+import rehypeMinifyWhitespace from 'rehype-minify-whitespace';
+import * as cheerio from 'cheerio';
 
-export function convertHtmlToMarkDown(html: string) {
-    try {
-        if (!html) return null;
+export async function convertHtmlToMarkdown(html: string, cleanTags = 'script, style, noscript, iframe, footer, header, nav, head') {
+    // Step 1: remove tags we don't want in the output
+    const $ = cheerio.load(html);
+    $(cleanTags).remove();
+    const cleanedHtml = $('body').html();
+    if (!cleanedHtml) return null;
 
-        const turndownService = new TurndownService();
+    // Step 2: run through the unified pipeline
+    const result = await unified()
+        .use(rehypeParse)
+        .use(rehypeMinifyWhitespace) // <-- this is the critical step
+        .use(rehypeRemark)
+        .use(remarkStringify)
+        .use(remarkGfm)
+        .process(cleanedHtml);
 
-        return turndownService.turndown(html);
+    // Step 3: collect metadata [optional]
+    const title = $("title").text();
+    const author = $('meta[name="author"]').attr("content");
+    const image = $('meta[property="og:image"]').attr("content");
 
-    } catch (error) {
-        console.error("Convert Html To MarkDown Error:", error);
-        return null;
-    }
+    return { markdown: String(result).trim(), title, author, image }
 };

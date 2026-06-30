@@ -22,6 +22,7 @@ export const feedProcess = inngest.createFunction({
             pubDate: item.pubDate ?? "",
         })).filter((item) => item.link !== "")
     });
+    
     //? step2 : all rss returned articles save in database
     const savedArticles = await step.run("save-articles", async () => {
         return await db

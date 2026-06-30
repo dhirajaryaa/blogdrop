@@ -1,11 +1,10 @@
 import { JSDOM } from "jsdom";
 import { Readability } from "@mozilla/readability";
 
-
+// main readability 
 export function extractArticleContent({ url, html }: { url: string, html: string }) {
-
-    // create jsdom create document 
     try {
+        // Create a JSDOM document from the HTML
         const dom = new JSDOM(html, {
             url: url,
             contentType: "text/html",
@@ -13,23 +12,33 @@ export function extractArticleContent({ url, html }: { url: string, html: string
 
         const document = dom.window.document;
 
-        //? remove unwanted elements first
-        const UNWANTED_SELECTORS = "script,style,noscript,iframe,svg,canvas,header,footer,nav,aside,form,button,input,select,textarea,dialog,menu,.ads,.advertisement,.ad,.banner,.popup,.modal,.social-share,.share-buttons,.newsletter,.comments,.related-posts,.recommended,.sidebar,.breadcrumbs";
+        // Optional: Clean unwanted elements first
+        const unwantedElements = document.querySelectorAll(
+            "script, style, noscript, iframe, footer, header, nav, .advertisement, .sidebar, .menu"
+        );
+        unwantedElements.forEach((element) => element.remove());
 
-        document.querySelectorAll(UNWANTED_SELECTORS).forEach((el) => el.remove());
-
-
-        // use readability 
+        // Use Readability to extract article content
         const reader = new Readability(document);
         const article = reader.parse();
 
-        if (!article) return null;
+        if (!article) {
+            return null;
+        }
 
-        return article;
-
+        return {
+            title: article.title || "",
+            content: article.content || "",
+            textContent: article.textContent || "",
+            length: article.length || 0,
+            excerpt: article.excerpt || "",
+            byline: article.byline || "",
+            dir: article.dir || "",
+            siteName: article.siteName || "",
+            lang: article.lang || "",
+        };
     } catch (error) {
-        console.error("Extract Article Content Error", error);
+        console.error("Error extracting article content:", error);
         return null;
     }
-
-}
+};

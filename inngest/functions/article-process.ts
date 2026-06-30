@@ -3,10 +3,11 @@ import { inngest } from "../client";
 import { article } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { extractArticleContent } from "@/lib/harvester/extract-article";
-import { convertHtmlToMarkDown } from "@/lib/harvester/html-markdown";
+import { convertHtmlToMarkdown } from "@/lib/harvester/html-markdown";
+
 
 export const articleProcessing = inngest.createFunction({
-    id: "article-processing", concurrency: 5, triggers: ({ event: "article/process" })
+    id: "article-processing", concurrency: 20, triggers: ({ event: "article/process" })
 }
     , async ({ step, event }) => {
 
@@ -15,34 +16,40 @@ export const articleProcessing = inngest.createFunction({
         if (!sourceArticle) return { error: "article not found" };
 
         //? step 1: fetch the article in text;
-        const articleHtml = await step.fetch(sourceArticle.originalUrl);
+        const response = await step.fetch(sourceArticle.originalUrl);
 
         //? step 2: readability js parse
         const articleData = await step.run("extract-article-form-link", async () => {
-            const html = await articleHtml.text();
+            const articleHtml = await response.text();
 
-            return extractArticleContent({ html, url: sourceArticle.originalUrl });
+            if (!articleHtml) return null;
 
-        })
+            return extractArticleContent({ html: articleHtml, url: sourceArticle.originalUrl });
+        });
 
         //? step 3: article html to markdown [so low token on AI gen]
         const processingRequired = await step.run("convert-html-to-markdown", async () => {
 
-            if (!articleData) { error: "failed to extract article" }
+            if (!articleData) return null;
 
-            const markdown = convertHtmlToMarkDown(articleData?.content ?? "")?.replace(/\n{3,}/g, "\n\n");
+            const data = await convertHtmlToMarkdown(articleData.content);
+
+            if (!data) return null;
 
             // save to db 
-
             return await db.update(article).set({
-                content: markdown,
-                author: articleData?.byline ?? article.author
+                content: data.markdown,
+                author: articleData?.byline ?? data.author,
+                imageUrl: data.image
             })
                 .where(eq(article.id, sourceArticle.id))
                 .returning({ id: article.id })
         })
 
         //? step 4: article meta data generation [function] so rate-limit after retry auto
+
+        if (!processingRequired) return { eventId: event.id, error: "article processing failed!" };
+
         await step.sendEvent(
             "ai-article-processing",
             processingRequired.map((article) => ({
@@ -51,8 +58,7 @@ export const articleProcessing = inngest.createFunction({
                     articleId: article.id,
                 },
             }))
-        )
-
+        );
 
         return { eventId: event.id, task: "article/process" };
 
