@@ -12,10 +12,12 @@ export function extractArticleContent({ url, html }: { url: string, html: string
 
         const document = dom.window.document;
 
-        const image = document
-            .querySelector("meta[property='og:image']")
-            ?.getAttribute("content");
-      
+        const image = document.querySelector("meta[property='og:image']")
+            ?.getAttribute("content") ||
+            document
+                .querySelector("meta[name='twitter:image']")
+                ?.getAttribute("content");
+
         // Optional: Clean unwanted elements first
         const unwantedElements = document.querySelectorAll(
             "script, style, noscript, img, iframe, footer, header, nav, .advertisement, .sidebar, .menu"

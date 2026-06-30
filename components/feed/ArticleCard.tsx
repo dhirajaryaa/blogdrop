@@ -17,7 +17,7 @@ function ArticleCard({ article }: { article: Article }) {
           rel="noopener noreferrer"
           className="block overflow-hidden"
         >
-          <div className="relative aspect-[16/9] w-full">
+          <div className="relative aspect-video w-full">
             <Image
               src={article.image}
               alt={article.title}

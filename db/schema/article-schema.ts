@@ -27,7 +27,6 @@ export const articleMetaData = pgTable("article_metadata", {
     id: uuid("id").primaryKey().defaultRandom(),
     articleId: uuid("article_id")
         .notNull()
-        .unique()
         .references(() => article.id, {
             onDelete: "cascade",
         }),
