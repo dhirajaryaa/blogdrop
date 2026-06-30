@@ -20,6 +20,7 @@ export async function getArticles() {
       originalUrl: article.originalUrl,
       author: article.author,
       publicAt: article.publicAt,
+      image: article.imageUrl,
       sourceName: source.title,
       sourceSiteUrl: source.siteUrl,
       summary: articleMetaData.summary,

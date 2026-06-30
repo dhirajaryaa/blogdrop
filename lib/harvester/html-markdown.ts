@@ -5,15 +5,10 @@ import remarkGfm from 'remark-gfm';
 import remarkStringify from 'remark-stringify';
 import rehypeMinifyWhitespace from 'rehype-minify-whitespace';
 import * as cheerio from 'cheerio';
-import { extractBannerImage } from './extract-img';
 
 export async function convertHtmlToMarkdown(html: string, cleanTags = 'script, style, noscript, iframe, footer, header, nav, head') {
     // Step 1: remove tags we don't want in the output
     const $ = cheerio.load(html);
-
-    // Extract banner image first
-    const bannerImage = extractBannerImage($);
-
     // Remove unwanted tags
     $(cleanTags).remove();
 
@@ -33,5 +28,5 @@ export async function convertHtmlToMarkdown(html: string, cleanTags = 'script, s
     const title = $("title").text();
     const author = $('meta[name="author"]').attr("content");
 
-    return { markdown: String(result).trim(), title, author, image:bannerImage }
+    return { markdown: String(result).trim(), title, author }
 };

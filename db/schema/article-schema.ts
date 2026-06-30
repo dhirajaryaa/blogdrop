@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique } from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
 
 export const article = pgTable("article", {
@@ -27,13 +27,18 @@ export const articleMetaData = pgTable("article_metadata", {
     id: uuid("id").primaryKey().defaultRandom(),
     articleId: uuid("article_id")
         .notNull()
-        .references(() => article.id, { onDelete: "cascade" }),
-    summary: text("summary").default(""),
-    tags: jsonb("tags").$type<string[]>().default([]),
-    keyTakeaways: jsonb("key_takeaways").$type<string[]>().default([]),
+        .unique()
+        .references(() => article.id, {
+            onDelete: "cascade",
+        }),
+    summary: text("summary"),
+    tags: jsonb("tags").$type<string[]>().default([]).notNull(),
+    keyTakeaways: jsonb("key_takeaways").$type<string[]>().default([]).notNull(),
     difficulty: text("difficulty").default("junior"), //[junior / mid / senior]
-    whyRead: text("why_read").default(""),
-    readingTime: text("reading_time").default("2"), // in minutes
+    whyRead: text("why_read"),
+    readingTime: integer("reading_time").default(2), // in minutes
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
-});
+}, ((table) => [
+    unique("article_metadata_article_id_unique").on(table.articleId),
+]));

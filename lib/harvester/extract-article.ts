@@ -12,9 +12,13 @@ export function extractArticleContent({ url, html }: { url: string, html: string
 
         const document = dom.window.document;
 
+        const image = document
+            .querySelector("meta[property='og:image']")
+            ?.getAttribute("content");
+      
         // Optional: Clean unwanted elements first
         const unwantedElements = document.querySelectorAll(
-            "script, style, noscript, iframe, footer, header, nav, .advertisement, .sidebar, .menu"
+            "script, style, noscript, img, iframe, footer, header, nav, .advertisement, .sidebar, .menu"
         );
         unwantedElements.forEach((element) => element.remove());
 
@@ -36,6 +40,7 @@ export function extractArticleContent({ url, html }: { url: string, html: string
             dir: article.dir || "",
             siteName: article.siteName || "",
             lang: article.lang || "",
+            image
         };
     } catch (error) {
         console.error("Error extracting article content:", error);
