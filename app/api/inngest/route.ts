@@ -1,4 +1,4 @@
-import { articleProcessing, feedProcess, refreshAllSource } from "@/inngest/functions";
+import { articleAIProcessing, articleProcessing, feedProcess, refreshAllSource } from "@/inngest/functions";
 import { inngest } from "../../../inngest/client";
 import { serve } from "inngest/next";
 
@@ -7,6 +7,7 @@ export const { GET, POST, PUT } = serve({
     functions: [
         refreshAllSource,
         feedProcess,
-        articleProcessing
+        articleProcessing,
+        articleAIProcessing
     ],
 });
