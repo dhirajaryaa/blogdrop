@@ -1,8 +1,8 @@
 "use server"
 
 import { db } from "@/db"
-import { article, articleMetaData, source } from "@/db/schema"
-import { and, desc, eq } from "drizzle-orm"
+import { article, articleMetaData, source, user } from "@/db/schema"
+import { and, desc, eq, sql } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 
@@ -13,9 +13,26 @@ export async function getArticles() {
 
   if (!session?.user) return []
 
+  const [currentUser] = await db
+    .select({ userInterests: user.userInterests })
+    .from(user)
+    .where(eq(user.id, session.user.id))
+    .limit(1)
+
+  const userInterests = currentUser?.userInterests ?? []
+
+  const conditions = [eq(article.status, "completed")]
+
+  if (userInterests.length > 0) {
+    conditions.push(
+      sql`EXISTS (SELECT 1 FROM jsonb_array_elements_text(${articleMetaData.tags}) tag WHERE tag = ANY(ARRAY[${sql.join(userInterests.map((i) => sql`${i}`), sql`, `)}]))`
+    )
+  }
+
   const rows = await db
     .select({
       id: article.id,
+      slug: article.slug,
       title: article.title,
       originalUrl: article.originalUrl,
       author: article.author,
@@ -28,8 +45,9 @@ export async function getArticles() {
       difficulty: articleMetaData.difficulty,
     })
     .from(article)
-    .leftJoin(source, and(eq(article.sourceId, source.id), eq(article.status, "completed")))
+    .leftJoin(source, eq(article.sourceId, source.id))
     .leftJoin(articleMetaData, eq(article.id, articleMetaData.articleId))
+    .where(and(...conditions))
     .orderBy(desc(article.publicAt))
     .limit(50)
 

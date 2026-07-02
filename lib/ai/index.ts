@@ -9,7 +9,7 @@ export const metadataSchema = z.object({
     summary: z.string(),
     tags: z.array(z.string()),
     keyTakeaways: z.array(z.string()),
-    whyRead: z.string(),
+    whyRead: z.string().nullable(),
     difficulty: z.enum(["junior", "mid", "senior"]),
 });
 
