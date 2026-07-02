@@ -3,8 +3,9 @@ import { inngest } from "../client";
 import { article, articleMetaData } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { aiGeneration } from "@/lib/ai";
+import { calculateReadingTime } from "@/lib/harvester/reading-time";
 
-export const articleAIProcessing = inngest.createFunction({ id: "ai-article-processing", triggers: { event: "article/ai-processing" } }, async ({ step, event }) => {
+export const articleAIProcessing = inngest.createFunction({ id: "ai-article-processing", concurrency: 1, triggers: { event: "article/ai-processing" } }, async ({ step, event }) => {
 
     const [sourceArticle] = await db.select().from(article).where(eq(article.id, event.data.articleId));
 
@@ -24,13 +25,20 @@ export const articleAIProcessing = inngest.createFunction({ id: "ai-article-proc
     //? step 2: save metadata on db [status later on Addon ] 
     await step.run("save-metadata", async () => {
 
-        await db.insert(articleMetaData).values({
-            articleId: sourceArticle.id,
-            summary: metadata.summary,
-            tags: metadata.tags,
-            keyTakeaways: metadata.keyTakeaways,
-            difficulty: metadata.difficulty,
-            whyRead: metadata.whyRead
+
+        return await db.transaction(async (tx) => {
+
+            await tx.insert(articleMetaData).values({
+                articleId: sourceArticle.id,
+                summary: metadata.summary,
+                tags: metadata.tags,
+                keyTakeaways: metadata.keyTakeaways,
+                difficulty: metadata.difficulty,
+                whyRead: metadata.whyRead,
+                readingTime: calculateReadingTime(sourceArticle.content ?? "")
+            });
+
+            await tx.update(article).set({ author: metadata.author }).where(eq(article.id, sourceArticle.id))
         });
 
     })

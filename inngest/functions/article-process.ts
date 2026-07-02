@@ -18,6 +18,16 @@ export const articleProcessing = inngest.createFunction({
         //? step 1: fetch the article in text;
         const response = await step.fetch(sourceArticle.originalUrl);
 
+        if (response.status === 429) {
+            await step.sleep("wait-to-retry", "1m");
+
+            throw new Error("Rate-Limit-hilted");
+        }
+
+        if (response.status === 404) {
+            return null;
+        };
+
         //? step 2: readability js parse
         const articleData = await step.run("extract-article-form-link", async () => {
             const articleHtml = await response.text();
