@@ -1,6 +1,5 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
 import { ProfileForm } from "@/components/profile/ProfileForm"
-import { IconUser } from "@tabler/icons-react"
 
 async function ProfilePage() {
     const user = await ensureAuthUser()

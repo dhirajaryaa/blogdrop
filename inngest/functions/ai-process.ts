@@ -34,11 +34,11 @@ export const articleAIProcessing = inngest.createFunction({ id: "ai-article-proc
                 tags: metadata.tags,
                 keyTakeaways: metadata.keyTakeaways,
                 difficulty: metadata.difficulty,
-                whyRead: metadata.whyRead,
+                whyRead: metadata.whyRead ?? "",
                 readingTime: calculateReadingTime(sourceArticle.content ?? "")
             });
 
-            await tx.update(article).set({ author: metadata.author,status:"completed" }).where(eq(article.id, sourceArticle.id))
+            await tx.update(article).set({ author: metadata.author ?? article.author, status: "completed" }).where(eq(article.id, sourceArticle.id))
         });
 
     })
