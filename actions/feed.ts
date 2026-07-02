@@ -2,7 +2,7 @@
 
 import { db } from "@/db"
 import { article, articleMetaData, source } from "@/db/schema"
-import { desc, eq } from "drizzle-orm"
+import { and, desc, eq } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 
@@ -28,7 +28,7 @@ export async function getArticles() {
       difficulty: articleMetaData.difficulty,
     })
     .from(article)
-    .leftJoin(source, eq(article.sourceId, source.id))
+    .leftJoin(source, and(eq(article.sourceId, source.id), eq(article.status, "completed")))
     .leftJoin(articleMetaData, eq(article.id, articleMetaData.articleId))
     .orderBy(desc(article.publicAt))
     .limit(50)
