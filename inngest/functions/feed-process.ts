@@ -2,6 +2,7 @@ import { db } from "@/db";
 import { inngest } from "../client";
 import Parser from "rss-parser"
 import { article } from "@/db/schema";
+import { randomUUID } from "node:crypto";
 
 export const feedProcess = inngest.createFunction({
     id: "feed-process", concurrency: 20, triggers: { event: "feed/process" }
@@ -28,13 +29,27 @@ export const feedProcess = inngest.createFunction({
         return await db
             .insert(article)
             .values(
-                articles.map((item) => ({
+                articles.map((item) => {
+                    const slug =
+                        item.title
+                            .toLowerCase()
+                            .trim()
+                            .replace(/[^\w\s-]/g, "")
+                            .replace(/\s+/g, "-")
+                            .replace(/-+/g, "-")
+                            .slice(0, 30)
+                            .replace(/-$/, "") +
+                        "-" +
+                        randomUUID().slice(0, 6);
+
+                    return{
                     title: item.title,
                     originalUrl: item.link,
                     author: item.author,
                     publicAt: item.pubDate,
                     sourceId: source.id,
-                }))
+                    slug: slug
+                }})
             )
             .onConflictDoNothing({
                 target: article.originalUrl

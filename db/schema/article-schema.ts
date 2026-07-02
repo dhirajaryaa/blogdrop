@@ -1,5 +1,11 @@
-import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
+
+export const articleStatusEnum = pgEnum("article_status", [
+    "pending",      // RSS se mila, process nahi hua
+    "processing",   // Harvester/AI pipeline chal rahi hai
+    "completed",    // Successfully process ho gaya 
+]);
 
 export const article = pgTable("article", {
     id: uuid("id").primaryKey().defaultRandom(),
@@ -13,6 +19,8 @@ export const article = pgTable("article", {
     publicAt: text("public_at").notNull(),
     imageUrl: text("image_url").default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
+    status: articleStatusEnum().default("pending"),
+    slug: text("slug").notNull().unique(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 },
 

@@ -50,7 +50,8 @@ export const articleProcessing = inngest.createFunction({
             return await db.update(article).set({
                 content: data.markdown,
                 author: articleData?.byline ?? data.author,
-                imageUrl: articleData.image
+                imageUrl: articleData.image,
+                status: "processing"
             })
                 .where(eq(article.id, sourceArticle.id))
                 .returning({ id: article.id })

@@ -38,7 +38,7 @@ export const articleAIProcessing = inngest.createFunction({ id: "ai-article-proc
                 readingTime: calculateReadingTime(sourceArticle.content ?? "")
             });
 
-            await tx.update(article).set({ author: metadata.author }).where(eq(article.id, sourceArticle.id))
+            await tx.update(article).set({ author: metadata.author,status:"completed" }).where(eq(article.id, sourceArticle.id))
         });
 
     })
