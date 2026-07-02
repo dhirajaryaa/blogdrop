@@ -1,5 +1,6 @@
 import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
+import { relations } from "drizzle-orm";
 
 export const articleStatusEnum = pgEnum("article_status", [
     "pending",      // RSS se mila, process nahi hua
@@ -23,7 +24,6 @@ export const article = pgTable("article", {
     slug: text("slug").notNull().unique(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 },
-
     (table) => [
         index("article_source_idx").on(table.sourceId),
         index("article_published_idx").on(table.publicAt),
@@ -39,13 +39,22 @@ export const articleMetaData = pgTable("article_metadata", {
             onDelete: "cascade",
         }),
     summary: text("summary"),
-    tags: jsonb("tags").$type<string[]>().default([]).notNull(),
-    keyTakeaways: jsonb("key_takeaways").$type<string[]>().default([]).notNull(),
+    categories: text("categories").array().default([]),
+    tags: text("tags").array().default([]),
+    keyTakeaways: text("key_takeaways").array().default([]),
     difficulty: text("difficulty").default("junior"), //[junior / mid / senior]
-    whyRead: text("why_read"),
+    whyRead: text("why_read").default(""),
     readingTime: integer("reading_time").default(2), // in minutes
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 }, ((table) => [
     unique("article_metadata_article_id_unique").on(table.articleId),
 ]));
+
+// relation ship 
+export const articleRelations = relations(article, ({ one }) => ({
+    metadata: one(articleMetaData, {
+        fields: [article.id],
+        references: [articleMetaData.articleId]
+    })
+}))

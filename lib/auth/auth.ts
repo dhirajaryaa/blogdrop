@@ -15,18 +15,6 @@ export const auth = betterAuth({
                 input: false,
                 defaultValue: false
             },
-            about: {
-                type: "string",
-                required: false,
-                defaultValue: "",
-                input: false
-            },
-            userInterests: {
-                type: "string[]",
-                required: false,
-                defaultValue: [],
-                input: false
-            },
             experienceLevel: {
                 type: ["mid", "junior", "senior"],
                 required: true,
@@ -40,8 +28,5 @@ export const auth = betterAuth({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
         }
-    },
-    logger: {
-        level: "debug",
-    },
+    }
 });
