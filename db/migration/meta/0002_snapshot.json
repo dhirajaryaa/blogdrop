@@ -1,6 +1,6 @@
 {
-  "id": "f5299a10-8ad5-43ae-b0db-48c040f9f124",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "ccda3566-aac5-4020-b627-9a1873e73433",
+  "prevId": "e6796616-c198-4455-89a2-f6b6fd1db1b4",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -590,6 +590,20 @@
           "notNull": true,
           "default": "now()"
         },
+        "status": {
+          "name": "status",
+          "type": "article_status",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": false,
+          "default": "'pending'"
+        },
+        "slug": {
+          "name": "slug",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
         "updated_at": {
           "name": "updated_at",
           "type": "timestamp",
@@ -668,6 +682,13 @@
           "columns": [
             "original_url"
           ]
+        },
+        "article_slug_unique": {
+          "name": "article_slug_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "slug"
+          ]
         }
       },
       "policies": {},
@@ -695,21 +716,20 @@
           "name": "summary",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "default": "''"
+          "notNull": false
         },
         "tags": {
           "name": "tags",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'[]'::jsonb"
         },
         "key_takeaways": {
           "name": "key_takeaways",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'[]'::jsonb"
         },
         "difficulty": {
@@ -723,15 +743,14 @@
           "name": "why_read",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "default": "''"
+          "notNull": false
         },
         "reading_time": {
           "name": "reading_time",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "default": "'2'"
+          "default": 2
         },
         "created_at": {
           "name": "created_at",
@@ -765,7 +784,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "article_metadata_article_id_unique": {
+          "name": "article_metadata_article_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "article_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -781,6 +808,15 @@
         "done",
         "failed",
         "error"
+      ]
+    },
+    "public.article_status": {
+      "name": "article_status",
+      "schema": "public",
+      "values": [
+        "pending",
+        "processing",
+        "completed"
       ]
     }
   },

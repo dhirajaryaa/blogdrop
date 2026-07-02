@@ -1,6 +1,6 @@
 {
-  "id": "a6e06574-0b13-4704-a670-f1a6eead9e5b",
-  "prevId": "6907636d-14a8-46e2-b082-15f9fdc1c474",
+  "id": "e6796616-c198-4455-89a2-f6b6fd1db1b4",
+  "prevId": "f5299a10-8ad5-43ae-b0db-48c040f9f124",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -559,7 +559,7 @@
         },
         "content": {
           "name": "content",
-          "type": "varchar(5000)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false,
           "default": "''"
@@ -598,7 +598,53 @@
           "default": "now()"
         }
       },
-      "indexes": {},
+      "indexes": {
+        "article_source_idx": {
+          "name": "article_source_idx",
+          "columns": [
+            {
+              "expression": "source_id",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "article_published_idx": {
+          "name": "article_published_idx",
+          "columns": [
+            {
+              "expression": "public_at",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": false,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        },
+        "article_url_idx": {
+          "name": "article_url_idx",
+          "columns": [
+            {
+              "expression": "original_url",
+              "isExpression": false,
+              "asc": true,
+              "nulls": "last"
+            }
+          ],
+          "isUnique": true,
+          "concurrently": false,
+          "method": "btree",
+          "with": {}
+        }
+      },
       "foreignKeys": {
         "article_source_id_source_id_fk": {
           "name": "article_source_id_source_id_fk",
@@ -649,21 +695,20 @@
           "name": "summary",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "default": "''"
+          "notNull": false
         },
         "tags": {
           "name": "tags",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'[]'::jsonb"
         },
         "key_takeaways": {
           "name": "key_takeaways",
           "type": "jsonb",
           "primaryKey": false,
-          "notNull": false,
+          "notNull": true,
           "default": "'[]'::jsonb"
         },
         "difficulty": {
@@ -677,15 +722,14 @@
           "name": "why_read",
           "type": "text",
           "primaryKey": false,
-          "notNull": false,
-          "default": "''"
+          "notNull": false
         },
         "reading_time": {
           "name": "reading_time",
-          "type": "text",
+          "type": "integer",
           "primaryKey": false,
           "notNull": false,
-          "default": "'2'"
+          "default": 2
         },
         "created_at": {
           "name": "created_at",
@@ -719,7 +763,15 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "article_metadata_article_id_unique": {
+          "name": "article_metadata_article_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "article_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

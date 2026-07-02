@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button"
 import { userInterests } from "@/config/interest"
 import { toast } from "sonner"
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react"
-import { completeOnboarding } from "@/app/(private)/onboarding/actions"
+import { completeOnboarding } from "@/actions/onboarding"
 
 export function OnboardingForm() {
   const router = useRouter()

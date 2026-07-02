@@ -77,12 +77,13 @@ CREATE TABLE "article" (
 	"title" text NOT NULL,
 	"original_url" text NOT NULL,
 	"source_id" uuid NOT NULL,
-	"content" varchar(5000) DEFAULT '',
+	"content" text DEFAULT '',
 	"author" text NOT NULL,
 	"public_at" text NOT NULL,
 	"image_url" text DEFAULT '',
 	"created_at" timestamp DEFAULT now() NOT NULL,
-	"updated_at" timestamp DEFAULT now() NOT NULL
+	"updated_at" timestamp DEFAULT now() NOT NULL,
+	CONSTRAINT "article_original_url_unique" UNIQUE("original_url")
 );
 --> statement-breakpoint
 CREATE TABLE "article_metadata" (
@@ -105,4 +106,7 @@ ALTER TABLE "article" ADD CONSTRAINT "article_source_id_source_id_fk" FOREIGN KE
 ALTER TABLE "article_metadata" ADD CONSTRAINT "article_metadata_article_id_article_id_fk" FOREIGN KEY ("article_id") REFERENCES "public"."article"("id") ON DELETE cascade ON UPDATE no action;--> statement-breakpoint
 CREATE INDEX "account_userId_idx" ON "account" USING btree ("user_id");--> statement-breakpoint
 CREATE INDEX "session_userId_idx" ON "session" USING btree ("user_id");--> statement-breakpoint
-CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("identifier");
+CREATE INDEX "verification_identifier_idx" ON "verification" USING btree ("identifier");--> statement-breakpoint
+CREATE INDEX "article_source_idx" ON "article" USING btree ("source_id");--> statement-breakpoint
+CREATE INDEX "article_published_idx" ON "article" USING btree ("public_at");--> statement-breakpoint
+CREATE UNIQUE INDEX "article_url_idx" ON "article" USING btree ("original_url");
