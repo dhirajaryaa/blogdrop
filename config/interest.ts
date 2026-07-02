@@ -7,6 +7,9 @@ export const userInterests = [
     { value: "rust", label: "Rust" },
     { value: "java", label: "Java" },
     { value: "csharp", label: "C#" },
+    { value: "php", label: "PHP" },
+    { value: "ruby", label: "Ruby" },
+    { value: "swift", label: "Swift" },
 
     // Frontend
     { value: "react", label: "React" },
@@ -14,7 +17,11 @@ export const userInterests = [
     { value: "vue", label: "Vue.js" },
     { value: "angular", label: "Angular" },
     { value: "svelte", label: "Svelte" },
+    { value: "html", label: "HTML" },
+    { value: "css", label: "CSS" },
     { value: "tailwindcss", label: "Tailwind CSS" },
+    { value: "vite", label: "Vite" },
+    { value: "web-components", label: "Web Components" },
 
     // Backend
     { value: "nodejs", label: "Node.js" },
@@ -22,16 +29,23 @@ export const userInterests = [
     { value: "nestjs", label: "NestJS" },
     { value: "graphql", label: "GraphQL" },
     { value: "rest-api", label: "REST API" },
-
-    // Mobile
-    { value: "flutter", label: "Flutter" },
-    { value: "react-native", label: "React Native" },
+    { value: "grpc", label: "gRPC" },
+    { value: "websockets", label: "WebSockets" },
+    { value: "authentication", label: "Authentication" },
+    { value: "authorization", label: "Authorization" },
+    { value: "api-design", label: "API Design" },
 
     // Database
     { value: "postgresql", label: "PostgreSQL" },
-    { value: "mongodb", label: "MongoDB" },
     { value: "mysql", label: "MySQL" },
+    { value: "mongodb", label: "MongoDB" },
     { value: "redis", label: "Redis" },
+    { value: "sqlite", label: "SQLite" },
+    { value: "elasticsearch", label: "Elasticsearch" },
+    { value: "orm", label: "ORM" },
+    { value: "database-design", label: "Database Design" },
+    { value: "query-optimization", label: "Query Optimization" },
+    { value: "caching", label: "Caching" },
 
     // Cloud & DevOps
     { value: "docker", label: "Docker" },
@@ -39,56 +53,57 @@ export const userInterests = [
     { value: "aws", label: "AWS" },
     { value: "azure", label: "Azure" },
     { value: "gcp", label: "Google Cloud" },
+    { value: "terraform", label: "Terraform" },
+    { value: "github-actions", label: "GitHub Actions" },
     { value: "ci-cd", label: "CI/CD" },
+    { value: "serverless", label: "Serverless" },
+    { value: "linux", label: "Linux" },
 
     // AI
     { value: "ai", label: "Artificial Intelligence" },
+    { value: "machine-learning", label: "Machine Learning" },
+    { value: "deep-learning", label: "Deep Learning" },
+    { value: "generative-ai", label: "Generative AI" },
     { value: "llms", label: "LLMs" },
     { value: "rag", label: "RAG" },
     { value: "ai-agents", label: "AI Agents" },
     { value: "prompt-engineering", label: "Prompt Engineering" },
+    { value: "embeddings", label: "Embeddings" },
+    { value: "vector-database", label: "Vector Database" },
 
-    // Engineering
+    // Architecture
     { value: "system-design", label: "System Design" },
-    { value: "architecture", label: "Software Architecture" },
     { value: "microservices", label: "Microservices" },
     { value: "distributed-systems", label: "Distributed Systems" },
+    { value: "event-driven", label: "Event Driven" },
+    { value: "message-queues", label: "Message Queues" },
+    { value: "architecture", label: "Software Architecture" },
     { value: "scalability", label: "Scalability" },
-    { value: "performance", label: "Performance Optimization" },
-    { value: "security", label: "Security" },
+    { value: "high-availability", label: "High Availability" },
+    { value: "fault-tolerance", label: "Fault Tolerance" },
+    { value: "design-patterns", label: "Design Patterns" },
+
+    // Quality
     { value: "testing", label: "Testing" },
+    { value: "performance", label: "Performance" },
+    { value: "security", label: "Security" },
+    { value: "observability", label: "Observability" },
+    { value: "monitoring", label: "Monitoring" },
+    { value: "logging", label: "Logging" },
+    { value: "debugging", label: "Debugging" },
+    { value: "refactoring", label: "Refactoring" },
     { value: "clean-code", label: "Clean Code" },
     { value: "code-quality", label: "Code Quality" },
-    { value: "design-patterns", label: "Design Patterns" },
-    { value: "refactoring", label: "Refactoring" },
-    { value: "debugging", label: "Debugging" },
 
-    // Content Type
-    { value: "case-studies", label: "Case Studies" },
-    { value: "tutorials", label: "Tutorials" },
+    // Engineering
+    { value: "case-study", label: "Case Study" },
     { value: "best-practices", label: "Best Practices" },
-    { value: "deep-dives", label: "Deep Dives" },
-    { value: "benchmarks", label: "Benchmarks" },
-
-    // Career
-    { value: "frontend", label: "Frontend Development" },
-    { value: "backend", label: "Backend Development" },
-    { value: "fullstack", label: "Full Stack" },
-    { value: "devops", label: "DevOps" },
-    { value: "career", label: "Career Growth" },
-    { value: "interview-prep", label: "Interview Preparation" },
-    { value: "opensource", label: "Open Source" },
-    { value: "startups", label: "Startups" },
-
-    // Roles
-    { value: "frontend-engineer", label: "Frontend Engineer" },
-    { value: "backend-engineer", label: "Backend Engineer" },
-    { value: "fullstack-engineer", label: "Full Stack Engineer" },
-    { value: "mobile-engineer", label: "Mobile Engineer" },
-    { value: "devops-engineer", label: "DevOps Engineer" },
-    { value: "platform-engineer", label: "Platform Engineer" },
-    { value: "data-engineer", label: "Data Engineer" },
-    { value: "ml-engineer", label: "ML Engineer" },
-    { value: "engineering-manager", label: "Engineering Manager" },
-    { value: "tech-lead", label: "Tech Lead" },
-];
+    { value: "tutorial", label: "Tutorial" },
+    { value: "engineering-culture", label: "Engineering Culture" },
+    { value: "developer-experience", label: "Developer Experience" },
+    { value: "developer-tools", label: "Developer Tools" },
+    { value: "open-source", label: "Open Source" },
+    { value: "product-engineering", label: "Product Engineering" },
+    { value: "career", label: "Career" },
+    { value: "interview", label: "Interview" },
+] as const;

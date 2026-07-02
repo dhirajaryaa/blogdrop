@@ -8,7 +8,8 @@ import { headers } from "next/headers"
 
 export async function completeOnboarding(data: {
   about: string
-  userInterests: string[]
+  categories: string[]
+  tags: string[]
   experienceLevel: string
 }) {
   const session = await auth.api.getSession({
@@ -22,10 +23,11 @@ export async function completeOnboarding(data: {
   await db
     .update(user)
     .set({
-      about: data.about,
-      userInterests: data.userInterests,
-      experienceLevel: data.experienceLevel,
       onboarded: true,
+      about: data.about,
+      categories: data.categories,
+      tags: data.tags,
+      experienceLevel: data.experienceLevel,
     })
     .where(eq(user.id, session.user.id))
 

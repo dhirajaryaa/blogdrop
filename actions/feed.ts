@@ -14,12 +14,12 @@ export async function getArticles() {
   if (!session?.user) return []
 
   const [currentUser] = await db
-    .select({ userInterests: user.userInterests })
+    .select({ tags: user.tags })
     .from(user)
     .where(eq(user.id, session.user.id))
     .limit(1)
 
-  const userInterests = currentUser?.userInterests ?? []
+  const userInterests = currentUser?.tags ?? []
 
   const conditions = [eq(article.status, "completed")]
 

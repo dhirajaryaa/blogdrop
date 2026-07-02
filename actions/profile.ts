@@ -7,7 +7,8 @@ import { getCurrentUser } from "@/lib/auth/get-user";
 
 export async function updateProfile(data: {
   about: string
-  userInterests: string[]
+  categories: string[]
+  tags: string[]
   experienceLevel: string
 }) {
   const currentUser = await getCurrentUser();
@@ -19,7 +20,8 @@ export async function updateProfile(data: {
     .update(user)
     .set({
       about: data.about,
-      userInterests: data.userInterests,
+      categories: data.categories,
+      tags: data.tags,
       experienceLevel: data.experienceLevel,
     })
     .where(eq(user.id, currentUser.id))
