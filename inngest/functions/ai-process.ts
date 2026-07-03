@@ -15,9 +15,7 @@ export const articleAIProcessing = inngest.createFunction({ id: "ai-article-proc
     // Todo: later on mvp migrate on inngest agent with multiple provider support 
     const metadata = await step.run("metadata-processing", async () => {
         const response = await aiGeneration(sourceArticle.content)
-
         return response
-
     });
 
     if (!metadata) return { error: "failed to generate metadata!" }

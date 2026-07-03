@@ -38,8 +38,7 @@ export const aiGeneration = async (markdown: string | null) => {
         text: {
             format: zodTextFormat(metadataSchema, "event"),
         },
-    });
-    
+    });    
 
     const output =  response.output_parsed;
     // console.log(output);

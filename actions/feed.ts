@@ -1,8 +1,8 @@
 "use server"
 
 import { db } from "@/db"
-import { article, articleMetaData, source, user } from "@/db/schema"
-import { and, desc, eq, sql } from "drizzle-orm"
+import { article, source, user } from "@/db/schema"
+import { eq, desc } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 
@@ -14,42 +14,46 @@ export async function getArticles() {
   if (!session?.user) return []
 
   const [currentUser] = await db
-    .select({ tags: user.tags })
+    .select({
+      tags: user.tags,
+      categories: user.categories,
+      experienceLevel: user.experienceLevel,
+    })
     .from(user)
     .where(eq(user.id, session.user.id))
     .limit(1)
 
-  const userInterests = currentUser?.tags ?? []
+  const userTagsSet = new Set(currentUser?.tags ?? [])
+  const userCategoriesSet = new Set(currentUser?.categories ?? [])
+  const userExperience = currentUser?.experienceLevel ?? "mid"
 
-  const conditions = [eq(article.status, "completed")]
+  const articles = await db.query.article.findMany({
+    with: {
+      metadata: true,
+      source: true,
+    },
+    where: eq(article.status, "completed"),
+    orderBy: desc(article.publicAt),
+    limit: 50,
+  })
 
-  if (userInterests.length > 0) {
-    conditions.push(
-      sql`EXISTS (SELECT 1 FROM jsonb_array_elements_text(${articleMetaData.tags}) tag WHERE tag = ANY(ARRAY[${sql.join(userInterests.map((i) => sql`${i}`), sql`, `)}]))`
-    )
-  }
-
-  const rows = await db
-    .select({
-      id: article.id,
-      slug: article.slug,
-      title: article.title,
-      originalUrl: article.originalUrl,
-      author: article.author,
-      publicAt: article.publicAt,
-      image: article.imageUrl,
-      sourceName: source.title,
-      sourceSiteUrl: source.siteUrl,
-      summary: articleMetaData.summary,
-      readingTime: articleMetaData.readingTime,
-      difficulty: articleMetaData.difficulty,
+  return articles
+    .filter((a) => {
+      if (!a.metadata) return false
+      const tagOverlap = a.metadata.tags?.some((t) => userTagsSet.has(t))
+      const categoryOverlap = a.metadata.categories?.some((c) => userCategoriesSet.has(c))
+      return tagOverlap || categoryOverlap
     })
-    .from(article)
-    .leftJoin(source, eq(article.sourceId, source.id))
-    .leftJoin(articleMetaData, eq(article.id, articleMetaData.articleId))
-    .where(and(...conditions))
-    .orderBy(desc(article.publicAt))
-    .limit(50)
-
-  return rows
+    .map((a) => ({
+      id: a.id,
+      slug: a.slug,
+      title: a.title,
+      author: a.author,
+      publicAt: a.publicAt,
+      image: a.imageUrl ?? "",
+      sourceName: a.source?.title ?? "",
+      summary: a.metadata?.summary ?? "",
+      readingTime: a.metadata?.readingTime ?? 2,
+      difficulty: a.metadata?.difficulty ?? "junior",
+    }))
 }

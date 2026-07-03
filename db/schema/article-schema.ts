@@ -56,5 +56,9 @@ export const articleRelations = relations(article, ({ one }) => ({
     metadata: one(articleMetaData, {
         fields: [article.id],
         references: [articleMetaData.articleId]
+    }),
+    source: one(source, {
+        fields: [article.sourceId],
+        references: [source.id]
     })
 }))
