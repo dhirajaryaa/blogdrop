@@ -6,38 +6,65 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
-import { userInterests } from "@/config/interest"
+import { userTags } from "@/config/tags"
+import { articleCategories } from "@/config/category"
 import { toast } from "sonner"
 import { IconChevronDown, IconChevronUp } from "@tabler/icons-react"
 import { updateProfile } from "@/actions/profile"
+import {
+  Combobox,
+  ComboboxChip,
+  ComboboxChips,
+  ComboboxChipsInput,
+  ComboboxContent,
+  ComboboxEmpty,
+  ComboboxItem,
+  ComboboxList,
+  ComboboxValue,
+  useComboboxAnchor,
+} from "@/components/ui/combobox"
 
 interface ProfileFormProps {
   defaultAbout: string
-  defaultInterests: string[]
+  defaultCategories: string[]
+  defaultTags: string[]
   defaultExperience: string
 }
 
-export function ProfileForm({ defaultAbout, defaultInterests, defaultExperience }: ProfileFormProps) {
+export function ProfileForm({
+  defaultAbout,
+  defaultCategories,
+  defaultTags,
+  defaultExperience,
+}: ProfileFormProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
   const [about, setAbout] = useState(defaultAbout)
-  const [selectedInterests, setSelectedInterests] = useState<string[]>(defaultInterests)
+  const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set(defaultCategories))
+  const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set(defaultTags))
   const [experience, setExperience] = useState(defaultExperience)
-  const [showAll, setShowAll] = useState(false)
-  const [errors, setErrors] = useState<{ interest: boolean, experience: boolean }>({ interest: false, experience: false })
+  const [showAllCategories, setShowAllCategories] = useState(false)
+  const [errors, setErrors] = useState<{
+    categories: "min" | "max" | null
+    tags: "min" | "max" | null
+    experience: boolean
+  }>({ categories: null, tags: null, experience: false })
 
-  const visibleInterests = showAll ? userInterests : userInterests.slice(0, 7)
-  const hiddenCount = userInterests.length - 7
+  const tagAnchor = useComboboxAnchor()
+  const tagItems = userTags.map((t) => t.value)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
 
-    if (selectedInterests.length < 3) {
-      setErrors((prev) => ({ ...prev, interest: true }))
-      return
+    const newErrors = {
+      categories: selectedCategories.size < 3 ? ("min" as const) : null,
+      tags: selectedTags.size < 3 ? ("min" as const) : null,
+      experience: !experience,
     }
-    if (!experience) {
-      setErrors((prev) => ({ ...prev, experience: true }))
+
+    setErrors(newErrors)
+
+    if (newErrors.categories || newErrors.tags || newErrors.experience) {
       return
     }
 
@@ -45,7 +72,8 @@ export function ProfileForm({ defaultAbout, defaultInterests, defaultExperience 
 
     const result = await updateProfile({
       about,
-      userInterests: selectedInterests,
+      categories: [...selectedCategories],
+      tags: [...selectedTags],
       experienceLevel: experience,
     })
 
@@ -53,7 +81,7 @@ export function ProfileForm({ defaultAbout, defaultInterests, defaultExperience 
       toast.success("Profile updated")
       router.refresh()
     } else {
-      toast.error(result.error || "Something went wrong")
+      toast.error("Something went wrong")
     }
 
     setLoading(false)
@@ -78,51 +106,109 @@ export function ProfileForm({ defaultAbout, defaultInterests, defaultExperience 
 
       <section className="space-y-3">
         <div>
-          <Label className="text-base">Interests</Label>
+          <Label className="text-base">Categories</Label>
           <p className="text-sm text-muted-foreground">
-            Pick topics you want to see in your feed
+            Pick 3–5 categories you want to see in your feed
           </p>
-          {
-            errors?.interest &&
-            <p className="text-sm text-destructive">
-              Please select at least 3 topics
-            </p>
-          }
+          {errors.categories === "max" && (
+            <p className="text-sm text-destructive">Maximum 5 categories allowed</p>
+          )}
+          {errors.categories === "min" && (
+            <p className="text-sm text-destructive">Please select at least 3 categories</p>
+          )}
         </div>
         <ToggleGroup
           type="multiple"
           variant="outline"
-          value={selectedInterests}
+          value={[...selectedCategories]}
           onValueChange={(value) => {
-            setSelectedInterests(value)
-            if (value.length >= 3) {
-              setErrors((prev) => ({ ...prev, interest: false }))
+            if (value.length > 5) {
+              setErrors((prev) => ({ ...prev, categories: "max" }))
+              return
             }
+            setSelectedCategories(new Set(value))
+            setErrors((prev) => ({ ...prev, categories: value.length >= 3 ? null : prev.categories }))
           }}
           className="flex-wrap w-full"
         >
-          {visibleInterests.map((interest) => (
+          {(showAllCategories ? articleCategories : articleCategories.slice(0, 6)).map((cat) => (
             <ToggleGroupItem
-              key={interest.value}
-              value={interest.value}
+              key={cat.value}
+              value={cat.value}
               className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
             >
-              {interest.label}
+              {cat.label}
             </ToggleGroupItem>
           ))}
         </ToggleGroup>
-        {hiddenCount > 0 && (
+        {articleCategories.length > 6 && (
           <Button
             type="button"
             variant="ghost"
             size="sm"
-            onClick={() => setShowAll(!showAll)}
+            onClick={() => setShowAllCategories(!showAllCategories)}
             className="text-muted-foreground gap-1"
           >
-            {showAll ? "Show less" : `Show all ${hiddenCount} topics`}
-            {showAll ? <IconChevronUp className="size-4" /> : <IconChevronDown className="size-4" />}
+            {showAllCategories ? "Show less" : `Show all ${articleCategories.length - 6} categories`}
+            {showAllCategories ? <IconChevronUp className="size-4" /> : <IconChevronDown className="size-4" />}
           </Button>
         )}
+      </section>
+
+      <section className="space-y-3">
+        <div>
+          <Label className="text-base">Tags</Label>
+          <p className="text-sm text-muted-foreground">
+            Pick 3–15 tags to fine-tune your feed
+          </p>
+          {errors.tags === "max" && (
+            <p className="text-sm text-destructive">Maximum 15 tags allowed</p>
+          )}
+          {errors.tags === "min" && (
+            <p className="text-sm text-destructive">Please select at least 3 tags</p>
+          )}
+        </div>
+        <Combobox
+          multiple
+          items={tagItems}
+          itemToStringLabel={(value: string) => userTags.find((t) => t.value === value)?.label ?? value}
+          value={[...selectedTags]}
+          onValueChange={(values: string[]) => {
+            if (values.length > 15) {
+              setErrors((prev) => ({ ...prev, tags: "max" }))
+              return
+            }
+            setSelectedTags(new Set(values))
+            setErrors((prev) => ({ ...prev, tags: values.length >= 3 ? null : prev.tags }))
+          }}
+        >
+          <ComboboxChips ref={tagAnchor} className="w-full">
+            <ComboboxValue>
+              {(values: string[]) => (
+                <>
+                  {values.map((value) => {
+                    const tag = userTags.find((t) => t.value === value)
+                    return <ComboboxChip key={value}>{tag?.label ?? value}</ComboboxChip>
+                  })}
+                  <ComboboxChipsInput placeholder="Search tags..." />
+                </>
+              )}
+            </ComboboxValue>
+          </ComboboxChips>
+          <ComboboxContent anchor={tagAnchor}>
+            <ComboboxEmpty>No tags found.</ComboboxEmpty>
+            <ComboboxList>
+              {(item: string) => {
+                const tag = userTags.find((t) => t.value === item)
+                return (
+                  <ComboboxItem key={item} value={item}>
+                    {tag?.label ?? item}
+                  </ComboboxItem>
+                )
+              }}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
       </section>
 
       <section className="space-y-3">
@@ -131,12 +217,11 @@ export function ProfileForm({ defaultAbout, defaultInterests, defaultExperience 
           <p className="text-sm text-muted-foreground">
             Your experience level helps us tailor content for you
           </p>
-          {
-            errors?.experience &&
+          {errors.experience && (
             <p className="text-sm text-destructive">
               Please select your experience level
             </p>
-          }
+          )}
         </div>
         <ToggleGroup
           type="single"

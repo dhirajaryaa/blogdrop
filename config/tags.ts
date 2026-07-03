@@ -1,4 +1,4 @@
-export const userInterests = [
+export const userTags = [
     // Languages
     { value: "javascript", label: "JavaScript" },
     { value: "typescript", label: "TypeScript" },
@@ -107,3 +107,5 @@ export const userInterests = [
     { value: "career", label: "Career" },
     { value: "interview", label: "Interview" },
 ] as const;
+
+export const userInterests = userTags;

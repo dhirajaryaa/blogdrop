@@ -5,9 +5,9 @@ import { user } from "@/db/schema"
 import { eq } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
+import { redirect } from "next/navigation"
 
 export async function completeOnboarding(data: {
-  about: string
   categories: string[]
   tags: string[]
   experienceLevel: string
@@ -17,14 +17,13 @@ export async function completeOnboarding(data: {
   });
 
   if (!session?.user?.id) {
-    return { error: "Not authenticated" }
+    redirect("/login");
   };
 
   await db
     .update(user)
     .set({
       onboarded: true,
-      about: data.about,
       categories: data.categories,
       tags: data.tags,
       experienceLevel: data.experienceLevel,
