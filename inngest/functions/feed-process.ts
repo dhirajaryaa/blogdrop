@@ -23,7 +23,7 @@ export const feedProcess = inngest.createFunction({
             pubDate: item.pubDate ?? "",
         })).filter((item) => item.link !== "")
     });
-    
+
     //? step2 : all rss returned articles save in database
     const savedArticles = await step.run("save-articles", async () => {
         return await db
@@ -42,14 +42,15 @@ export const feedProcess = inngest.createFunction({
                         "-" +
                         randomUUID().slice(0, 6);
 
-                    return{
-                    title: item.title,
-                    originalUrl: item.link,
-                    author: item.author,
-                    publicAt: item.pubDate,
-                    sourceId: source.id,
-                    slug: slug
-                }})
+                    return {
+                        title: item.title,
+                        originalUrl: item.link,
+                        author: item.author,
+                        publicAt: item.pubDate,
+                        sourceId: source.id,
+                        slug: slug
+                    }
+                })
             )
             .onConflictDoNothing({
                 target: article.originalUrl
@@ -66,7 +67,7 @@ export const feedProcess = inngest.createFunction({
                 articleId: article.id,
             },
         }))
-    )
+    );
 
-    return { eventId: event.id, task: "feed-process" };
+    return { id: event.id, totalNewArticle: savedArticles.length };
 })

@@ -7,20 +7,18 @@ import { convertHtmlToMarkdown } from "@/lib/harvester/html-markdown";
 
 
 export const articleProcessing = inngest.createFunction({
-    id: "article-processing", concurrency: 20, triggers: ({ event: "article/process" })
+    id: "article-processing", concurrency: 5, triggers: ({ event: "article/process" })
 }
     , async ({ step, event }) => {
 
         const [sourceArticle] = await db.select().from(article).where(eq(article.id, event.data.articleId));
 
-        if (!sourceArticle) return { error: "article not found" };
+        if (!sourceArticle) return { id: event.id, error: "article not found" };
 
         //? step 1: fetch the article in text;
         const response = await step.fetch(sourceArticle.originalUrl);
 
         if (response.status === 429) {
-            await step.sleep("wait-to-retry", "1m");
-
             throw new Error("Rate-Limit-hilted");
         }
 
@@ -59,7 +57,7 @@ export const articleProcessing = inngest.createFunction({
 
         //? step 4: article meta data generation [function] so rate-limit after retry auto
 
-        if (!processingRequired) return { eventId: event.id, error: "article processing failed!" };
+        if (!processingRequired) return { id: event.id, error: "article processing failed!" };
 
         await step.sendEvent(
             "ai-article-processing",
@@ -71,6 +69,6 @@ export const articleProcessing = inngest.createFunction({
             }))
         );
 
-        return { eventId: event.id, task: "article/process" };
+        return { id: event.id, totalNewAIProcessing: processingRequired.length };
 
     })

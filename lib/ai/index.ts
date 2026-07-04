@@ -1,17 +1,7 @@
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
-import { z } from "zod";
 import { SYSTEM_PROMPT } from "./prompt";
-
-
-export const metadataSchema = z.object({
-    author: z.string(),
-    summary: z.string(),
-    tags: z.array(z.string()),
-    keyTakeaways: z.array(z.string()),
-    whyRead: z.string().nullable(),
-    difficulty: z.enum(["junior", "mid", "senior"]),
-});
+import { metadataSchema } from "./schema";
 
 
 
