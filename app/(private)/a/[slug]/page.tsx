@@ -14,10 +14,10 @@ async function ArticlePage({ params }: ArticlePageProps) {
   const { slug } = await params
   const article = await getArticleBySlug(slug)
 
-  if (!article) notFound()
+  if (!article) notFound();
 
   return (
-    <div className="max-w-3xl mx-auto space-y-8 my-8 px-4">
+    <div className="max-w-4xl mx-auto space-y-8 my-8 px-4">
       <Link
         href="/feed"
         className={buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 text-muted-foreground" })}
@@ -28,7 +28,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
 
       <article className="space-y-6">
         {article.image && (
-          <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border">
+          <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border max-h-100">
             <img
               src={article.image}
               alt={article.title}

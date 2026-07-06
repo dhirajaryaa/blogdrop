@@ -27,7 +27,7 @@ async function FeedPage() {
         </Link>
       </div>
     )
-  }
+  };
 
   return (
     <div className="space-y-6">

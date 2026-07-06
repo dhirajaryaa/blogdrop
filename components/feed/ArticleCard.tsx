@@ -1,10 +1,10 @@
-import Link from "next/link";
 import { IconClock } from "@tabler/icons-react";
 
 import type { getArticles } from "@/actions/feed";
 import GlowBadge from "../common/GlowBadge";
 import { formatDate } from "@/utils/format-date";
 import { formatAuthors } from "@/utils/format-author";
+import Link from "next/link";
 
 type Article = Awaited<ReturnType<typeof getArticles>>[number];
 
@@ -26,28 +26,17 @@ function ArticleCard({ article }: { article: Article }) {
 
       <div className="p-5">
         <div className="mb-3 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-          {article.sourceName && (
-            <span className="font-semibold text-foreground">
-              {article.sourceName}
-            </span>
-          )}
+          <span className="font-semibold text-foreground">
+            {article.sourceName}
+          </span>
+          <span>•</span>
+          <span className="flex items-center gap-1">
+            <IconClock className="size-3" />
+            {article.readingTime} min
+          </span>
+          <span>•</span>
+          <GlowBadge>{article.difficulty}</GlowBadge>
 
-          {article.readingTime && (
-            <>
-              <span>•</span>
-              <span className="flex items-center gap-1">
-                <IconClock className="size-3" />
-                {article.readingTime} min
-              </span>
-            </>
-          )}
-
-          {article.difficulty && (
-            <>
-              <span>•</span>
-              <GlowBadge>{article.difficulty}</GlowBadge>
-            </>
-          )}
         </div>
 
         <h2 className="mb-2 line-clamp-2 text-xl font-semibold leading-tight transition-colors group-hover:text-primary">

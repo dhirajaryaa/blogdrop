@@ -38,12 +38,8 @@ export async function getArticles() {
   })
 
   return articles
-    .filter((a) => {
-      if (!a.metadata) return false
-      const tagOverlap = a.metadata.tags?.some((t) => userTagsSet.has(t))
-      const categoryOverlap = a.metadata.categories?.some((c) => userCategoriesSet.has(c))
-      return tagOverlap || categoryOverlap
-    })
+    .filter((a) => a.metadata.difficulty === userExperience)
+    .sort(() => Math.random() - 0.5) // random order
     .map((a) => ({
       id: a.id,
       slug: a.slug,

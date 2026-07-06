@@ -18,9 +18,9 @@ export const articleAIProcessing = inngest.createFunction({
         if (!sourceArticle) return { error: "article not found" };
 
         const content = [
-            sourceArticle.content?.slice(0, 2500),
+            sourceArticle.content?.slice(0, 3000),
             "...",
-            sourceArticle.content?.slice(-1000),
+            sourceArticle.content?.slice(-1500),
         ].filter(Boolean)
             .join("\n");
 
@@ -37,7 +37,7 @@ export const articleAIProcessing = inngest.createFunction({
 
             return await db.transaction(async (tx) => {
 
-                const { categories, difficulty, keyTakeaways, summary, tags, whyRead } = metadata.data;
+                const { categories, difficulty, keyTakeaways, summary, tags, whyRead } = metadata.data; // come form metadata extraction AI
 
                 await tx.insert(articleMetaData).values({
                     articleId: sourceArticle.id,
@@ -50,7 +50,7 @@ export const articleAIProcessing = inngest.createFunction({
                     readingTime: calculateReadingTime(sourceArticle.content ?? "")
                 });
 
-                await tx.update(article).set({ status: "completed" }).where(eq(article.id, sourceArticle.id))
+                await tx.update(article).set({ status: "completed" }).where(eq(article.id, sourceArticle.id));
             });
 
         });
