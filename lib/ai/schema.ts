@@ -1,5 +1,6 @@
 import { z } from "zod"
 
+// categories
 export const CATEGORIES = [
     "AI",
     "Frontend",
@@ -26,9 +27,10 @@ export const CATEGORIES = [
     "Tutorial",
     "Career",
     "Product Engineering",
-] as const;
+];
+const categoryEnum = z.enum(CATEGORIES);
 
-
+// tags
 export const TAGS = [
     "javascript",
     "typescript",
@@ -120,37 +122,74 @@ export const TAGS = [
     "product-engineering",
     "career",
     "interview",
-] as const;
+];
+const TagEnum = z.enum(TAGS);
 
 
-export const schema = {
+export const metadataSchemaOpenAI = z.object({
+    summary: z.string().describe("summary in 2-3 factual sentences, no marketing language."),
+    tags: TagEnum.describe("select 3-7 items ONLY from the provided tag list. No duplicates."),
+    categories: categoryEnum.describe("select 1-3 items ONLY from the provided category list."),
+    keyTakeaways: z.array(z.string()).describe("3-5 standalone article insights."),
+    difficulty: z.enum(["junior", "mid", "senior"]).describe("Article difficulty: junior(beginner / tutorial), mid(intermediate with trade - offs and multiple technologies), senior (architecture, scalability, distributed systems, production concerns)"),
+    whyRead: z.string().describe("Generate a single natural-sounding recommendation sentence based only on the selected predefined category and matching tags"),
+    author: z.string().describe("Author; fallback to company name.")
+});
+
+
+export const metadataJsonSchema = {
     type: "object",
     properties: {
-        author: { type: "string" },
-        summary: { type: "string" },
-        category: {
-            type: "array",
-            maxItems: 3,
-            items: { type: "string" },
+        summary: {
+            type: "string",
+            description: "2–3 factual sentences summarizing the article."
         },
         tags: {
             type: "array",
-            maxItems: 5,
-            items: { type: "string"},
+            items: {
+                type: "string",
+                enum: TAGS
+            },
+            description: "Select 3–15 unique tags from the predefined tag list."
         },
-        keyTakeaways: { type: "string" },
-        whyRead: { type: "string" },
-        difficulty: { type: "string", enum: ["junior", "mid", "senior"] },
+        categories: {
+            type: "array",
+            items: {
+                type: "string",
+                enum: CATEGORIES
+            },
+            description: "Select 1–3 categories from the predefined category list."
+        },
+        keyTakeaways: {
+            type: "array",
+            items: {
+                type: "string"
+            },
+            description: "Concise standalone insights from the article."
+        },
+        difficulty: {
+            type: "string",
+            enum: ["junior", "mid", "senior"],
+            description:
+                "junior = beginner/tutorial, mid = intermediate, senior = architecture, scalability, distributed systems, production."
+        },
+        whyRead: {
+            type: "string",
+            description: "One sentence explaining why an engineer should read this article."
+        },
+        author: {
+            type: "string",
+            description: "Authors name. If unavailable, use the company or publication name."
+        }
     },
-    required: [
-        "author",
-        "summary",
-        "category",
-        "tags",
-        "keyTakeaways",
-        "whyRead",
-        "difficulty",
-    ],
-};
 
-export const metadataSchema = z.fromJSONSchema(schema as Parameters<typeof z.fromJSONSchema>[0]);
+    required: [
+        "summary",
+        "tags",
+        "categories",
+        "keyTakeaways",
+        "difficulty",
+        "whyRead",
+        "author"
+    ]
+};

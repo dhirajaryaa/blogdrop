@@ -1,38 +1,36 @@
 import OpenAI from "openai";
 import { zodTextFormat } from "openai/helpers/zod";
-import { SYSTEM_PROMPT } from "./prompt";
-import { metadataSchema } from "./schema";
+import { metadataSchemaOpenAI } from "./schema";
 
-
-
-// TODO: change open router to openai official api key in production
 const client = new OpenAI({
-    baseURL: process.env.LLM_API_ENDPOINT!,
-    apiKey: process.env.LLM_API_KEY!,
+    apiKey: process.env.LLM_API_KEY,
+    baseURL: process.env.LLM_API_ENDPOINT
 });
 
+export const aiGeneration = async (markdown: string) => {
+    try {
+        // 2. USE client.models.generateContent instead of interactions
+        const response = await client.responses.parse({
+            model: "openai/gpt-oss-20b",
+            input: `you are export metadata extractor. article_markdown-${JSON.stringify(markdown)}`,
 
-export const aiGeneration = async (markdown: string | null) => {
-
-    if (!markdown) return null;
-
-    const response = await client.responses.parse({
-        model: "openai/gpt-oss-120b",
-        input: [
-            { role: "system", content: SYSTEM_PROMPT },
-            {
-                role: "user",
-                content: `postMarkdown : ${markdown}`,
+            text: {
+                format: zodTextFormat(metadataSchemaOpenAI, "event"),
             },
-        ],
-        text: {
-            format: zodTextFormat(metadataSchema, "event"),
-        },
-    });    
+        });
 
-    const output =  response.output_parsed;
-    // console.log(output);
+        console.log("💳️ total token count:",response.usage?.total_tokens);
 
-    return output;
-    
-};
+        console.log(response.output_parsed);
+        
+
+        if (!response.output_parsed) {
+            return null;
+        };
+        return response.output_parsed;
+
+    } catch (error) {
+        console.error("AI metadata data generation failed:", error);
+        return null;
+    }
+}
