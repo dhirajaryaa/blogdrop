@@ -1,36 +1,57 @@
-import OpenAI from "openai";
-import { zodTextFormat } from "openai/helpers/zod";
-import { metadataSchemaOpenAI } from "./schema";
+import { GoogleGenAI } from "@google/genai";
+import { ArticleMetaData, metadataJsonSchema, metadataSchema } from "./schema";
 
-const client = new OpenAI({
-    apiKey: process.env.LLM_API_KEY,
-    baseURL: process.env.LLM_API_ENDPOINT
+
+type Response = {
+    success: true,
+    data: ArticleMetaData,
+    tokenUsed: number | undefined
+} | {
+    success: false,
+    error: string
+};
+
+
+// client create gen ai 
+const client = new GoogleGenAI({
+    apiKey: process.env.LLM_API_KEY!
 });
 
-export const aiGeneration = async (markdown: string) => {
-    try {
-        // 2. USE client.models.generateContent instead of interactions
-        const response = await client.responses.parse({
-            model: "openai/gpt-oss-20b",
-            input: `you are export metadata extractor. article_markdown-${JSON.stringify(markdown)}`,
+// system prompt
+const prompt = `You are an expert technical content analyst.
+Analyze the provided Markdown article and extract accurate metadata.
+Return only valid structured data that exactly matches the provided response schema. Do not include explanations, markdown, or extra text. Infer missing information conservatively and never hallucinate facts.`;
 
-            text: {
-                format: zodTextFormat(metadataSchemaOpenAI, "event"),
-            },
+
+export const llmGeneration = async (articleMarkdown: string): Promise<Response> => {
+    try {
+        const interaction = await client.interactions.create({
+            model: "gemini-3.1-flash-lite",
+            input: `ARTICLE_CONTENT=${JSON.stringify(articleMarkdown)}`,
+            system_instruction: prompt,
+            response_format: {
+                type: "text",
+                mime_type: "application/json",
+                schema: metadataJsonSchema
+            }
         });
 
-        console.log("💳️ total token count:",response.usage?.total_tokens);
+        // type check 
+        const result = metadataSchema.safeParse(JSON.parse(interaction.output_text ?? ""));
 
-        console.log(response.output_parsed);
-        
-
-        if (!response.output_parsed) {
-            return null;
+        if (!result.success) {
+            return { success: false, error: "Invalid metadata from LLM" };
         };
-        return response.output_parsed;
 
-    } catch (error) {
-        console.error("AI metadata data generation failed:", error);
-        return null;
-    }
+        return {
+            success: true,
+            data: result.data,
+            tokenUsed: interaction.usage?.total_tokens
+        };
+
+    } catch (error: unknown) {
+        const message = error instanceof Error ? error.message : "🤖 LLM Generation Failed!";
+        console.error(message, error);
+        return { success: false, error: message };
+    };
 }
