@@ -4,5 +4,5 @@ export function calculateReadingTime(content: string): number {
         .split(/\s+/)
         .filter(Boolean).length;
 
-    return Math.max(1, Math.ceil(words / 200));
+    return Math.max(1, Math.ceil(words / 200)) ?? 0;
 }

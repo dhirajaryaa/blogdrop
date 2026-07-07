@@ -4,6 +4,8 @@ import { article, articleMetaData } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { calculateReadingTime } from "@/lib/harvester/reading-time";
 import { llmGeneration } from "@/lib/ai";
+import { categoriesMapping, tagsMapping } from "@/lib/harvester/tag-mapping";
+
 
 export const articleAIProcessing = inngest.createFunction({
     id: "ai-article-processing",
@@ -31,31 +33,46 @@ export const articleAIProcessing = inngest.createFunction({
 
         if (!metadata.success) return { error: metadata.error ?? "failed to generate metadata" };
 
-        //? step 2: save metadata on db [status later on Addon ] 
+
+        const { categories, difficulty, keyTakeaways, summary, tags, whyRead, author } = metadata.data; // come form metadata extraction AI
+
+
+        //? step 2: tags & categories mapping with predefined tags-categories
+        const canonicalMapping = await step.run("map-original-tags", async () => {
+
+            const canonicalCategories = categoriesMapping(categories);
+            const canonicalTags = tagsMapping(tags);
+
+            return { categories: canonicalCategories, tags: canonicalTags };
+        });
+
+
+        //? step 3: save metadata on db [status later on Addon ] 
 
         await step.run("save-metadata", async () => {
 
             return await db.transaction(async (tx) => {
 
-                const { categories, difficulty, keyTakeaways, summary, tags, whyRead } = metadata.data; // come form metadata extraction AI
-
                 await tx.insert(articleMetaData).values({
                     articleId: sourceArticle.id,
                     summary,
-                    tags,
-                    categories,
+                    tags: canonicalMapping.tags ?? tags,
+                    categories: canonicalMapping.categories ?? categories,
                     keyTakeaways,
                     difficulty,
                     whyRead,
                     readingTime: calculateReadingTime(sourceArticle.content ?? "")
                 });
 
-                await tx.update(article).set({ status: "completed" }).where(eq(article.id, sourceArticle.id));
+                await tx.update(article).set({
+                    status: "completed",
+                    author: sourceArticle.author || author
+                }).where(eq(article.id, sourceArticle.id));
             });
 
         });
 
-        //? step 3: sleep so ai processing
+        //? step 4: sleep so ai processing
         await step.sleep("wait-to-new-event-run", "5s");
 
         return { id: event.id, status: "Article processing Done.", totalTokenUsed: metadata.tokenUsed };

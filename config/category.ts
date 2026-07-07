@@ -25,3 +25,32 @@ export const articleCategories = [
     { value: "career", label: "Career & Learning" },
     { value: "product-engineering", label: "Product Engineering" },
 ] as const;
+
+
+export const CategoryAlias: Record<string, string[]> = {
+    "ai": ["artificial intelligence", "machine learning", "ml", "deep learning", "llms", "generative ai", "genai", "ai/ml"],
+    "frontend": ["front-end", "front end", "client-side", "ui development", "frontend engineering", "web frontend"],
+    "backend": ["back-end", "back end", "server-side", "backend engineering", "backend development"],
+    "mobile": ["mobile development", "mobile apps", "ios development", "android development", "app development", "cross-platform mobile"],
+    "cloud": ["cloud computing", "aws", "azure", "gcp", "cloud infrastructure", "cloud native"],
+    "devops": ["dev ops", "ci/cd", "infrastructure automation", "sre", "site reliability engineering", "devops practices"],
+    "database": ["databases", "db", "sql", "nosql", "data storage", "database management"],
+    "security": ["appsec", "cybersecurity", "infosec", "application security", "security best practices"],
+    "performance": ["performance optimization", "perf", "speed optimization", "performance tuning", "latency optimization"],
+    "architecture": ["software architecture", "system architecture", "architectural design", "architectural patterns"],
+    "system-design": ["systems design", "designing systems", "system design interview", "scalable system design"],
+    "distributed-systems": ["distributed computing", "distributed architecture", "distributed systems design", "distributed systems engineering"],
+    "platform-engineering": ["platform eng", "internal developer platform", "idp", "platform teams", "developer platform"],
+    "developer-tools": ["dev tools", "devtools", "tooling", "cli tools", "developer tooling"],
+    "observability": ["monitoring", "logging", "telemetry", "tracing", "opentelemetry", "metrics and monitoring"],
+    "networking": ["computer networking", "network protocols", "network engineering", "tcp/ip"],
+    "data-engineering": ["data pipelines", "etl", "data infrastructure", "big data", "data platform"],
+    "testing": ["qa", "quality assurance", "unit testing", "test automation", "integration testing"],
+    "open-source": ["oss", "open source software", "foss", "open source projects"],
+    "engineering-culture": ["eng culture", "team culture", "engineering management", "engineering org"],
+    "case-study": ["case studies", "real-world example", "postmortem", "post-mortem", "war stories"],
+    "best-practices": ["industry best practices", "recommended practices", "coding standards", "guidelines"],
+    "tutorial": ["tutorials", "how-to guide", "step-by-step guide", "walkthrough", "getting started guide"],
+    "career": ["career growth", "career advice", "learning path", "career development", "interview prep"],
+    "product-engineering": ["product eng", "product-minded engineering", "product development", "product thinking"]
+}

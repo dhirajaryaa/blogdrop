@@ -12,6 +12,7 @@ export const metadataSchema = z.object({
     keyTakeaways: z.array(z.string()).describe("Concise standalone insights from the article"),
     difficulty: z.enum(["junior", "mid", "senior"]),
     whyRead: z.string().describe("One sentence explaining why an engineer should read this article"),
+    author: z.string().describe("authors of this article if not found. Company Name with Team. like: Github Team., Slack Team.")
 });
 
 // zod convert schema

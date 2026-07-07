@@ -9,7 +9,7 @@ import { eq } from "drizzle-orm";
 export const refreshAllSource = inngest.createFunction(
     {
         id: "refresh-source-list",
-        triggers: { event: "cron/refresh-Source" }
+        triggers: { event: "cron/refresh-Source", }
     },
     async ({ event, step }) => {
         // trigger all source refresh
