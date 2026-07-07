@@ -2,7 +2,7 @@ import { CategoryAlias } from '@/config/category';
 import { TagsAlias } from '@/config/tags';
 import Fuse from 'fuse.js';
 
-export const tagsMapping = (generatedTags: string[]) => {
+export const tagsMapping = (generatedTags: string[]): string[] => {
 
     //? step 1: fuse data [key-value paris(Canonical,alias)]
     const fuseData = Object.entries(TagsAlias).map(([canonical, alias]) => ({ canonical, alias }));
@@ -15,23 +15,23 @@ export const tagsMapping = (generatedTags: string[]) => {
         keys: ["canonical", "alias"] // check karga
     });
 
-    const normalizedTags = generatedTags.map((tag) => {
+    const normalizedTags: string[] = [];
+
+
+    for (const tag of generatedTags) {
         const result = fuse.search(tag);
 
-        if (result.length === 0) return null;
+        if (result.length === 0) continue;
+        if ((result[0].score ?? 1) > 0.3) continue;
 
-        if ((result[0].score ?? 1) > 0.3) return null;
+        normalizedTags.push(result[0].item.canonical);
+    }
 
-        return result[0].item.canonical;
-    })
-        .filter(Boolean);
-
-    //? step 3: return Canonical tags match nhi huya ignore it
     return normalizedTags;
 }
 
 
-export const categoriesMapping = (generatedCategories: string[]) => {
+export const categoriesMapping = (generatedCategories: string[]): string[] => {
 
     //? step 1: fuse data [key-value paris(Canonical,alias)]
     const fuseData = Object.entries(CategoryAlias).map(([canonical, alias]) => ({ canonical, alias }));
@@ -44,17 +44,17 @@ export const categoriesMapping = (generatedCategories: string[]) => {
         keys: ["canonical", "alias"] // check karga
     });
 
-    const normalizedTags = generatedCategories.map((tag) => {
-        const result = fuse.search(tag);
+    const normalizedCategories: string[] = [];
 
-        if (result.length === 0) return null;
+    for (const category of generatedCategories) {
+        const result = fuse.search(category);
 
-        if ((result[0].score ?? 1) > 0.3) return null;
+        if (result.length === 0) continue;
+        if ((result[0].score ?? 1) > 0.3) continue;
 
-        return result[0].item.canonical;
-    })
-        .filter(Boolean);
+        normalizedCategories.push(result[0].item.canonical)
+    };
 
     //? step 3: return Canonical tags match nhi huya ignore it
-    return normalizedTags;
+    return normalizedCategories;
 }
