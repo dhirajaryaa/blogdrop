@@ -10,7 +10,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { IconBookmark, IconHistory, IconHome, IconSettings, IconTag, IconTrendingUp } from "@tabler/icons-react"
+import { IconBookmark, IconHistory, IconHome, IconSettings, IconTrendingUp, IconUserCircle } from "@tabler/icons-react"
 import Link from "next/link";
 import Logo from "../common/Logo";
 import { usePathname } from "next/navigation";
@@ -35,10 +35,15 @@ export function AppSidebar() {
             href: "/bookmarks",
         },
         {
-            title: "Topics",
-            icon: IconTag,
-            href: "/topics",
+            title: "Profile",
+            icon: IconUserCircle,
+            href: "/profile",
         },
+        // {
+        //     title: "Topics",
+        //     icon: IconTag,
+        //     href: "/topics",
+        // },
     ];
 
     const NavItemsBottom = [
@@ -61,13 +66,13 @@ export function AppSidebar() {
             {/* header links */}
             <SidebarHeader>
                 <SidebarMenu>
-                    <SidebarMenuItem className="px-3 py-4">
+                    <SidebarMenuItem className="px-3 py-2">
                         <Logo href="/feed" />
                     </SidebarMenuItem>
                 </SidebarMenu>
             </SidebarHeader>
             {/* main nav links  */}
-            <SidebarContent>
+            <SidebarContent className="pt-4">
                 <SidebarGroup>
                     <SidebarMenu>
                         {NavItemsTop.map((link) => {

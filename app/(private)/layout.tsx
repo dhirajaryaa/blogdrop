@@ -1,6 +1,6 @@
 import AppHeader from "@/components/sidebar/app-header";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 
 async function AppPage({ children }: { children: React.ReactNode }) {
   return (
