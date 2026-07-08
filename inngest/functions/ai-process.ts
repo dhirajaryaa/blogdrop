@@ -10,7 +10,7 @@ import { categoriesMapping, tagsMapping } from "@/lib/harvester/tag-mapping";
 export const articleAIProcessing = inngest.createFunction({
     id: "ai-article-processing",
     concurrency: 5,
-    throttle: { limit: 12, period: "1m" },
+    throttle: { limit: 10, period: "1m" },
     triggers: { event: "article/ai-processing" }
 },
     async ({ step, event }) => {
@@ -31,7 +31,9 @@ export const articleAIProcessing = inngest.createFunction({
             return llmGeneration(content);
         });
 
-        if (!metadata.success) return { error: metadata.error ?? "failed to generate metadata" };
+        if (!metadata.success) {
+            throw new Error(metadata.error ?? "failed to generate metadata")
+        };
 
 
         const { categories, difficulty, keyTakeaways, summary, tags, whyRead, author } = metadata.data; // come form metadata extraction AI
