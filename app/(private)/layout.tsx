@@ -1,12 +1,25 @@
-import Header from "@/components/common/Header";
+import { AppSidebar } from "@/components/sidebar/app-sidebar";
+import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 async function AppPage({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <Header />
-      <main className="relative p-8 mx-auto max-w-6xl w-full md:py-10">
-        {children}
-      </main>
+      <SidebarProvider 
+        style={
+          {
+            "--sidebar-width": "16rem",
+            "--sidebar-width-mobile": "16rem",
+          } as React.CSSProperties
+        }
+      >
+        <AppSidebar />
+        <SidebarInset>
+          <main>
+            <SidebarTrigger />
+            {children}
+          </main>
+        </SidebarInset>
+      </SidebarProvider>
     </>
   )
 }
