@@ -57,7 +57,7 @@ export function AppSidebar() {
 
 
     return (
-        <Sidebar>
+        <Sidebar variant="sidebar">
             {/* header links */}
             <SidebarHeader>
                 <SidebarMenu>

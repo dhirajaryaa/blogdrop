@@ -5,12 +5,14 @@ import { getArticleBySlug } from "@/actions/article"
 import { buttonVariants } from "@/components/ui/button"
 import GlowBadge from "@/components/common/GlowBadge"
 import { formatDate } from "@/utils/format-date"
+import { ensureAuthUser } from "@/lib/auth/get-user"
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
 }
 
 async function ArticlePage({ params }: ArticlePageProps) {
+  await ensureAuthUser()
   const { slug } = await params
   const article = await getArticleBySlug(slug)
 

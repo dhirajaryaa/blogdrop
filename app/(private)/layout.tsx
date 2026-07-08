@@ -1,10 +1,11 @@
+import AppHeader from "@/components/sidebar/app-header";
 import { AppSidebar } from "@/components/sidebar/app-sidebar";
 import { SidebarInset, SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 
 async function AppPage({ children }: { children: React.ReactNode }) {
   return (
     <>
-      <SidebarProvider 
+      <SidebarProvider
         style={
           {
             "--sidebar-width": "16rem",
@@ -14,8 +15,8 @@ async function AppPage({ children }: { children: React.ReactNode }) {
       >
         <AppSidebar />
         <SidebarInset>
-          <main>
-            <SidebarTrigger />
+          <AppHeader />
+          <main className="flex-1 w-full h-full overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
             {children}
           </main>
         </SidebarInset>
