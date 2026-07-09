@@ -1,9 +1,9 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
 import { getArticles } from "@/actions/feed"
-import { ArticleCard } from "@/components/feed/ArticleCard"
 import { IconRss } from "@tabler/icons-react"
 import Link from "next/link"
 import { SectionHeader } from "@/components/common/section-header"
+import ArticlesList from "@/components/article/article-list"
 
 async function FeedPage() {
   await ensureAuthUser()
@@ -32,13 +32,13 @@ async function FeedPage() {
 
   return (
     <>
-      <SectionHeader title="Discover" description="Fresh stories, trending insights, and articles tailored to your interests.
-">
-        <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-          {articles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
-        </section>
+      <SectionHeader title="Discover" description="Fresh stories, trending insights, and articles tailored to your interests."
+        className=" max-w-7xl mx-auto"
+      >
+        {/* listing  */}
+
+        <ArticlesList articles={articles} />
+
       </SectionHeader>
     </>
   )
