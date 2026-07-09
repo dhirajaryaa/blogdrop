@@ -10,7 +10,7 @@ import {
     SidebarMenuButton,
     SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { IconBookmark, IconHistory, IconHome, IconSettings, IconTrendingUp, IconUserCircle } from "@tabler/icons-react"
+import { IconBookmark, IconCompass, IconHistory, IconHome, IconSettings, IconTrendingUp, IconUserCircle } from "@tabler/icons-react"
 import Link from "next/link";
 import Logo from "../common/Logo";
 import { usePathname } from "next/navigation";
@@ -20,8 +20,8 @@ export function AppSidebar() {
 
     const NavItemsTop = [
         {
-            title: "Home",
-            icon: IconHome,
+            title: "Discover",
+            icon: IconCompass,
             href: "/feed",
         },
         {

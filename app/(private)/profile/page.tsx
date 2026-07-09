@@ -3,6 +3,11 @@ import { ProfileForm } from "@/components/profile/ProfileForm"
 import { db } from "@/db"
 import { user } from "@/db/schema"
 import { eq } from "drizzle-orm"
+import { SectionHeader } from "@/components/common/section-header"
+import { Button, buttonVariants } from "@/components/ui/button"
+import { toast } from "sonner"
+import { githubRepoLink } from "@/config/constant"
+import { IconBrandGithub } from "@tabler/icons-react"
 
 async function ProfilePage() {
     const currentUser = await ensureAuthUser()
@@ -15,23 +20,36 @@ async function ProfilePage() {
         .where(eq(user.id, currentUser.id))
 
     return (
-        <div className="max-w-2xl mx-auto space-y-8">
-            <div className="space-y-1">
-                <h1 className="text-2xl font-semibold tracking-tight">Profile</h1>
-                <p className="text-sm text-muted-foreground">
-                    Manage your profile and content preferences
-                </p>
-            </div>
-
-            <div className="rounded-2xl border bg-card/60 border-border p-6 sm:p-8">
-                <ProfileForm
-                    defaultAbout={currentUser.about ?? ""}
-                    defaultCategories={userRecord?.categories ?? []}
-                    defaultTags={userRecord?.tags ?? []}
-                    defaultExperience={currentUser.experienceLevel ?? "mid"}
-                />
-            </div>
-        </div>
+        <>
+            <SectionHeader
+                title="Profile"
+                description="Manage your profile and content preferences."
+                className="max-w-3xl mx-auto"
+                action={
+            <a
+                href={githubRepoLink}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={buttonVariants({
+                    variant: "default",
+                    className: "hidden sm:inline-flex items-center gap-2",
+                })}
+            >
+                <IconBrandGithub size={18} />
+                <span>Star on GitHub</span>
+            </a>
+                }
+            >
+                <section className="">
+                    <ProfileForm
+                        defaultAbout={currentUser.about ?? ""}
+                        defaultCategories={userRecord?.categories ?? []}
+                        defaultTags={userRecord?.tags ?? []}
+                        defaultExperience={currentUser.experienceLevel ?? "mid"}
+                    />
+                </section>
+            </SectionHeader>
+        </>
     )
 }
 

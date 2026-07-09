@@ -32,8 +32,7 @@ async function FeedPage() {
 
   return (
     <>
-      <SectionHeader title="Discover" description="Fresh stories, trending insights, and articles tailored to your interests.
-">
+      <SectionHeader title="Reading History" description="Revisit articles you've recently read and continue where you left off.">
         <section className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
           {articles.map((article) => (
             <ArticleCard key={article.id} article={article} />
