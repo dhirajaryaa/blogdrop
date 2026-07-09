@@ -6,6 +6,7 @@ import { buttonVariants } from "@/components/ui/button"
 import GlowBadge from "@/components/common/GlowBadge"
 import { formatDate } from "@/utils/format-date"
 import { ensureAuthUser } from "@/lib/auth/get-user"
+import { Badge } from "@/components/ui/badge"
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
@@ -86,13 +87,14 @@ async function ArticlePage({ params }: ArticlePageProps) {
 
         {article.tags && article.tags.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
-            {article.tags.map((tag) => (
-              <span
-                key={tag}
-                className="text-xs px-2.5 py-1 rounded-full bg-muted text-foreground"
+            {article.tags.map((tag, i) => (
+              <Badge
+                key={tag + i}
+                variant={"secondary"}
+                className="capitalize py-2.5"
               >
                 {tag}
-              </span>
+              </Badge>
             ))}
           </div>
         )}

@@ -135,7 +135,8 @@ export function ProfileForm({
             <ToggleGroupItem
               key={cat.value}
               value={cat.value}
-              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+              size={"sm"}
+              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary text-xs"
             >
               {cat.label}
             </ToggleGroupItem>

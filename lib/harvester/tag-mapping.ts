@@ -15,7 +15,7 @@ export const tagsMapping = (generatedTags: string[]): string[] => {
         keys: ["canonical", "alias"] // check karga
     });
 
-    const normalizedTags: string[] = [];
+    const normalizedTags = new Set<string>();;
 
 
     for (const tag of generatedTags) {
@@ -24,10 +24,10 @@ export const tagsMapping = (generatedTags: string[]): string[] => {
         if (result.length === 0) continue;
         if ((result[0].score ?? 1) > 0.3) continue;
 
-        normalizedTags.push(result[0].item.canonical);
+        normalizedTags.add(result[0].item.canonical);
     }
 
-    return normalizedTags;
+    return [...normalizedTags];
 }
 
 
@@ -44,7 +44,7 @@ export const categoriesMapping = (generatedCategories: string[]): string[] => {
         keys: ["canonical", "alias"] // check karga
     });
 
-    const normalizedCategories: string[] = [];
+    const normalizedCategories = new Set<string>();;
 
     for (const category of generatedCategories) {
         const result = fuse.search(category);
@@ -52,9 +52,9 @@ export const categoriesMapping = (generatedCategories: string[]): string[] => {
         if (result.length === 0) continue;
         if ((result[0].score ?? 1) > 0.3) continue;
 
-        normalizedCategories.push(result[0].item.canonical)
+        normalizedCategories.add(result[0].item.canonical)
     };
 
     //? step 3: return Canonical tags match nhi huya ignore it
-    return normalizedCategories;
+    return [...normalizedCategories];
 }

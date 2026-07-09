@@ -112,6 +112,7 @@ export function OnboardingForm() {
             <ToggleGroupItem
               key={cat.value}
               value={cat.value}
+              size={"sm"}
               className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
             >
               {cat.label}
