@@ -1,10 +1,13 @@
 "use server"
 
 import { db } from "@/db"
-import { article, source, user } from "@/db/schema"
-import { eq, desc } from "drizzle-orm"
+import { article, articleMetaData, source, user } from "@/db/schema"
+import { eq, desc, and, sql } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
+import { getCurrentUser } from "@/lib/auth/get-user"
+import { redirect } from "next/navigation"
+import { AppResponse } from "@/lib/types"
 
 export async function getArticles() {
   const session = await auth.api.getSession({
@@ -52,4 +55,70 @@ export async function getArticles() {
       readingTime: a.metadata?.readingTime ?? 2,
       difficulty: a.metadata?.difficulty ?? "junior",
     }))
+};
+
+//Todo : add consistent response,input validate and error handing ;
+export type FeedType = {
+  id: string;
+  title: string;
+  slug: string;
+  imageUrl: string | null;
+  summary: string | null;
+  tags: string[] | null;
+  categories: string[] | null;
+  matchScore: number;
+}[]
+
+// get personalized feed 
+export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20): Promise<AppResponse<FeedType>> {
+  try {
+    // check user 
+    const user = await getCurrentUser();
+
+    if (!user) {
+      redirect("/login")
+    };
+
+    // score match sql; 
+    const matchScore = sql<number>`
+    cardinality(
+    ARRAY(
+    SELECT UNNEST(${articleMetaData.tags})
+    INTERSECT
+    SELECT UNNEST(${user.tags}::text[])
+    )
+    )
+    `
+
+    const feed = await db
+      .select({
+        id: article.id,
+        title: article.title,
+        slug: article.slug,
+        imageUrl: article.imageUrl,
+        summary: articleMetaData.summary,
+        tags: articleMetaData.tags,
+        categories: articleMetaData.categories,
+        matchScore: matchScore.as("match_score")
+      })
+      .from(article)
+      .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
+      .where(
+        and(
+          eq(article.status, "completed"),
+          sql`${articleMetaData.categories} && ${user.categories}::text[]`
+        )
+      )
+      .orderBy(desc(matchScore), desc(article.publicAt))
+      .limit(limit)
+      .offset(pageNo * limit);
+
+    return { success: true, data: feed };
+    
+  } catch (error: any) {
+    const message = error instanceof Error ? error.message : "Personalized Feed Fetching Error";
+    console.error(message, error);
+    return { success: false, error: message };
+  }
+
 }
