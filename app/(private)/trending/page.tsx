@@ -1,6 +1,6 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
 import { getArticles } from "@/actions/feed"
-import { ArticleCard } from "@/components/article/ArticleCard"
+import { ArticleCard } from "@/components/article/article-card"
 import { IconRss } from "@tabler/icons-react"
 import Link from "next/link"
 import { SectionHeader } from "@/components/common/section-header"

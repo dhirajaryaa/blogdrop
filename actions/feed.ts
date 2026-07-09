@@ -7,7 +7,6 @@ import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 import { getCurrentUser } from "@/lib/auth/get-user"
 import { redirect } from "next/navigation"
-import { AppResponse } from "@/lib/types"
 
 export async function getArticles() {
   const session = await auth.api.getSession({
@@ -63,62 +62,76 @@ export type FeedType = {
   title: string;
   slug: string;
   imageUrl: string | null;
+  author: string;
+  publicAt: string;
   summary: string | null;
   tags: string[] | null;
   categories: string[] | null;
+  readingTime: number | null;
+  difficulty: string | null;
+  sourceName: string;
   matchScore: number;
-}[]
+}
 
 // get personalized feed 
-export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20): Promise<AppResponse<FeedType>> {
-  try {
-    // check user 
-    const user = await getCurrentUser();
+export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20): Promise<FeedType[]> {
+  // check user 
+  const user = await getCurrentUser();
 
-    if (!user) {
-      redirect("/login")
-    };
+  if (!user) {
+    redirect("/login")
+  };
 
-    // score match sql; 
-    const matchScore = sql<number>`
-    cardinality(
-    ARRAY(
-    SELECT UNNEST(${articleMetaData.tags})
-    INTERSECT
-    SELECT UNNEST(${user.tags}::text[])
-    )
-    )
-    `
+  if (!user.tags || !user.categories) {
+    throw new Error("User preferences not found");
+  };
 
-    const feed = await db
-      .select({
-        id: article.id,
-        title: article.title,
-        slug: article.slug,
-        imageUrl: article.imageUrl,
-        summary: articleMetaData.summary,
-        tags: articleMetaData.tags,
-        categories: articleMetaData.categories,
-        matchScore: matchScore.as("match_score")
-      })
-      .from(article)
-      .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
-      .where(
-        and(
-          eq(article.status, "completed"),
-          sql`${articleMetaData.categories} && ${user.categories}::text[]`
-        )
+  const userTags = sql`ARRAY[${sql.join(
+    user.tags.map((tag) => sql`${tag}`),
+    sql`,`
+  )}]::text[]`;
+
+  const userCategories = sql`ARRAY[${sql.join(
+    user.categories.map((category) => sql`${category}`),
+    sql`,`
+  )}]::text[]`;
+
+  const matchScore = sql<number>`
+(
+  SELECT COUNT(*)
+  FROM unnest(${articleMetaData.tags}) AS tag
+  WHERE tag = ANY(${userTags})
+)
+`;
+
+  const feed = await db
+    .select({
+      id: article.id,
+      title: article.title,
+      slug: article.slug,
+      imageUrl: article.imageUrl,
+      author: article.author,
+      publicAt: article.publicAt,
+      summary: articleMetaData.summary,
+      tags: articleMetaData.tags,
+      categories: articleMetaData.categories,
+      readingTime: articleMetaData.readingTime,
+      difficulty: articleMetaData.difficulty,
+      sourceName: source.title,
+      matchScore,
+    })
+    .from(article)
+    .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
+    .innerJoin(source, eq(source.id, article.sourceId))
+    .where(
+      and(
+        eq(article.status, "completed"),
+        sql`${articleMetaData.categories} && ${userCategories}`
       )
-      .orderBy(desc(matchScore), desc(article.publicAt))
-      .limit(limit)
-      .offset(pageNo * limit);
+    )
+    .orderBy(desc(matchScore), desc(article.publicAt))
+    .limit(limit)
+    .offset((pageNo - 1) * limit);
 
-    return { success: true, data: feed };
-    
-  } catch (error: any) {
-    const message = error instanceof Error ? error.message : "Personalized Feed Fetching Error";
-    console.error(message, error);
-    return { success: false, error: message };
-  }
-
+  return feed;
 }
