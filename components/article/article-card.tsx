@@ -14,22 +14,13 @@ import { formatAuthors } from "@/utils/format-author";
 import { formatDate } from "@/utils/format-date";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "../ui/button";
+import ArticleImage from "./article-img";
 
 export function ArticleCard({ article }: { article: FeedType }) {
     return (
         <Link href={`/a/${article.slug}`} className="block h-full relative">
             <Card className="py-0 group">
-                {article.imageUrl && (
-                    <div className="relative aspect-video overflow-hidden object-cover">
-                        <Image
-                            src={article.imageUrl}
-                            alt={article.title}
-                            fill
-                            sizes="(max-width:768px) 100vw, (max-width:1200px) 50vw, 33vw"
-                            className="object-fill transition-transform duration-500 group-hover:scale-103"
-                        />
-                    </div>
-                )}
+                <ArticleImage url={article.imageUrl} alt={article.title} />
                 <CardContent className="flex flex-1 flex-col py-0 px-5">
                     {/* Meta */}
                     <div className="mb-3 flex h-7 justify-between items-center gap-2 text-xs text-muted-foreground">

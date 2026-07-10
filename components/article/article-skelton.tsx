@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function ArticleSkelton() {
     return (
-        <Card className="p-2 max-w-xs">
+        <Card className="p-2">
             <div className="aspect-video bg-background/60 w-full rounded-xl" />
             <CardContent className="px-2 pb-2 space-y-4">
                 <div className="flex items-center gap-2">

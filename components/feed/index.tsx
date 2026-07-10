@@ -18,7 +18,7 @@ export function FeedList() {
     } = useInfiniteQuery({
         queryKey: ["feed"],
         initialPageParam: 1,
-        queryFn: async ({ pageParam }) => {
+        queryFn: async ({ pageParam}) => {
             const res = await fetch(`/api/feed?page=${pageParam}&limit=20`);
             if (!res.ok) throw new Error("Failed to fetch feed");
             return res.json();
@@ -29,7 +29,9 @@ export function FeedList() {
         },
     });
 
-    const allArticles = data?.pages.flat() ?? [];
+    const allArticles = data?.pages.flatMap(page=>page) ?? [];
+    console.log(data);
+    
 
     if (isPending) {
         return (

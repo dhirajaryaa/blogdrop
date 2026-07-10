@@ -70,7 +70,7 @@ export async function GET(req: NextRequest) {
                     sql`${articleMetaData.categories} && ${userCategories}`
                 )
             )
-            .orderBy(desc(matchScore), desc(article.publicAt))
+            .orderBy(desc(matchScore))
             .limit(limit)
             .offset((page - 1) * limit);
 
