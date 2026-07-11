@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function ArticleSkelton() {
     return (
-        <div className="flex flex-col sm:flex-row gap-4 border-b border-border/50 py-6">
+        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl py-6 w-full dark:hover:bg-muted/60 bg-muted/30 border-2">
             <div className="flex flex-1 flex-col justify-between">
                 <div>
                     {/* Metadata Row */}
@@ -26,14 +26,6 @@ function ArticleSkelton() {
                         <Skeleton className="w-5/6 h-4" />
                     </div>
                 </div>
-
-                <div className="flex items-center mt-2">
-                    <Skeleton className="w-32 h-4" />
-                </div>
-            </div>
-
-            <div className="flex flex-col justify-start sm:items-end">
-                <Skeleton className="size-10 rounded-full" />
             </div>
         </div>
     )

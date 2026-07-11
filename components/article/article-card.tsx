@@ -62,11 +62,11 @@ export function ArticleCard({ article }: { article: FeedType }) {
 
             <div className="z-10 absolute right-3 top-3">
                 <Button
-                    className="text-muted-foreground hover:text-primary hover:bg-primary/10 transition-colors rounded-full"
+                    className="hidden group-hover:inline-flex items-center justify-center text-muted-foreground hover:text-primary"
                     variant="ghost"
                     size="icon"
                 >
-                    <IconBookmark className="size-5" fill="currentColor" />
+                    <IconBookmark className="size-5" />
                 </Button>
             </div>
         </article>
