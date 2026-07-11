@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation"
 import Link from "next/link"
-import { IconArrowLeft, IconClock, IconExternalLink, IconUser } from "@tabler/icons-react"
+import { IconArrowLeft, IconCalendar, IconCircleCheck, IconClock, IconExternalLink, IconHash, IconSparkles, IconUser } from "@tabler/icons-react"
 import { getArticleBySlug } from "@/actions/article"
 import { buttonVariants } from "@/components/ui/button"
 import GlowBadge from "@/components/common/GlowBadge"
@@ -15,36 +15,31 @@ interface ArticlePageProps {
 async function ArticlePage({ params }: ArticlePageProps) {
   await ensureAuthUser()
   const { slug } = await params
-  const article = await getArticleBySlug(slug)
+  const article = await getArticleBySlug(slug);
+
+  const domain = new URL(article.originalUrl).hostname;
+  const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}`;
 
   if (!article) notFound();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 my-8 px-4">
+    <div className="max-w-4xl mx-auto space-y-8 my-4 px-4 relative">
       <Link
         href="/feed"
-        className={buttonVariants({ variant: "ghost", size: "sm", className: "gap-1.5 text-muted-foreground" })}
+        className={buttonVariants({ variant: "outline", size: "sm" })}
       >
         <IconArrowLeft className="size-4" />
         Back to feed
       </Link>
 
       <article className="space-y-6">
-        {article.image && (
-          <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border max-h-100">
-            <img
-              src={article.image}
-              alt={article.title}
-              className="size-full object-cover"
-            />
-          </div>
-        )}
-
+        {/* topbar  */}
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            {article.sourceName && (
-              <span className="font-semibold text-foreground">{article.sourceName}</span>
-            )}
+            <span className="inline-flex items-center gap-2 text-foreground/70 tracking-normal font-semibold text-sm">
+              <img loading="lazy" decoding="async" src={faviconUrl} alt={article?.sourceName || "logo"} className="size-5 rounded-full object-cover" />
+              {article.sourceName}
+            </span>
             {article.readingTime && (
               <>
                 <span>•</span>
@@ -57,26 +52,39 @@ async function ArticlePage({ params }: ArticlePageProps) {
             {article.difficulty && (
               <>
                 <span>•</span>
-                <GlowBadge>{article.difficulty}</GlowBadge>
+                <GlowBadge className="capitalize">{article.difficulty}</GlowBadge>
               </>
             )}
           </div>
 
-          <h1 className="text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-4xl font-bold tracking-tight leading-tight">
             {article.title}
           </h1>
 
-          {article.author && (
+          <div className="flex gap-2 items-center justify-between">
             <p className="flex items-center gap-1.5 text-sm text-muted-foreground">
               <IconUser className="size-3.5" />
               By {article.author}
             </p>
-          )}
+            <div className="flex gap-1 items-center">
+              <IconCalendar className="size-4 text-muted-foreground" />
+              <time className="block text-sm text-muted-foreground">
+                {formatDate(article.publicAt)}
+              </time>
+            </div>
+          </div>
 
-          <time className="block text-sm text-muted-foreground">
-            {formatDate(article.publicAt)}
-          </time>
         </div>
+        {/* image  */}
+        {article.image && (
+          <div className="relative aspect-video w-full overflow-hidden rounded-2xl border border-border max-h-100">
+            <img
+              src={article.image}
+              alt={article.title}
+              className="size-full object-cover"
+            />
+          </div>
+        )}
 
         {article.whyRead && article.whyRead.length > 0 && (
           <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 ">
@@ -91,18 +99,18 @@ async function ArticlePage({ params }: ArticlePageProps) {
               <Badge
                 key={tag + i}
                 variant={"secondary"}
-                className="capitalize py-2.5"
+                className="capitalize py-2.5 gap-0.5 bg-primary/10 text-primary"
               >
-                {tag}
+                <IconHash /> {tag}
               </Badge>
             ))}
           </div>
         )}
 
         {article.summary && (
-          <div className="space-y-3">
-            <h2 className="text-xl font-semibold tracking-tight">Summary</h2>
-            <p className="text-base leading-7 text-muted-foreground">{article.summary}</p>
+          <div className="space-y-3 bg-primary/8 border-l-4 border-primary p-4">
+            <h2 className="text-[17px] uppercase flex items-center text-primary font-semibold tracking-tight"><IconSparkles className="size-5" /> AI Summary</h2>
+            <p className="text-base leading-5 text-muted-foreground">{article.summary}</p>
           </div>
         )}
 
@@ -112,7 +120,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
             <ul className="space-y-2">
               {article.keyTakeaways.map((takeaway, i) => (
                 <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
-                  <span className="mt-1.5 size-1.5 shrink-0 rounded-full bg-primary" />
+                  <IconCircleCheck className="text-primary size-5" />
                   {takeaway}
                 </li>
               ))}
@@ -120,7 +128,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
 
-        <div className="flex flex-col sm:flex-row gap-3 pt-4 border-t border-border">
+        <div className="flex flex-row gap-3 pt-4 border-t border-border mt-10">
           <Link
             href={`${article.originalUrl}?ref=blogdrop`}
             target="_blank"
@@ -135,7 +143,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
               href={`${article.sourceSiteUrl}?ref=blogdrop`}
               target="_blank"
               rel="noopener noreferrer"
-              className={buttonVariants({ variant: "outline", size: "lg" })}
+              className={buttonVariants({ variant: "link", size: "lg" })}
             >
               Visit {article.sourceName}
             </Link>

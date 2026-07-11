@@ -10,22 +10,22 @@ import {
 } from "@tabler/icons-react";
 import { formatAuthors } from "@/utils/format-author";
 import { formatDate } from "@/utils/format-date";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 
 export function ArticleCard({ article }: { article: FeedType }) {
     const domain = new URL(article.originalUrl).hostname;
     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}`;
 
     return (
-        <article className="group flex flex-col sm:flex-row gap-4 py-6 transition-colors hover:bg-muted/70 hover:shadow-md p-4 rounded-2xl bg-muted/30 border-2 relative">
-            <Link href={`/a/${article.slug}`} className="absolute inset-0 z-0" aria-label={`Read ${article.title}`} />
+        <article className="group flex flex-col sm:flex-row gap-4 py-6 transition-colors hover:bg-muted/40 dark:hover:bg-muted/60 hover:shadow-md p-4 rounded-2xl bg-muted/30 dark:bg-muted/20 border-2 relative">
+            <Link href={`/article/${article.slug}`} className="absolute inset-0 z-0" aria-label={`Read ${article.title}`} />
 
             <div className="flex flex-1 flex-col justify-between">
                 <div>
                     {/* Metadata Row */}
                     <div className="mb-2 flex items-center gap-3 font-mono text-[11px] text-muted-foreground uppercase tracking-wider">
                         <span className="inline-flex items-center gap-2 text-foreground/70 tracking-normal font-bold">
-                            <img src={faviconUrl} alt={article.sourceName} className="size-4 rounded-full object-cover" />
+                            <img loading="lazy" decoding="async" src={faviconUrl} alt={article.sourceName} className="size-4 rounded-full object-cover" />
                             {article.sourceName}
                         </span>
                         <span>&bull;</span>
