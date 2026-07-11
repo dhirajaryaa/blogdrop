@@ -1,27 +1,15 @@
 import { QueryProvider } from "@/components/provider/query-provider";
-import AppHeader from "@/components/sidebar/app-header";
-import { AppSidebar } from "@/components/sidebar/app-sidebar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
+import AppHeader from "@/components/common/app-header";
 
-async function AppPage({ children }: { children: React.ReactNode }) {
+function AppPage({ children }: { children: React.ReactNode }) {
   return (
     <QueryProvider>
-      <SidebarProvider
-        style={
-          {
-            "--sidebar-width": "16rem",
-            "--sidebar-width-mobile": "16rem",
-          } as React.CSSProperties
-        }
-      >
-        <AppSidebar />
-        <SidebarInset>
-          <AppHeader />
-          <main className="flex-1 w-full h-full overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
-            {children}
-          </main>
-        </SidebarInset>
-      </SidebarProvider>
+      <div className="min-h-screen flex flex-col relative w-full">
+        <AppHeader />
+        <main className="flex-1 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-8">
+          {children}
+        </main>
+      </div>
     </QueryProvider>
   )
 }

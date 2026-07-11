@@ -1,12 +1,13 @@
 "use server"
 
 import { db } from "@/db"
+import { articleCategories } from "@/config/category"
+import { userTags as articleTags } from "@/config/tags"
 import { article, articleMetaData, source, user } from "@/db/schema"
 import { eq, desc, and, sql } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 import { getCurrentUser } from "@/lib/auth/get-user"
-import { redirect } from "next/navigation"
 
 export async function getArticles() {
   const session = await auth.api.getSession({
@@ -78,21 +79,16 @@ export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20
   // check user 
   const user = await getCurrentUser();
 
-  if (!user) {
-    redirect("/login")
-  };
-
-  if (!user.tags || !user.categories) {
-    throw new Error("User preferences not found");
-  };
+  const categories = user?.categories ?? articleCategories.map(cat => cat.value);
+  const tags = user?.tags ?? articleTags.map(tag => tag.value);
 
   const userTags = sql`ARRAY[${sql.join(
-    user.tags.map((tag) => sql`${tag}`),
+    tags.map((tag) => sql`${tag}`),
     sql`,`
   )}]::text[]`;
 
   const userCategories = sql`ARRAY[${sql.join(
-    user.categories.map((category) => sql`${category}`),
+    categories.map((category) => sql`${category}`),
     sql`,`
   )}]::text[]`;
 

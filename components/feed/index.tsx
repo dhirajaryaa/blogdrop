@@ -4,6 +4,7 @@ import ArticleSkelton from "@/components/article/article-skelton";
 import EmptyFeed from "@/components/article/empty-feed";
 import { ArticleCard } from "@/components/article/article-card";
 import { useInfiniteQuery } from "@tanstack/react-query";
+import { getPersonalizedFeed } from "@/actions/feed";
 
 const PAGE_SIZE = 20;
 
@@ -19,9 +20,7 @@ export function FeedList() {
         queryKey: ["feed"],
         initialPageParam: 1,
         queryFn: async ({ pageParam}) => {
-            const res = await fetch(`/api/feed?page=${pageParam}&limit=20`);
-            if (!res.ok) throw new Error("Failed to fetch feed");
-            return res.json();
+            return await getPersonalizedFeed()
         },
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length < PAGE_SIZE) return undefined;
@@ -30,12 +29,10 @@ export function FeedList() {
     });
 
     const allArticles = data?.pages.flatMap(page=>page) ?? [];
-    console.log(data);
     
-
     if (isPending) {
         return (
-            <section className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+            <section className="flex flex-col border-t border-border/50">
                 {Array.from({ length: 8 }).map((_, i) => (
                     <ArticleSkelton key={i} />
                 ))}
@@ -44,8 +41,7 @@ export function FeedList() {
     };
 
     return (
-        <section
-            className="grid gap-5 grid-cols-[repeat(auto-fill,minmax(280px,1fr))]">
+        <section className="flex flex-col border-t border-border/50">
             {allArticles.length === 0 ? (<EmptyFeed />) : (
                 allArticles.map((article) => (<ArticleCard key={article.id} article={article} />))
             )}

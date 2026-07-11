@@ -1,20 +1,26 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
-import { SectionHeader } from "@/components/common/section-header"
 import { FeedList } from "@/components/feed"
+import { FeedSidebar } from "@/components/feed/feed-sidebar"
+import Link from "next/link"
+import LinkTab from "@/components/common/link-tab"
 
 async function FeedPage() {
-  await ensureAuthUser()
+  // await ensureAuthUser()
 
   return (
-    <>
-      <SectionHeader title="Discover" description="Fresh stories, trending insights, and articles tailored to your interests."
-        className=" max-w-7xl mx-auto"
-      >
+    <div className="flex gap-8 max-w-7xl mx-auto w-full relative">
+      {/* Left Sidebar */}
+      <FeedSidebar />
+
+      {/* Main Feed Content */}
+      <section className="relative">
+        {/* Tabs */}
+      <LinkTab />
+
         {/* listing  */}
         <FeedList />
-
-      </SectionHeader>
-    </>
+      </section>
+    </div>
   )
 }
 
