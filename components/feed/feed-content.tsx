@@ -10,6 +10,10 @@ import LinkTab from "../common/link-tab";
 import { authClient } from "@/lib/auth/auth-client";
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
+import SearchBox from "../sidebar/search-box";
+import { Button } from "../ui/button";
+import { IconFilter2 } from "@tabler/icons-react";
+import { toast } from "sonner";
 
 const PAGE_SIZE = 20;
 
@@ -64,7 +68,7 @@ function FeedContent() {
 
     }, [allArticles, fuse, searchInput]);
 
-    // handle filter or  tags
+    //! handle filter or  tags
     const filteredArticles = useMemo(() => {
         return filteredSearchArticles.filter(article => {
             const categoryMatch = selectedCategory.trim() ? article.categories?.includes(selectedCategory) : article;
@@ -84,7 +88,7 @@ function FeedContent() {
         <section className="w-full max-w-6xl mx-auto">
             {/* links tab  */}
             <LinkTab />
-            <div className="w-full flex flex-row gap-6 pt-1 md:pt-6">
+            <div className="w-full flex flex-col gap-4 md:flex-row md:gap-6 pt-1 md:pt-6">
                 {/* sidebar for desktop view */}
                 <FeedSidebar
                     searchInput={searchInput}
@@ -94,6 +98,19 @@ function FeedContent() {
                     selectedTags={selectedTags}
                     setSelectedTags={setSelectedTags}
                 />
+
+                {/* mobile view search bar  */}
+                <div className="w-full flex items-center gap-2 md:hidden">
+                    <SearchBox searchInput={searchInput}
+                        setSearchInput={setSearchInput} />
+                    <Button
+                        variant="outline"
+                        onClick={() => toast.info("Mobile filters are coming soon. You can use search for now.")}
+                    >
+                        <IconFilter2 />
+                        Filters
+                    </Button>
+                </div>
 
                 {/* feed list show  */}
                 {

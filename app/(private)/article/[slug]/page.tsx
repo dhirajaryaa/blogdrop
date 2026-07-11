@@ -23,7 +23,7 @@ async function ArticlePage({ params }: ArticlePageProps) {
   if (!article) notFound();
 
   return (
-    <div className="max-w-4xl mx-auto space-y-8 my-4 px-4 relative">
+    <div className="max-w-4xl mx-auto space-y-8 my-4 px-4 relative py-8">
       <Link
         href="/feed"
         className={buttonVariants({ variant: "outline", size: "sm" })}

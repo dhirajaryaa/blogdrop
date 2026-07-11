@@ -23,9 +23,9 @@ export function FeedSidebar({
 
     const defaultCategories = articleCategories.filter(c =>
         [
+            "ai",
             "frontend",
             "backend",
-            "ai",
             "cloud",
             "system-design",
         ].includes(c.value)
@@ -53,7 +53,7 @@ export function FeedSidebar({
 
             {/* Categories */}
             <div className="space-y-3">
-                <h3 className="text-[11px] font-mono font-bold tracking-widest text-muted-foreground uppercase">Categories</h3>
+                <h3 className="text-[11px] font-mono font-bold tracking-widest text-foreground uppercase">Categories</h3>
                 <ToggleGroup type="single"
                     spacing={1}
                     value={selectedCategory}
@@ -68,7 +68,7 @@ export function FeedSidebar({
             </div>
             {/* Trending Tags */}
             <div className="space-y-3">
-                <h3 className="text-[11px] font-mono font-bold tracking-widest text-muted-foreground uppercase">Trending Tags</h3>
+                <h3 className="text-[11px] font-mono font-bold tracking-widest text-foreground uppercase">Trending Tags</h3>
                 <div className="flex flex-wrap gap-2 w-full">
                     <ToggleGroup type="multiple"
                         value={selectedTags}
