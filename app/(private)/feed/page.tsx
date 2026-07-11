@@ -13,9 +13,9 @@ async function FeedPage() {
       <FeedSidebar />
 
       {/* Main Feed Content */}
-      <section className="relative">
+      <section className="relative flex-1 min-w-1">
         {/* Tabs */}
-      <LinkTab />
+        <LinkTab />
 
         {/* listing  */}
         <FeedList />

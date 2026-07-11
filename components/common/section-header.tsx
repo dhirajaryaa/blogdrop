@@ -17,19 +17,19 @@ export function SectionHeader({
     className,
 }: SectionHeaderProps) {
     return (
-        <div className={cn("space-y-6", className)}>
-            <section className="flex items-start justify-between gap-4">
+        <div className={cn("space-y-6 max-w-5xl", className)}>
+            <section className="flex items-start justify-between gap-4 pt-2">
                 <div className="min-w-0">
-                    <h1 className="text-2xl font-semibold tracking-tight">
+                    <h1 className="text-3xl font-semibold tracking-tight text-foreground">
                         {title}
                     </h1>
-                    <p className="mt-1 text-sm text-muted-foreground">
+                    <p className="mt-1.5 text-sm text-muted-foreground max-w-2xl">
                         {description}
                     </p>
                 </div>
 
                 {action && (
-                    <div className="shrink-0">
+                    <div className="shrink-0 mt-1">
                         {action}
                     </div>
                 )}

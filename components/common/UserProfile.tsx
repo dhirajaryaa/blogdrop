@@ -3,7 +3,7 @@
 import { authClient } from "@/lib/auth/auth-client";
 import Link from "next/link";
 import { buttonVariants } from "@/components/ui/button";
-import { IconArrowRight, IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
+import { IconArrowRight, IconHistory, IconLogout, IconSettings, IconUser } from "@tabler/icons-react";
 import {
   Avatar,
   AvatarFallback,
@@ -52,18 +52,26 @@ function UserProfile() {
                     </Avatar>
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" >
+                <DropdownMenuContent align="end" className="w-full" >
                   <DropdownMenuGroup>
                     <DropdownMenuItem asChild>
                       <Link href={"/profile"}>
-                      <IconUser />
-                      Profile
+                        <IconUser />
+                        Profile
                       </Link>
                     </DropdownMenuItem>
+                  
                     <DropdownMenuItem asChild>
-                      <Link href={"/settings"}> 
-                      <IconSettings />
-                      Settings
+                      <Link href={"/history"}>
+                        <IconHistory />
+                        Reading History
+                      </Link>
+                    </DropdownMenuItem>
+
+                      <DropdownMenuItem asChild>
+                      <Link href={"/settings"}>
+                        <IconSettings />
+                        Settings
                       </Link>
                     </DropdownMenuItem>
                   </DropdownMenuGroup>

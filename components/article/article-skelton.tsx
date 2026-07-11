@@ -1,34 +1,41 @@
-import {
-    Card,
-    CardContent,
-    CardDescription,
-} from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
 function ArticleSkelton() {
     return (
-        <Card className="p-2">
-            <div className="aspect-video bg-background/60 w-full rounded-xl" />
-            <CardContent className="px-2 pb-2 space-y-4">
-                <div className="flex items-center gap-2">
-                    <Skeleton className="size-6" />
-                    <Skeleton className="w-1/3 h-5" />
+        <div className="flex flex-col sm:flex-row gap-4 border-b border-border/50 py-6">
+            <div className="flex flex-1 flex-col justify-between">
+                <div>
+                    {/* Metadata Row */}
+                    <div className="mb-2 flex items-center gap-3">
+                        <Skeleton className="w-16 h-4" />
+                        <Skeleton className="w-4 h-4 rounded-full" />
+                        <Skeleton className="w-20 h-4" />
+                        <Skeleton className="w-4 h-4 rounded-full" />
+                        <Skeleton className="w-16 h-4" />
+                    </div>
+
+                    {/* Headline */}
+                    <div className="mb-2 pr-12 space-y-2">
+                        <Skeleton className="w-full h-6" />
+                        <Skeleton className="w-3/4 h-6" />
+                    </div>
+
+                    {/* Summary */}
+                    <div className="mb-3 space-y-2 max-w-3xl">
+                        <Skeleton className="w-full h-4" />
+                        <Skeleton className="w-5/6 h-4" />
+                    </div>
                 </div>
-                <CardDescription className="space-y-3">
-                    <Skeleton className="w-full h-4" />
-                    <Skeleton className="w-4/6 h-4" />
-                    <Skeleton className="w-5/6 h-4" />
-                    <Skeleton className="w-4/6 h-4" />
-                    <Skeleton className="w-5/6 h-4" />
-                    <Skeleton className="w-2/6 h-4" />
-                </CardDescription>
-                <div className="flex gap-2 items-center">
-                    {Array.from({ length: 4 }).map((_, i) => (
-                        <Skeleton key={i} className="w-12 h-5" />
-                    ))}
+
+                <div className="flex items-center mt-2">
+                    <Skeleton className="w-32 h-4" />
                 </div>
-            </CardContent>
-        </Card>
+            </div>
+
+            <div className="flex flex-col justify-start sm:items-end">
+                <Skeleton className="size-10 rounded-full" />
+            </div>
+        </div>
     )
 }
 

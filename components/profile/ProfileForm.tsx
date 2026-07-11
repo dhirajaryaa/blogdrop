@@ -6,23 +6,9 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { Button } from "@/components/ui/button"
-import { userTags } from "@/config/tags"
-import { articleCategories } from "@/config/category"
 import { toast } from "sonner"
-import { IconChevronDown, IconChevronUp } from "@tabler/icons-react"
 import { updateProfile } from "@/actions/profile"
-import {
-  Combobox,
-  ComboboxChip,
-  ComboboxChips,
-  ComboboxChipsInput,
-  ComboboxContent,
-  ComboboxEmpty,
-  ComboboxItem,
-  ComboboxList,
-  ComboboxValue,
-  useComboboxAnchor,
-} from "@/components/ui/combobox"
+import { CategoryTagSelector } from "@/components/common/category-tag-selector"
 
 interface ProfileFormProps {
   defaultAbout: string
@@ -43,15 +29,12 @@ export function ProfileForm({
   const [selectedCategories, setSelectedCategories] = useState<Set<string>>(new Set(defaultCategories))
   const [selectedTags, setSelectedTags] = useState<Set<string>>(new Set(defaultTags))
   const [experience, setExperience] = useState(defaultExperience)
-  const [showAllCategories, setShowAllCategories] = useState(false)
+  
   const [errors, setErrors] = useState<{
     categories: "min" | "max" | null
     tags: "min" | "max" | null
     experience: boolean
   }>({ categories: null, tags: null, experience: false })
-
-  const tagAnchor = useComboboxAnchor()
-  const tagItems = userTags.map((t) => t.value)
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -88,11 +71,11 @@ export function ProfileForm({
   }
 
   return (
-    <form onSubmit={onSubmit} className="space-y-10">
+    <form onSubmit={onSubmit} className="space-y-10 py-6 max-w-3xl mx-auto">
       <section className="space-y-3">
         <div>
-          <Label className="text-base">About you</Label>
-          <p className="text-sm text-muted-foreground">
+          <Label className="text-base font-semibold text-foreground">About you</Label>
+          <p className="text-sm text-muted-foreground mt-1">
             Share a short bio so other devs know what you&apos;re about
           </p>
         </div>
@@ -100,126 +83,27 @@ export function ProfileForm({
           placeholder="I'm a full-stack developer passionate about..."
           value={about}
           onChange={(e) => setAbout(e.target.value)}
-          className="min-h-30"
+          className="min-h-[120px] rounded-lg border-border/50 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
         />
       </section>
 
-      <section className="space-y-3">
-        <div>
-          <Label className="text-base">Categories</Label>
-          <p className="text-sm text-muted-foreground">
-            Pick 3–5 categories you want to see in your feed
-          </p>
-          {errors.categories === "max" && (
-            <p className="text-sm text-destructive">Maximum 5 categories allowed</p>
-          )}
-          {errors.categories === "min" && (
-            <p className="text-sm text-destructive">Please select at least 3 categories</p>
-          )}
-        </div>
-        <ToggleGroup
-          type="multiple"
-          variant="outline"
-          value={[...selectedCategories]}
-          onValueChange={(value) => {
-            if (value.length > 5) {
-              setErrors((prev) => ({ ...prev, categories: "max" }))
-              return
-            }
-            setSelectedCategories(new Set(value))
-            setErrors((prev) => ({ ...prev, categories: value.length >= 3 ? null : prev.categories }))
-          }}
-          className="flex-wrap w-full"
-        >
-          {(showAllCategories ? articleCategories : articleCategories.slice(0, 6)).map((cat) => (
-            <ToggleGroupItem
-              key={cat.value}
-              value={cat.value}
-              size={"sm"}
-              className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary text-xs"
-            >
-              {cat.label}
-            </ToggleGroupItem>
-          ))}
-        </ToggleGroup>
-        {articleCategories.length > 6 && (
-          <Button
-            type="button"
-            variant="ghost"
-            size="sm"
-            onClick={() => setShowAllCategories(!showAllCategories)}
-            className="text-muted-foreground gap-1"
-          >
-            {showAllCategories ? "Show less" : `Show all ${articleCategories.length - 6} categories`}
-            {showAllCategories ? <IconChevronUp className="size-4" /> : <IconChevronDown className="size-4" />}
-          </Button>
-        )}
-      </section>
+      <CategoryTagSelector
+        selectedCategories={selectedCategories}
+        setSelectedCategories={setSelectedCategories}
+        selectedTags={selectedTags}
+        setSelectedTags={setSelectedTags}
+        errors={errors}
+        setErrors={setErrors}
+      />
 
       <section className="space-y-3">
         <div>
-          <Label className="text-base">Tags</Label>
-          <p className="text-sm text-muted-foreground">
-            Pick 3–15 tags to fine-tune your feed
-          </p>
-          {errors.tags === "max" && (
-            <p className="text-sm text-destructive">Maximum 15 tags allowed</p>
-          )}
-          {errors.tags === "min" && (
-            <p className="text-sm text-destructive">Please select at least 3 tags</p>
-          )}
-        </div>
-        <Combobox
-          multiple
-          items={tagItems}
-          itemToStringLabel={(value: string) => userTags.find((t) => t.value === value)?.label ?? value}
-          value={[...selectedTags]}
-          onValueChange={(values: string[]) => {
-            if (values.length > 15) {
-              setErrors((prev) => ({ ...prev, tags: "max" }))
-              return
-            }
-            setSelectedTags(new Set(values))
-            setErrors((prev) => ({ ...prev, tags: values.length >= 3 ? null : prev.tags }))
-          }}
-        >
-          <ComboboxChips ref={tagAnchor} className="w-full">
-            <ComboboxValue>
-              {(values: string[]) => (
-                <>
-                  {values.map((value) => {
-                    const tag = userTags.find((t) => t.value === value)
-                    return <ComboboxChip key={value}>{tag?.label ?? value}</ComboboxChip>
-                  })}
-                  <ComboboxChipsInput placeholder="Search tags..." />
-                </>
-              )}
-            </ComboboxValue>
-          </ComboboxChips>
-          <ComboboxContent anchor={tagAnchor}>
-            <ComboboxEmpty>No tags found.</ComboboxEmpty>
-            <ComboboxList>
-              {(item: string) => {
-                const tag = userTags.find((t) => t.value === item)
-                return (
-                  <ComboboxItem key={item} value={item}>
-                    {tag?.label ?? item}
-                  </ComboboxItem>
-                )
-              }}
-            </ComboboxList>
-          </ComboboxContent>
-        </Combobox>
-      </section>
-
-      <section className="space-y-3">
-        <div>
-          <Label className="text-base">Experience</Label>
-          <p className="text-sm text-muted-foreground">
+          <Label className="text-base font-semibold text-foreground">Experience</Label>
+          <p className="text-sm text-muted-foreground mt-1">
             Your experience level helps us tailor content for you
           </p>
           {errors.experience && (
-            <p className="text-sm text-destructive">
+            <p className="text-sm text-destructive mt-1">
               Please select your experience level
             </p>
           )}
@@ -232,29 +116,30 @@ export function ProfileForm({
             setExperience(value)
             setErrors((prev) => ({ ...prev, experience: false }))
           }}
+          className="justify-start gap-3"
         >
           <ToggleGroupItem
             value="junior"
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+            className="rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary px-6 shadow-none"
           >
             Junior
           </ToggleGroupItem>
           <ToggleGroupItem
             value="mid"
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+            className="rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary px-6 shadow-none"
           >
             Mid-Level
           </ToggleGroupItem>
           <ToggleGroupItem
             value="senior"
-            className="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary"
+            className="rounded-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground data-[state=on]:border-primary px-6 shadow-none"
           >
             Senior
           </ToggleGroupItem>
         </ToggleGroup>
       </section>
 
-      <Button type="submit" size="lg" className="w-full" disabled={loading}>
+      <Button type="submit" size="lg" className="rounded-full mt-8 shadow-none" disabled={loading}>
         {loading ? "Saving..." : "Save changes"}
       </Button>
     </form>

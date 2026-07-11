@@ -41,7 +41,7 @@ export function FeedList() {
     };
 
     return (
-        <section className="flex flex-col border-t border-border/50">
+        <section className="flex flex-col border-t border-border/50 overflow-y-auto">
             {allArticles.length === 0 ? (<EmptyFeed />) : (
                 allArticles.map((article) => (<ArticleCard key={article.id} article={article} />))
             )}
