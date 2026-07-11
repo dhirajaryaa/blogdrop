@@ -19,7 +19,7 @@ export function FeedList() {
     } = useInfiniteQuery({
         queryKey: ["feed"],
         initialPageParam: 1,
-        queryFn: async ({ pageParam}) => {
+        queryFn: async ({ pageParam }) => {
             return await getPersonalizedFeed()
         },
         getNextPageParam: (lastPage, allPages) => {
@@ -28,11 +28,11 @@ export function FeedList() {
         },
     });
 
-    const allArticles = data?.pages.flatMap(page=>page) ?? [];
-    
+    const allArticles = data?.pages.flatMap(page => page) ?? [];
+
     if (isPending) {
         return (
-            <section className="flex flex-col border-t border-border/50">
+            <section className="flex flex-col border-t border-border/50 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                     <ArticleSkelton key={i} />
                 ))}
@@ -41,7 +41,7 @@ export function FeedList() {
     };
 
     return (
-        <section className="flex flex-col border-t border-border/50 overflow-y-auto">
+        <section className="flex flex-col  overflow-y-auto gap-6">
             {allArticles.length === 0 ? (<EmptyFeed />) : (
                 allArticles.map((article) => (<ArticleCard key={article.id} article={article} />))
             )}

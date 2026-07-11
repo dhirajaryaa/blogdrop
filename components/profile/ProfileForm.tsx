@@ -83,7 +83,7 @@ export function ProfileForm({
           placeholder="I'm a full-stack developer passionate about..."
           value={about}
           onChange={(e) => setAbout(e.target.value)}
-          className="min-h-[120px] rounded-lg border-border/50 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
+          className="min-h-30 rounded-lg border-border/50 shadow-none focus-visible:ring-1 focus-visible:ring-primary"
         />
       </section>
 

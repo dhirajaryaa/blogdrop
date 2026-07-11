@@ -8,7 +8,7 @@ async function FeedPage() {
   // await ensureAuthUser()
 
   return (
-    <div className="flex gap-8 max-w-7xl mx-auto w-full relative">
+    <div className="flex gap-8 max-w-6xl mx-auto w-full">
       {/* Left Sidebar */}
       <FeedSidebar />
 

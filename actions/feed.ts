@@ -72,6 +72,7 @@ export type FeedType = {
   difficulty: string | null;
   sourceName: string;
   matchScore: number;
+  originalUrl : string;
 }
 
 // get personalized feed 
@@ -107,6 +108,7 @@ export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20
       slug: article.slug,
       imageUrl: article.imageUrl,
       author: article.author,
+      originalUrl : article.originalUrl,
       publicAt: article.publicAt,
       summary: articleMetaData.summary,
       tags: articleMetaData.tags,

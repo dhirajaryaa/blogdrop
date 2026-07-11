@@ -7,15 +7,23 @@ import { getCurrentUser } from "@/lib/auth/get-user"
 export async function FeedSidebar() {
     const user = await getCurrentUser();
 
-    if (!user) return;
+    const categories =
+        user?.categories && user.categories
+            ? articleCategories.filter(category =>
+                user?.categories?.includes(category.value)
+            )
+            : articleCategories.slice(0, 5);
 
-    const categories = articleCategories.filter(category =>
-        user.categories?.includes(category.value)
-    ) ?? articleCategories.slice(0, 5);
-    const tags = userTags.filter(tag => user.tags?.includes(tag.value)) ?? userTags.slice(0, 7);
+    const tags =
+        user?.tags && user.tags
+            ? userTags.filter(tag =>
+                user?.tags?.includes(tag.value)
+            )
+            : userTags.slice(0, 7);
+
 
     return (
-        <aside className="hidden lg:flex flex-col w-64 shrink-0 space-y-8 pr-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto pb-8">
+        <aside className="hidden md:flex flex-col w-64 shrink-0 space-y-8 pr-6 sticky top-24 h-[calc(100vh-6rem)] overflow-y-auto pb-8 ">
             {/* Categories */}
             <div className="space-y-3">
                 <h3 className="text-[11px] font-mono font-bold tracking-widest text-muted-foreground uppercase">Categories</h3>
@@ -33,23 +41,6 @@ export async function FeedSidebar() {
                     ))}
                 </div>
             </div>
-
-            {/* Complexity */}
-            {/* <div className="space-y-3">
-                <h3 className="text-[11px] font-mono font-bold tracking-widest text-muted-foreground uppercase">Complexity</h3>
-                <ToggleGroup type="single" variant="outline" defaultValue="intro" className="justify-start gap-2">
-                    <ToggleGroupItem value="intro" className="rounded-full text-xs h-7 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground shadow-none border-border/50 font-mono">
-                        Intro
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="mid" className="rounded-full text-xs h-7 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground shadow-none border-border/50 font-mono">
-                        Mid
-                    </ToggleGroupItem>
-                    <ToggleGroupItem value="expert" className="rounded-full text-xs h-7 px-3 data-[state=on]:bg-primary data-[state=on]:text-primary-foreground shadow-none border-border/50 font-mono">
-                        Expert
-                    </ToggleGroupItem>
-                </ToggleGroup>
-            </div> */}
-
             {/* Trending Tags */}
             <div className="space-y-3">
                 <h3 className="text-[11px] font-mono font-bold tracking-widest text-muted-foreground uppercase">Trending Tags</h3>
