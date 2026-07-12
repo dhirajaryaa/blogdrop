@@ -31,7 +31,7 @@ export const tagsMapping = (generatedTags: string[]): string[] => {
 }
 
 
-export const categoriesMapping = (generatedCategories: string[]): string[] => {
+export const categoriesMapping = (generatedCategories: string): string | null => {
 
     //? step 1: fuse data [key-value paris(Canonical,alias)]
     const fuseData = Object.entries(CategoryAlias).map(([canonical, alias]) => ({ canonical, alias }));
@@ -46,15 +46,11 @@ export const categoriesMapping = (generatedCategories: string[]): string[] => {
 
     const normalizedCategories = new Set<string>();;
 
-    for (const category of generatedCategories) {
-        const result = fuse.search(category);
+    const result = fuse.search(generatedCategories);
 
-        if (result.length === 0) continue;
-        if ((result[0].score ?? 1) > 0.3) continue;
+    if (result.length === 0) return null;
 
-        normalizedCategories.add(result[0].item.canonical)
-    };
+    if ((result[0].score ?? 1) > 0.3) return null;
 
-    //? step 3: return Canonical tags match nhi huya ignore it
-    return [...normalizedCategories];
+    return result[0].item.canonical;
 }

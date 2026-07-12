@@ -4,7 +4,7 @@ import { db } from "@/db"
 import { articleCategories } from "@/config/category"
 import { userTags as articleTags } from "@/config/tags"
 import { article, articleMetaData, source, user } from "@/db/schema"
-import { eq, desc, and, sql } from "drizzle-orm"
+import { eq, desc, and, sql, inArray } from "drizzle-orm"
 import { auth } from "@/lib/auth/auth"
 import { headers } from "next/headers"
 import { getCurrentUser } from "@/lib/auth/get-user"
@@ -71,39 +71,140 @@ export type FeedType = {
   publicAt: string;
   summary: string | null;
   tags: string[] | null;
-  categories: string[] | null;
+  categories: string | null;
   readingTime: number | null;
   difficulty: string | null;
   sourceName: string;
   matchScore: number;
-  originalUrl : string;
+  originalUrl: string;
 }
 
 // get personalized feed 
-export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20): Promise<FeedType[]> {
-  // check user 
+// export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20): Promise<FeedType[]> {
+//   // check user 
+//   const user = await getCurrentUser();
+
+//   const categories = user?.categories ?? articleCategories.map(cat => cat.value);
+//   const tags = user?.tags ?? articleTags.map(tag => tag.value);
+
+//   const userTags = sql`ARRAY[${sql.join(
+//     tags.map((tag) => sql`${tag}`),
+//     sql`,`
+//   )}]::text[]`;
+
+//   const userCategories = sql`ARRAY[${sql.join(
+//     categories.map((category) => sql`${category}`),
+//     sql`,`
+//   )}]::text[]`;
+
+//   const matchScore = sql<number>`
+// (
+//   SELECT COUNT(*)
+//   FROM unnest(${articleMetaData.tags}) AS tag
+//   WHERE tag = ANY(${userTags})
+// )
+// `;
+
+//   const feed = await db
+//     .select({
+//       id: article.id,
+//       title: article.title,
+//       slug: article.slug,
+//       imageUrl: article.imageUrl,
+//       author: article.author,
+//       originalUrl : article.originalUrl,
+//       publicAt: article.publicAt,
+//       summary: articleMetaData.summary,
+//       tags: articleMetaData.tags,
+//       categories: articleMetaData.categories,
+//       readingTime: articleMetaData.readingTime,
+//       difficulty: articleMetaData.difficulty,
+//       sourceName: source.title,
+//       matchScore,
+//     })
+//     .from(article)
+//     .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
+//     .innerJoin(source, eq(source.id, article.sourceId))
+//     .where(
+//       and(
+//         eq(article.status, "completed"),
+//         sql`${articleMetaData.categories} && ${userCategories}`
+//       )
+//     )
+//     .orderBy(desc(matchScore), desc(article.publicAt))
+//     .limit(limit)
+//     .offset((pageNo - 1) * limit);
+
+//   return feed;
+// }
+
+export async function getPersonalizedFeed(
+  pageNo: number = 1,
+  limit: number = 20
+): Promise<FeedType[]> {
   const user = await getCurrentUser();
 
-  const categories = user?.categories ?? articleCategories.map(cat => cat.value);
-  const tags = user?.tags ?? articleTags.map(tag => tag.value);
+  const categories =
+    user?.categories ?? articleCategories.map((cat) => cat.value);
 
+  const tags =
+    user?.tags ?? articleTags.map((tag) => tag.value);
+
+  // User tags array
   const userTags = sql`ARRAY[${sql.join(
     tags.map((tag) => sql`${tag}`),
     sql`,`
   )}]::text[]`;
 
-  const userCategories = sql`ARRAY[${sql.join(
+  // Tag match count
+  const tagMatches = sql<number>`
+    (
+      SELECT COUNT(*)
+      FROM unnest(${articleMetaData.tags}) AS tag
+      WHERE tag = ANY(${userTags})
+    )
+  `;
+
+  // Category score
+  const categoryScore = sql<number>`
+    CASE
+      WHEN ${articleMetaData.categories} = ANY (
+        ARRAY[
+          ${sql.join(
     categories.map((category) => sql`${category}`),
     sql`,`
-  )}]::text[]`;
+  )}
+        ]::text[]
+      )
+      THEN 30
+      ELSE 0
+    END
+  `;
 
-  const matchScore = sql<number>`
-(
-  SELECT COUNT(*)
-  FROM unnest(${articleMetaData.tags}) AS tag
-  WHERE tag = ANY(${userTags})
-)
+  // Freshness score
+  const freshnessScore = sql<number>`
+CASE
+  WHEN (${article.publicAt})::timestamp >= NOW() - INTERVAL '1 day' THEN 15
+  WHEN (${article.publicAt})::timestamp >= NOW() - INTERVAL '7 days' THEN 10
+  WHEN (${article.publicAt})::timestamp >= NOW() - INTERVAL '30 days' THEN 5
+  ELSE 0
+END
 `;
+
+  // Daily random score (0–5)
+  const randomScore = sql<number>`
+    abs(hashtext(${article.id}::text || CURRENT_DATE::text)) % 6
+  `;
+
+  // Final recommendation score
+  const recommendationScore = sql<number>`
+    (
+      (${tagMatches} * 20)
+      + ${categoryScore}
+      + ${freshnessScore}
+      + ${randomScore}
+    )
+  `;
 
   const feed = await db
     .select({
@@ -112,15 +213,19 @@ export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20
       slug: article.slug,
       imageUrl: article.imageUrl,
       author: article.author,
-      originalUrl : article.originalUrl,
+      originalUrl: article.originalUrl,
       publicAt: article.publicAt,
+
       summary: articleMetaData.summary,
+      whyRead: articleMetaData.whyRead,
       tags: articleMetaData.tags,
       categories: articleMetaData.categories,
-      readingTime: articleMetaData.readingTime,
       difficulty: articleMetaData.difficulty,
+      readingTime: articleMetaData.readingTime,
+
       sourceName: source.title,
-      matchScore,
+
+      matchScore: recommendationScore,
     })
     .from(article)
     .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
@@ -128,10 +233,14 @@ export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20
     .where(
       and(
         eq(article.status, "completed"),
-        sql`${articleMetaData.categories} && ${userCategories}`
+        eq(articleMetaData.difficulty, user?.experienceLevel as string),
+        inArray(articleMetaData.categories, categories)
       )
     )
-    .orderBy(desc(matchScore), desc(article.publicAt))
+    .orderBy(
+      desc(recommendationScore),
+      desc(article.publicAt)
+    )
     .limit(limit)
     .offset((pageNo - 1) * limit);
 

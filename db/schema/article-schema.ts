@@ -39,7 +39,7 @@ export const articleMetaData = pgTable("article_metadata", {
             onDelete: "cascade",
         }),
     summary: text("summary"),
-    categories: text("categories").array().default([]),
+    categories: text("categories").notNull(),
     tags: text("tags").array().default([]),
     keyTakeaways: text("key_takeaways").array().default([]),
     difficulty: text("difficulty").default("junior"), //[junior / mid / senior]

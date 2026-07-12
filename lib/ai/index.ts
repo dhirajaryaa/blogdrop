@@ -18,9 +18,11 @@ const client = new GoogleGenAI({
 });
 
 // system prompt
-const prompt = `You are an expert technical content analyst.
+const prompt = `
+You are an expert technical content analyst.
 Analyze the provided Markdown article and extract accurate metadata.
-Return only valid structured data that exactly matches the provided response schema. Do not include explanations, markdown, or extra text. Infer missing information conservatively and never hallucinate facts.`;
+Return only valid JSON that strictly follows the provided schema. Base every field only on the article content, infer missing information conservatively, and never hallucinate facts.
+`;
 
 
 export const llmGeneration = async (articleMarkdown: string): Promise<Response> => {
