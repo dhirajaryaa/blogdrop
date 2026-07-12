@@ -18,31 +18,9 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "BlogDrop — Every Engineering Blog. One Feed.",
-  description:
-    "AI-powered engineering blog aggregator. Follow Netflix, Stripe, Uber, Cloudflare and hundreds of engineering blogs in a single personalized feed.",
-  keywords: [
-    "engineering blogs",
-    "developer blog aggregator",
-    "AI summaries",
-    "tech blogs",
-    "Netflix tech blog",
-    "Stripe engineering",
-  ],
-  openGraph: {
-    title: "BlogDrop — Every Engineering Blog. One Feed.",
-    description:
-      "AI-powered engineering blog aggregator. Follow hundreds of engineering blogs in a single personalized feed.",
-    type: "website",
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "BlogDrop — Every Engineering Blog. One Feed.",
-    description:
-      "AI-powered engineering blog aggregator. Follow hundreds of engineering blogs in a single personalized feed.",
-  },
-};
+import { constructMetadata } from "@/lib/utils";
+
+export const metadata = constructMetadata();
 
 export default function RootLayout({
   children,

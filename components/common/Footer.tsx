@@ -37,7 +37,7 @@ const footerSections = [
     links: [
       { title: "Privacy Policy", href: "/privacy" },
       { title: "Terms of Service", href: "/terms" },
-      { title: "Disclaimer", href: "/disclaimer" },
+      { title: "Copyright Policy", href: "/copyright" },
       { title: "Cookie Policy", href: "/cookies" },
     ],
   },
@@ -125,7 +125,7 @@ export default function Footer() {
           </p>
 
           <p className="text-xs text-muted-foreground">
-            Built for developers who love learning.
+            Built for developers who ♥️ learning.
           </p>
         </div>
       </div>

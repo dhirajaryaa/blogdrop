@@ -1,4 +1,11 @@
 import { SeedSourceBtn } from "@/components/settings/SeedSource"
+import { constructMetadata } from "@/lib/utils"
+
+export const metadata = constructMetadata({
+  title: "Settings - BlogDrop",
+  description: "Manage your BlogDrop settings.",
+  noIndex: true,
+})
 
 function SettingsPage() {
     return (

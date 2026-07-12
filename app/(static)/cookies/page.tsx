@@ -2,49 +2,32 @@ import { PageHeader } from "@/components/static/PageHeader";
 import { ContentSection } from "@/components/static/ContentSection";
 import { LegalSection, LegalCard } from "@/components/static/LegalSection";
 import { MarkdownContent } from "@/components/static/MarkdownContent";
-import { Metadata } from "next";
+import { constructMetadata } from "@/lib/utils";
 
-export const metadata: Metadata = {
+export const metadata = constructMetadata({
   title: "Cookie Policy - BlogDrop",
-  description: "How we use cookies to improve your experience.",
-};
+  description: "Cookie Policy for BlogDrop",
+});
 
 export default function CookiesPage() {
   return (
     <>
       <PageHeader 
         title="Cookie Policy" 
-        description="Information about how we use cookies and similar technologies."
-        updatedAt="October 15, 2024"
+        updatedAt="July 2026"
       />
       
       <ContentSection>
-        <LegalSection title="What are Cookies?">
+        <LegalSection title="How we use cookies">
           <LegalCard>
             <MarkdownContent>
-              <p>Cookies are small text files that are stored on your computer or mobile device when you visit a website. They are widely used to make websites work, or work more efficiently, as well as to provide reporting information.</p>
-            </MarkdownContent>
-          </LegalCard>
-        </LegalSection>
-
-        <LegalSection title="Types of Cookies We Use">
-          <LegalCard>
-            <MarkdownContent>
-              <p>We use the following types of cookies:</p>
+              <p>BlogDrop uses cookies to:</p>
               <ul>
-                <li><strong>Necessary Cookies:</strong> These are required for the operation of our website. They include, for example, cookies that enable you to log into secure areas of our website.</li>
-                <li><strong>Authentication Cookies:</strong> We use these to remember your login state so you don&apos;t have to log in every time you visit.</li>
-                <li><strong>Preference Cookies:</strong> These are used to recognize you when you return to our website. This enables us to personalize our content for you and remember your preferences (for example, your choice of dark or light theme).</li>
-                <li><strong>Analytics Cookies:</strong> These allow us to recognize and count the number of visitors and to see how visitors move around our website when they are using it.</li>
+                <li>Keep you logged in (session cookies)</li>
+                <li>Remember basic preferences (theme, saved tags)</li>
+                <li>Understand aggregate usage via analytics (e.g., page views, click-through to sources)</li>
               </ul>
-            </MarkdownContent>
-          </LegalCard>
-        </LegalSection>
-
-        <LegalSection title="Managing Cookies">
-          <LegalCard>
-            <MarkdownContent>
-              <p>You can block cookies by activating the setting on your browser that allows you to refuse the setting of all or some cookies. However, if you use your browser settings to block all cookies (including essential cookies) you may not be able to access all or parts of our site, specifically authenticated areas.</p>
+              <p>You can disable cookies in your browser settings, but some features (like staying logged in) may not work properly without them. BlogDrop does not use cookies for third-party ad targeting.</p>
             </MarkdownContent>
           </LegalCard>
         </LegalSection>

@@ -1,4 +1,11 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
+import { constructMetadata } from "@/lib/utils"
+
+export const metadata = constructMetadata({
+  title: "Profile - BlogDrop",
+  description: "Manage your BlogDrop profile.",
+  noIndex: true,
+})
 import { ProfileForm } from "@/components/profile/ProfileForm"
 import { db } from "@/db"
 import { user } from "@/db/schema"

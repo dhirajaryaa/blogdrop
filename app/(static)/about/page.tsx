@@ -1,78 +1,65 @@
 import { PageHeader } from "@/components/static/PageHeader";
 import { ContentSection } from "@/components/static/ContentSection";
 import { SectionTitle } from "@/components/static/SectionTitle";
-import { InfoCard } from "@/components/static/InfoCard";
 import { MarkdownContent } from "@/components/static/MarkdownContent";
-import { IconCode, IconRobot, IconBrandOpenSource } from "@tabler/icons-react";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import { Metadata } from "next";
+import { constructMetadata } from "@/lib/utils";
 
-export const metadata: Metadata = {
+export const metadata = constructMetadata({
   title: "About BlogDrop",
-  description: "Learn why we are building BlogDrop and our vision for the future of engineering content.",
-};
+  description: "One feed. Every engineering blog worth reading.",
+});
 
 export default function AboutPage() {
   return (
     <>
       <PageHeader 
-        title="About BlogDrop" 
-        description="We are building the ultimate aggregation platform for software engineering teams. Curated, AI-summarized, and noise-free."
+        title="BlogDrop" 
+        description="One feed. Every engineering blog worth reading."
       />
       
       <ContentSection>
-        <div className="grid md:grid-cols-2 gap-8 lg:gap-12 items-start">
-          <MarkdownContent>
-            <p>
-              <strong>BlogDrop</strong> was born out of a simple frustration: there is too much noise in the developer ecosystem. Between social media algorithms, scattered RSS feeds, and corporate marketing disguised as engineering posts, finding signal is harder than ever.
-            </p>
-            <p>
-              Our mission is to centralize high-quality, trusted engineering knowledge. We believe that learning from the challenges and solutions of teams at Netflix, Stripe, Cloudflare, and others is the fastest way to grow as a developer.
-            </p>
-          </MarkdownContent>
-          <div className="grid gap-4">
-            <InfoCard 
-              title="Trusted Sources Only" 
-              description="We hand-curate our feed to include only verified engineering blogs from reputable tech companies. No spam, no low-effort tutorials." 
-              icon={<IconCode className="w-6 h-6" />}
-            />
-            <InfoCard 
-              title="AI-Powered Summaries" 
-              description="We use advanced LLMs to extract the core architecture decisions and takeaways, saving you hours of reading time." 
-              icon={<IconRobot className="w-6 h-6" />}
-            />
-          </div>
-        </div>
-      </ContentSection>
-
-      <ContentSection>
-        <SectionTitle>Our Vision</SectionTitle>
         <MarkdownContent>
           <p>
-            We envision a future where developers don&apos;t have to hunt for knowledge. By aggregating and distilling the world&apos;s best engineering blogs, we aim to be the homepage for every software engineer. 
+            The best engineering writing is scattered across a hundred different company blogs, and nobody has time to check them all. BlogDrop pulls it into one place — Netflix, Stripe, Cloudflare, Martin Fowler, and the rest — tagged, categorized, and ready to skim.
           </p>
           <p>
-            We are actively building features like personalized tagging, team collaboration feeds, and deeper AI analysis of code snippets found in articles.
+            We&apos;re not another newsletter. No inbox clutter, no weekly digest lag. Just a live feed of what serious engineering teams are publishing, right now.
           </p>
         </MarkdownContent>
       </ContentSection>
 
       <ContentSection>
-        <SectionTitle>Open Source</SectionTitle>
-        <div className="flex flex-col md:flex-row gap-8 items-center bg-card border border-border rounded-xl p-8 shadow-sm">
-          <div className="flex-1 space-y-4">
-            <p className="text-muted-foreground">
-              We believe in building in public and contributing back to the community. Parts of BlogDrop&apos;s aggregation engine and UI components are open source.
-            </p>
-            <Button asChild>
-              <Link href="https://github.com/blogdrop" target="_blank">
-                <IconBrandOpenSource className="w-4 h-4 mr-2" />
-                View GitHub Organization
-              </Link>
-            </Button>
-          </div>
-        </div>
+        <SectionTitle>How it works</SectionTitle>
+        <MarkdownContent>
+          <p><strong>1. We watch the sources</strong><br/>
+          Every engineering blog worth following gets tracked automatically. New post goes up, it shows up here — usually within minutes.</p>
+
+          <p><strong>2. AI does the sorting</strong><br/>
+          Every article gets tagged, categorized, and summarized so you know in five seconds if it&apos;s worth your fifteen minutes. No more opening ten tabs to find the one post that&apos;s actually relevant to what you&apos;re working on.</p>
+
+          <p><strong>3. You read the original</strong><br/>
+          BlogDrop never republishes full articles. Every post links straight back to the source. We&apos;re a map, not a replacement for the destination.</p>
+        </MarkdownContent>
+      </ContentSection>
+
+      <ContentSection>
+        <SectionTitle>Why it&apos;s different</SectionTitle>
+        <MarkdownContent>
+          <ul>
+            <li><strong>No noise.</strong> No sponsored placements, no SEO-bait &quot;top 10 frameworks&quot; listicles. Just the primary sources — the teams that actually build the thing writing about how they built it.</li>
+            <li><strong>AI tagging, not AI opinions.</strong> BlogDrop uses AI to classify and summarize, never to editorialize. You get the facts of what a post covers, not someone&apos;s take on it.</li>
+            <li><strong>Built by one dev, not a company.</strong> BlogDrop is an independent project. No investors deciding what you should read next.</li>
+          </ul>
+        </MarkdownContent>
+      </ContentSection>
+
+      <ContentSection>
+        <SectionTitle>Want your blog listed?</SectionTitle>
+        <MarkdownContent>
+          <p>
+            If your team runs an engineering blog and isn&apos;t on BlogDrop yet, <a href="/contact">reach out</a> — sources are added on a rolling basis, prioritizing blogs with consistent, technical, first-hand writing.
+          </p>
+        </MarkdownContent>
       </ContentSection>
     </>
   );

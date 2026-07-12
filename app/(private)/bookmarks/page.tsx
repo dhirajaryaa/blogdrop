@@ -1,4 +1,11 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
+import { constructMetadata } from "@/lib/utils"
+
+export const metadata = constructMetadata({
+  title: "Bookmarks - BlogDrop",
+  description: "Your saved engineering articles.",
+  noIndex: true,
+})
 import { getArticles } from "@/actions/feed"
 import { IconRss } from "@tabler/icons-react"
 import Link from "next/link"

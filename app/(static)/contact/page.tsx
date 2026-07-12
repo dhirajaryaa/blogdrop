@@ -1,58 +1,61 @@
 import { PageHeader } from "@/components/static/PageHeader";
 import { ContentSection } from "@/components/static/ContentSection";
 import { ContactCard } from "@/components/static/ContactCard";
-import { IconBrandGithub, IconBrandX, IconMail, IconBug, IconBulb } from "@tabler/icons-react";
-import { Metadata } from "next";
+import { IconMail, IconBug, IconRss } from "@tabler/icons-react";
 import { SocialLinks } from "@/components/static/SocialLinks";
+import { constructMetadata } from "@/lib/utils";
 
-export const metadata: Metadata = {
+export const metadata = constructMetadata({
   title: "Contact Us - BlogDrop",
-  description: "Get in touch with the BlogDrop team for support, feature requests, or business inquiries.",
-};
+  description: "Get in touch with the BlogDrop team.",
+});
 
 export default function ContactPage() {
   return (
     <>
       <PageHeader 
-        title="Contact Us" 
-        description="We'd love to hear from you. Whether you have a feature request, found a bug, or just want to say hi."
+        title="Get in touch" 
       />
       
       <ContentSection>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <ContactCard 
-            title="General Inquiries"
-            description="For general questions, feedback, or business inquiries."
-            icon={<IconMail className="w-8 h-8" />}
-            href="mailto:hello@blogdrop.com"
-            actionText="Email Us"
+            title="Add your blog"
+            description="Send us your RSS feed URL. We prioritize consistent, technical, first-hand writing."
+            icon={<IconRss className="w-8 h-8" />}
+            href="mailto:contact@blogdrop.dev"
+            actionText="Submit Blog"
           />
           <ContactCard 
-            title="Bug Reports"
-            description="Found a glitch or an article that isn't parsing correctly?"
+            title="Found a bug or bad tag?"
+            description="Tell us what's wrong and we'll fix it. Your feedback makes our AI better."
             icon={<IconBug className="w-8 h-8" />}
             href="https://github.com/blogdrop/issues"
             actionText="Report Issue"
           />
           <ContactCard 
-            title="Feature Requests"
-            description="Have an idea for a new feature? Let us know on X or GitHub."
-            icon={<IconBulb className="w-8 h-8" />}
-            href="https://x.com/blogdrop"
-            actionText="Reach Out"
+            title="Something else?"
+            description="For general questions, feedback, or any other inquiries."
+            icon={<IconMail className="w-8 h-8" />}
+            href="mailto:contact@blogdrop.dev"
+            actionText="Email Us"
           />
         </div>
       </ContentSection>
 
       <ContentSection>
         <div className="bg-muted p-6 rounded-xl border border-border">
-          <h3 className="font-semibold text-lg mb-2">Response Time</h3>
-          <p className="text-muted-foreground mb-4">
-            We are a small team, but we try our best to respond to all emails and issues within 24-48 business hours. For urgent matters, reaching out via email is the fastest route.
-          </p>
-          <div className="flex items-center gap-4">
-            <span className="text-sm font-medium">Follow us:</span>
-            <SocialLinks />
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between">
+            <div>
+              <h3 className="font-semibold text-lg mb-1">Response Time</h3>
+              <p className="text-muted-foreground text-sm">
+                We are an independent project, but we try our best to respond as quickly as possible.
+              </p>
+            </div>
+            <div className="flex items-center gap-4">
+              <span className="text-sm font-medium">Follow us:</span>
+              <SocialLinks />
+            </div>
           </div>
         </div>
       </ContentSection>

@@ -1,4 +1,6 @@
 import { notFound } from "next/navigation"
+import { constructMetadata } from "@/lib/utils"
+import { Metadata } from "next"
 import Link from "next/link"
 import { IconArrowLeft, IconCalendar, IconCircleCheck, IconClock, IconExternalLink, IconHash, IconSparkles, IconUser } from "@tabler/icons-react"
 import { getArticleBySlug } from "@/actions/article"
@@ -10,6 +12,24 @@ import { Badge } from "@/components/ui/badge"
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
+}
+
+export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
+  
+  if (!article) {
+    return constructMetadata({
+      title: "Article Not Found - BlogDrop",
+      description: "The requested article could not be found."
+    });
+  }
+
+  return constructMetadata({
+    title: `${article.title} - BlogDrop`,
+    description: article.summary || "Read this engineering article on BlogDrop.",
+    image: article.image || "/thumbnail.png",
+  });
 }
 
 async function ArticlePage({ params }: ArticlePageProps) {

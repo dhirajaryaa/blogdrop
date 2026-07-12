@@ -1,4 +1,10 @@
 import { ensureAuthUser } from "@/lib/auth/get-user"
+import { constructMetadata } from "@/lib/utils"
+
+export const metadata = constructMetadata({
+  title: "Your Feed - BlogDrop",
+  description: "Your personalized engineering blog feed.",
+})
 import { FeedList } from "@/components/feed/FeedList"
 import { FeedSidebar } from "@/components/feed/feed-sidebar"
 import Link from "next/link"
