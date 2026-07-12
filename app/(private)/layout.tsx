@@ -1,5 +1,6 @@
 import { QueryProvider } from "@/components/provider/query-provider";
 import AppHeader from "@/components/common/app-header";
+import Footer from "@/components/common/Footer";
 
 function AppPage({ children }: { children: React.ReactNode }) {
   return (
@@ -9,6 +10,7 @@ function AppPage({ children }: { children: React.ReactNode }) {
         <main className="min-h-full w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative mt-16">
           {children}
         </main>
+        <Footer />
       </div>
     </QueryProvider>
   )

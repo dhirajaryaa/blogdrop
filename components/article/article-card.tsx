@@ -17,7 +17,7 @@ export function ArticleCard({ article }: { article: FeedType }) {
     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}`;
 
     return (
-        <article className="group flex flex-col sm:flex-row gap-4 py-6 transition-colors hover:bg-muted/40 dark:hover:bg-muted/60 hover:shadow-md p-4 rounded-2xl bg-muted/30 dark:bg-muted/20 border-2 relative">
+        <article className="group flex flex-col sm:flex-row gap-4 py-6 transition-colors hover:shadow-sm p-4 rounded-2xl bg-card border-2 relative">
             <Link href={`/article/${article.slug}`} className="absolute inset-0 z-0" aria-label={`Read ${article.title}`} />
 
             <div className="flex flex-1 flex-col justify-between">

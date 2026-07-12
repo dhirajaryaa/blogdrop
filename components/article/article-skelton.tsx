@@ -2,7 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 
 function ArticleSkelton() {
     return (
-        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl py-6 w-full dark:hover:bg-muted/60 bg-muted/30 border-2">
+        <div className="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl py-6 w-full bg-card border-2">
             <div className="flex flex-1 flex-col justify-between">
                 <div>
                     {/* Metadata Row */}
