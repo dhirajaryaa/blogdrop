@@ -61,7 +61,7 @@ export function FeedSidebar({
                     className="w-full flex-wrap" variant={"outline"} >
                     {
                         defaultCategories.map(((cat, i) => (
-                            <ToggleGroupItem className="capitalize data-[state=on]:bg-primary/10 outline-0 data-[state=on]:text-primary data-[state=on]:font-medium px-2 text-muted-foreground font-normal w-full justify-start rounded-lg border-0" value={cat.value} key={cat.value}>{cat.label}</ToggleGroupItem>
+                            <ToggleGroupItem className="capitalize data-[state=on]:bg-primary/10 outline-0 data-[state=on]:text-primary data-[state=on]:font-medium px-2 text-muted-foreground font-normal w-full justify-start rounded-lg border-0 hover:scale-99 duration-300 transition-all" value={cat.value} key={cat.value}>{cat.label}</ToggleGroupItem>
                         )))
                     }
                 </ToggleGroup>
@@ -76,7 +76,7 @@ export function FeedSidebar({
                         className="w-full flex-wrap" variant={"outline"} >
                         {
                             defaultTags.map(((tag, i) => (
-                                <ToggleGroupItem size={"sm"} variant={"outline"} className="text-xs font-mono shadow-none transition-colors lowercase data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:font-medium px-3 py-1 text-muted-foreground font-normal rounded-lg bg-transparent border-border/50 hover:bg-muted" value={tag.value} key={tag.value}>#{tag.label}</ToggleGroupItem>
+                                <ToggleGroupItem size={"sm"} variant={"outline"} className="text-xs font-mono shadow-none transition-colors lowercase data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:font-medium px-3 py-1 text-muted-foreground font-normal rounded-lg bg-transparent border-border/50 hover:bg-muted hover:scale-99 duration-300 transition-all" value={tag.value} key={tag.value}>#{tag.label}</ToggleGroupItem>
                             )))
                         }
                     </ToggleGroup>

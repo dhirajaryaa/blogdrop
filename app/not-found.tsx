@@ -7,15 +7,15 @@ import AppHeader from "@/components/common/app-header";
 
 export default function NotFound() {
   return (
-    <div className="flex flex-col min-h-screen bg-background text-foreground">
+    <div className="min-h-screen w-full bg-background text-foreground relative">
       <AppHeader />
-      <main className="flex-1 flex flex-col items-center justify-center p-4">
+      <main className="w-full space-y-8 max-w-xl mx-auto mt-30">
         <EmptyState
           icon={<IconError404 className="w-16 h-16 text-muted-foreground" />}
           title="Page Not Found"
           description="We couldn't find the page you were looking for. It might have been moved or doesn't exist."
         />
-        <div className="mt-8 flex gap-4">
+        <div className="flex gap-4 items-center justify-center mx-auto">
           <Button asChild>
             <Link href="/">Back to Home</Link>
           </Button>

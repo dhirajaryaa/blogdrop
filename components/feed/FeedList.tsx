@@ -5,7 +5,6 @@ import EmptyFeed from "@/components/article/empty-feed";
 import { ArticleCard } from "@/components/article/article-card";
 import { FeedType } from "@/actions/feed";
 
-const PAGE_SIZE = 20;
 
 export function FeedLoadingList() {
     return (
@@ -18,36 +17,6 @@ export function FeedLoadingList() {
 }
 
 export function FeedList({ articles }: { articles: FeedType[] }) {
-
-    // const { data,
-    //     isPending,
-    //     isError,
-    //     fetchNextPage,
-    //     hasNextPage,
-    //     isFetchingNextPage
-    // } = useInfiniteQuery({
-    //     queryKey: ["feed"],
-    //     initialPageParam: 1,
-    //     queryFn: async ({ pageParam }) => {
-    //         return await getPersonalizedFeed(pageParam, PAGE_SIZE)
-    //     },
-    //     getNextPageParam: (lastPage, allPages) => {
-    //         if (lastPage.length < PAGE_SIZE) return undefined;
-    //         return allPages.length + 1;
-    //     },
-    // });
-
-    // const allArticles = data?.pages.flatMap(page => page) ?? [];
-
-    // if (isPending) {
-    //     return (
-    //         <section className="flex flex-col w-full border-t border-border/50 gap-6">
-    //             {Array.from({ length: 8 }).map((_, i) => (
-    //                 <ArticleSkelton key={i} />
-    //             ))}
-    //         </section>
-    //     );
-    // };
 
     return (
         <section className="flex flex-col overflow-y-auto gap-6 w-full">

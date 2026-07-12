@@ -32,22 +32,8 @@ async function ProfilePage() {
                 title="Profile"
                 description="Manage your profile and content preferences."
                 className="max-w-3xl mx-auto"
-                action={
-            <a
-                href={githubRepoLink}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={buttonVariants({
-                    variant: "default",
-                    className: "hidden sm:inline-flex items-center gap-2",
-                })}
             >
-                <IconBrandGithub size={18} />
-                <span>Star on GitHub</span>
-            </a>
-                }
-            >
-                <section className="">
+                <section>
                     <ProfileForm
                         defaultAbout={currentUser.about ?? ""}
                         defaultCategories={userRecord?.categories ?? []}
