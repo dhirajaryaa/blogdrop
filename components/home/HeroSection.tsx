@@ -33,7 +33,7 @@ const topArticles = [
 
 export default function HeroSection() {
   return (
-    <section className="relative flex flex-col items-center justify-center overflow-hidden  py-16 md:pb-24 px-4">
+    <section className="relative flex flex-col items-center justify-center overflow-hidden md:pb-24 px-4">
 
       <div className="absolute inset-0 .bg-\[radial-gradient\(ellipse_at_top\,_var\(--tw-gradient-stops\)\)\] {
  background-image: radial-gradient(ellipse at top, var(--tw-gradient-stops));
@@ -59,7 +59,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.4, 0.25, 1] }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.1] mb-6 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text "
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text "
         >
           Every Engineering Blog.
           <br />
@@ -70,7 +70,7 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
-          className="text-lg sm:text-xl text-muted-foreground max-w-2xl mb-10 leading-relaxed"
+          className="text-base sm:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed"
         >
           Follow Netflix, Stripe, Uber, Cloudflare, AWS and hundreds of engineering blogs in a single personalized feed powered by AI.
         </motion.p>
@@ -81,7 +81,7 @@ export default function HeroSection() {
           transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
           className="flex flex-col sm:flex-row gap-4 mb-16"
         >
-          <Button size="lg" className="h-12 px-6 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 shadow-glow hover:shadow-glow-lg transition-shadow duration-300" asChild>
+          <Button size="lg" className="h-12 px-6 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/95 shadow-glow hover:shadow-glow-lg transition-shadow duration-300" asChild>
             <a href={earlyAccessFormLink} target="_blank">
               Get Early Access
               <IconArrowRight className="size-4 ml-1" />

@@ -1,14 +1,14 @@
-import Header from "@/components/common/Header";
 import Footer from "@/components/common/Footer";
 import { IconError404 } from "@tabler/icons-react";
 import { EmptyState } from "@/components/static/EmptyState";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import AppHeader from "@/components/common/app-header";
 
 export default function NotFound() {
   return (
     <div className="flex flex-col min-h-screen bg-background text-foreground">
-      <Header />
+      <AppHeader />
       <main className="flex-1 flex flex-col items-center justify-center p-4">
         <EmptyState
           icon={<IconError404 className="w-16 h-16 text-muted-foreground" />}

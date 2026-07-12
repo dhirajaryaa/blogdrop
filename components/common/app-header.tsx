@@ -12,6 +12,7 @@ function AppHeader() {
 
     const mainLinks = [
         { href: "/feed", label: "For You" },
+        { href: "/explore", label: "Explore" },
         { href: "/trending", label: "Trending" },
         { href: "/bookmarks", label: "Bookmarks" },
     ];

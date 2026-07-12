@@ -10,7 +10,7 @@ import LinkTab from "../common/link-tab";
 import { authClient } from "@/lib/auth/auth-client";
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
-import SearchBox from "../sidebar/search-box";
+import SearchBox from "../common/search-box";
 import { Button } from "../ui/button";
 import { IconFilter2 } from "@tabler/icons-react";
 import { toast } from "sonner";

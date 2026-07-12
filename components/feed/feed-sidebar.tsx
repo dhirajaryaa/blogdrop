@@ -1,4 +1,4 @@
-import SearchBox from "../sidebar/search-box";
+import SearchBox from "../common/search-box";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
