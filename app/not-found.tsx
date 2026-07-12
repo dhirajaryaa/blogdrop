@@ -9,7 +9,7 @@ export default function NotFound() {
   return (
     <div className="min-h-screen w-full bg-background text-foreground relative">
       <AppHeader />
-      <main className="w-full space-y-8 max-w-xl mx-auto mt-30">
+      <main className="w-full space-y-8 max-w-xl mx-auto mt-30 px-12">
         <EmptyState
           icon={<IconError404 className="w-16 h-16 text-muted-foreground" />}
           title="Page Not Found"

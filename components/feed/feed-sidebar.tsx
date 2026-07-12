@@ -76,7 +76,7 @@ export function FeedSidebar({
                         className="w-full flex-wrap" variant={"outline"} >
                         {
                             defaultTags.map(((tag, i) => (
-                                <ToggleGroupItem size={"sm"} variant={"outline"} className="text-xs font-mono shadow-none transition-colors lowercase data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:font-medium px-3 py-1 text-muted-foreground font-normal rounded-lg bg-transparent border-border/50 hover:bg-muted hover:scale-99 duration-300 transition-all" value={tag.value} key={tag.value}>#{tag.label}</ToggleGroupItem>
+                                <ToggleGroupItem size={"sm"} variant={"outline"} className="text-xs font-mono shadow-none lowercase data-[state=on]:bg-primary/10 data-[state=on]:text-primary data-[state=on]:font-medium px-3 py-1 text-muted-foreground font-normal rounded-lg bg-transparent border-border/50 hover:bg-muted hover:scale-99 duration-300 transition-all" value={tag.value} key={tag.value}>#{tag.label}</ToggleGroupItem>
                             )))
                         }
                     </ToggleGroup>

@@ -65,7 +65,7 @@ export default function Footer() {
               </span>
             </Link>
 
-            <p className="mt-4 max-w-xs text-sm leading-6 text-muted-foreground">
+            <p className="mt-2 max-w-xs text-sm leading-6 text-muted-foreground">
               Read what matters. Skip the noise.
             </p>
 

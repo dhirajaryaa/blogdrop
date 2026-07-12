@@ -6,6 +6,8 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/common/theme-toggle";
+import { Button } from "../ui/button";
+import { IconNews } from "@tabler/icons-react";
 
 function AppHeader() {
     const pathname = usePathname();
@@ -45,6 +47,10 @@ function AppHeader() {
                 </div>
 
                 <div className="flex items-center gap-2">
+                    <Button variant="link" size="lg">
+                        <IconNews className="size-4" />
+                        Daily Digest
+                    </Button>
                     <ThemeToggle />
                     <UserProfile />
                 </div>
