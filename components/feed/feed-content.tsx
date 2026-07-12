@@ -53,7 +53,7 @@ function FeedContent() {
                 "author",
                 "tags",
                 "categories",
-                "source.name",
+                "sourceName",
             ],
             threshold: 0.3,
             ignoreLocation: true,

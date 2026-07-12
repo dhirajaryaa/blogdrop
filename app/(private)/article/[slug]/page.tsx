@@ -148,13 +148,12 @@ async function ArticlePage({ params }: ArticlePageProps) {
           </div>
         )}
 
-        <div className="flex flex-row gap-3 pt-4 border-t border-border mt-10">
+        <div className="flex flex-col md:flex-row gap-3 pt-4 border-t border-border mt-10 items-center justify-center md:justify-start w-full">
           <Link
             href={`${article.originalUrl}?ref=blogdrop`}
             target="_blank"
             rel="noopener noreferrer"
-            className={buttonVariants({ size: "lg", className: "gap-2" })}
-          >
+            className={buttonVariants({ size: "lg", className: "gap-2 w-full md:max-w-xs md:h-12" })}>
             Read full article
             <IconExternalLink className="size-4" />
           </Link>

@@ -1,11 +1,11 @@
 import type { Metadata } from "next"
 import GoogleLoginButton from "@/components/auth/GoogleLoginButton"
-import { IconArrowLeft, IconBrandTabler } from "@tabler/icons-react"
+import { IconBrandTabler } from "@tabler/icons-react"
 import { getCurrentUser } from "@/lib/auth/get-user";
 import { redirect } from "next/navigation";
 import { authCallbackPath } from "@/config/constant";
-import Link from "next/link";
-import { buttonVariants } from "@/components/ui/button";
+import GoBack from "@/components/common/back-button";
+import Image from "next/image";
 
 export const metadata: Metadata = {
   title: "Login — BlogDrop",
@@ -29,15 +29,18 @@ export default async function LoginPage() {
 
   return (
     <main className="flex-1 flex items-center justify-center px-4">
-      <Link href={"/"} className={buttonVariants({ variant: "secondary", className: "rounded-lg absolute top-2 left-2" })}>
-    <IconArrowLeft/> Back
-      </Link>
+      <GoBack className="absolute top-4 left-4" variant={"outline"}/>
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="flex justify-center">
-            <div className="size-12 rounded-xl bg-linear-to-br from-primary to-primary/50 flex items-center justify-center shadow-lg">
-              <IconBrandTabler className="size-7 text-white" />
-            </div>
+            <Image
+              src="/logo.png"
+              alt="BlogDrop"
+              width={64}
+              height={64}
+              className="rounded-lg size-10"
+              priority
+            />
           </div>
           <h1 className="text-2xl font-bold tracking-tight">Welcome to BlogDrop</h1>
           <p className="text-sm text-muted-foreground">

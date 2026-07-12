@@ -46,7 +46,7 @@ export function FeedSidebar({
 
 
     return (
-        <aside className="hidden md:flex flex-col max-w-60 w-full sticky top-24 h-full gap-4">
+        <aside className="hidden md:flex flex-col max-w-60 w-full sticky top-24 h-full gap-4 pt-1">
             {/* search  */}
             <h3 className="sr-only">Search</h3>
             <SearchBox searchInput={searchInput} setSearchInput={setSearchInput} />

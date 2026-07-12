@@ -5,7 +5,9 @@ import { FeedType } from "@/actions/feed";
 import {
     IconArrowRight,
     IconBookmark,
+    IconBulb,
     IconClock,
+    IconSparkles,
     IconUser,
 } from "@tabler/icons-react";
 import { formatAuthors } from "@/utils/format-author";
@@ -17,7 +19,7 @@ export function ArticleCard({ article }: { article: FeedType }) {
     const faviconUrl = `https://www.google.com/s2/favicons?domain=${domain}`;
 
     return (
-        <article className="group flex flex-col sm:flex-row gap-4 py-6 transition-all hover:shadow-sm p-4 rounded-2xl bg-card border-2 relative hover:scale-99 duration-500">
+        <article className="group flex flex-col sm:flex-row gap-4 py-6 transition-all hover:shadow-sm p-4 rounded-2xl bg-card border-2 relative hover:scale-99 duration-300 dark:bg-accent/60">
             <Link href={`/article/${article.slug}`} className="absolute inset-0 z-0" aria-label={`Read ${article.title}`} />
 
             <div className="flex flex-1 flex-col justify-between">
@@ -30,22 +32,29 @@ export function ArticleCard({ article }: { article: FeedType }) {
                         </span>
                         <span>&bull;</span>
                         <time>{formatDate(article.publicAt)}</time>
-                        <span>&bull;</span>
-                        <span className="inline-flex items-center gap-1">
+                        <span className="sm:inline hidden">&bull;</span>
+                        <span className="sm:inline-flex items-center gap-1 hidden">
                             <IconClock className="size-3.5" />
                             {article.readingTime} min
                         </span>
                     </div>
 
                     {/* Headline */}
-                    <h2 className="mb-2 text-lg font-semibold leading-snug tracking-tight text-foreground transition-colors group-hover:text-primary pr-12">
+                    <h2 className="mb-2 text-lg font-semibold leading-snug tracking-tight text-foreground line-clamp-2 transition-colors pr-12">
                         {article.title}
                     </h2>
+
+                    {/* why read  */}
+                    <p className="text-xs mb-2 pr-2 -ml-1 font-mono  tracking-tight  text-primary/80 items-start flex gap-1">
+                        <IconBulb className="size-4" /> <span className="line-clamp-2">{article.whyRead}</span>
+                    </p>
 
                     {/* Summary */}
                     <p className="line-clamp-2 text-sm leading-relaxed text-muted-foreground mb-3 max-w-3xl">
                         {article.summary}
                     </p>
+
+
                 </div>
 
                 <div className="flex items-center justify-between mt-2 relative z-10">
@@ -59,7 +68,7 @@ export function ArticleCard({ article }: { article: FeedType }) {
                     </div>
                 </div>
             </div>
-
+            {/* bookmark it  */}
             <div className="z-10 absolute right-3 top-3">
                 <Button
                     className="hidden group-hover:inline-flex items-center justify-center text-muted-foreground hover:text-primary"

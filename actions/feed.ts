@@ -75,69 +75,12 @@ export type FeedType = {
   readingTime: number | null;
   difficulty: string | null;
   sourceName: string;
+  whyRead: string | null;
   matchScore: number;
   originalUrl: string;
 }
 
 // get personalized feed 
-// export async function getPersonalizedFeed(pageNo: number = 1, limit: number = 20): Promise<FeedType[]> {
-//   // check user 
-//   const user = await getCurrentUser();
-
-//   const categories = user?.categories ?? articleCategories.map(cat => cat.value);
-//   const tags = user?.tags ?? articleTags.map(tag => tag.value);
-
-//   const userTags = sql`ARRAY[${sql.join(
-//     tags.map((tag) => sql`${tag}`),
-//     sql`,`
-//   )}]::text[]`;
-
-//   const userCategories = sql`ARRAY[${sql.join(
-//     categories.map((category) => sql`${category}`),
-//     sql`,`
-//   )}]::text[]`;
-
-//   const matchScore = sql<number>`
-// (
-//   SELECT COUNT(*)
-//   FROM unnest(${articleMetaData.tags}) AS tag
-//   WHERE tag = ANY(${userTags})
-// )
-// `;
-
-//   const feed = await db
-//     .select({
-//       id: article.id,
-//       title: article.title,
-//       slug: article.slug,
-//       imageUrl: article.imageUrl,
-//       author: article.author,
-//       originalUrl : article.originalUrl,
-//       publicAt: article.publicAt,
-//       summary: articleMetaData.summary,
-//       tags: articleMetaData.tags,
-//       categories: articleMetaData.categories,
-//       readingTime: articleMetaData.readingTime,
-//       difficulty: articleMetaData.difficulty,
-//       sourceName: source.title,
-//       matchScore,
-//     })
-//     .from(article)
-//     .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
-//     .innerJoin(source, eq(source.id, article.sourceId))
-//     .where(
-//       and(
-//         eq(article.status, "completed"),
-//         sql`${articleMetaData.categories} && ${userCategories}`
-//       )
-//     )
-//     .orderBy(desc(matchScore), desc(article.publicAt))
-//     .limit(limit)
-//     .offset((pageNo - 1) * limit);
-
-//   return feed;
-// }
-
 export async function getPersonalizedFeed(
   pageNo: number = 1,
   limit: number = 20
@@ -233,7 +176,7 @@ END
     .where(
       and(
         eq(article.status, "completed"),
-        eq(articleMetaData.difficulty, user?.experienceLevel as string),
+        eq(articleMetaData.difficulty, user?.experienceLevel as string || "mid"), // if guest user so mid show
         inArray(articleMetaData.categories, categories)
       )
     )
