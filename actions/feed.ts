@@ -49,11 +49,15 @@ export async function getArticles() {
       title: a.title,
       author: a.author,
       publicAt: a.publicAt,
-      image: a.imageUrl ?? "",
+      imageUrl: a.imageUrl,
       sourceName: a.source?.title ?? "",
       summary: a.metadata?.summary ?? "",
       readingTime: a.metadata?.readingTime ?? 2,
       difficulty: a.metadata?.difficulty ?? "junior",
+      tags: a.metadata?.tags ?? [],
+      categories: a.metadata?.categories ?? [],
+      matchScore: 0,
+      originalUrl: a.originalUrl,
     }))
 };
 

@@ -7,7 +7,7 @@ function AppPage({ children }: { children: React.ReactNode }) {
     <QueryProvider>
       <div className="min-h-screen relative w-full">
         <AppHeader />
-        <main className="min-h-full w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative mt-16">
+        <main className="min-h-full w-full max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative mt-16 py-6">
           {children}
         </main>
         <Footer />

@@ -16,7 +16,7 @@ export default function EmptyFeed() {
                 </h2>
 
                 <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                    We couldn't find any articles for your current interests.
+                    We couldn&apos;t find any articles for your current interests.
                     Try refreshing your feed or update your preferences to discover
                     more content.
                 </p>

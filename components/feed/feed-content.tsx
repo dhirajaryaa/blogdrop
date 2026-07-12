@@ -88,7 +88,7 @@ function FeedContent() {
         <section className="w-full max-w-6xl mx-auto">
             {/* links tab  */}
             <LinkTab />
-            <div className="w-full flex flex-col gap-4 md:flex-row md:gap-6 pt-1 md:pt-6">
+            <div className="w-full flex flex-col gap-4 md:flex-row md:gap-6">
                 {/* sidebar for desktop view */}
                 <FeedSidebar
                     searchInput={searchInput}
