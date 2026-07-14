@@ -36,6 +36,13 @@
       "when": 1783868635432,
       "tag": "0004_remarkable_giant_man",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1784044230717,
+      "tag": "0005_normal_inhumans",
+      "breakpoints": true
     }
   ]
 }

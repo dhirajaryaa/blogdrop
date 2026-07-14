@@ -1,6 +1,7 @@
 import { pgTable, text, timestamp, boolean } from "drizzle-orm/pg-core";
 import { account, session } from "./auth-schema";
 import { relations } from "drizzle-orm";
+import { bookmark } from "./article-schema";
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -25,4 +26,5 @@ export const user = pgTable("user", {
 export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
+  bookmarks : many(bookmark)
 }));

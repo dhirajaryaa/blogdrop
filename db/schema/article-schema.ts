@@ -1,6 +1,7 @@
 import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
 import { relations } from "drizzle-orm";
+import { user } from "./user-schema";
 
 export const articleStatusEnum = pgEnum("article_status", [
     "pending",      // RSS se mila, process nahi hua
@@ -8,6 +9,7 @@ export const articleStatusEnum = pgEnum("article_status", [
     "completed",    // Successfully process ho gaya 
 ]);
 
+//! article 
 export const article = pgTable("article", {
     id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
@@ -30,7 +32,7 @@ export const article = pgTable("article", {
         uniqueIndex("article_url_idx").on(table.originalUrl),
     ]);
 
-
+//! article metadata
 export const articleMetaData = pgTable("article_metadata", {
     id: uuid("id").primaryKey().defaultRandom(),
     articleId: uuid("article_id")
@@ -51,8 +53,24 @@ export const articleMetaData = pgTable("article_metadata", {
     unique("article_metadata_article_id_unique").on(table.articleId),
 ]));
 
-// relation ship 
-export const articleRelations = relations(article, ({ one }) => ({
+
+//! bookmark Articles
+export const bookmark = pgTable("bookmark", {
+    id: uuid("id").primaryKey().defaultRandom(),
+    articleId: uuid("article_id")
+        .notNull()
+        .references(() => article.id),
+    userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
+}, ((table) => [
+    unique("bookmark_article_unique").on(table.articleId, table.userId),
+]));
+
+
+
+//? relation ship 
+export const articleRelations = relations(article, ({ one, many }) => ({
     metadata: one(articleMetaData, {
         fields: [article.id],
         references: [articleMetaData.articleId]
@@ -60,5 +78,6 @@ export const articleRelations = relations(article, ({ one }) => ({
     source: one(source, {
         fields: [article.sourceId],
         references: [source.id]
-    })
+    }),
+    bookmark: many(bookmark)
 }))

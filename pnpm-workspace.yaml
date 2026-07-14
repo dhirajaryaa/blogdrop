@@ -1,5 +1,5 @@
 allowBuilds:
-  '@google/genai': set this to true or false
+  '@google/genai': true
   esbuild: true
   protobufjs: true
   sharp: true
