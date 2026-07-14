@@ -1,10 +1,11 @@
 "use client"
 
 import { motion } from "motion/react"
-import { IconArrowRight, IconBrandGithub, IconStar, IconBookmark, IconTrendingUp, IconClock, IconSparkles2 } from "@tabler/icons-react"
+import { IconArrowRight, IconStar, IconBookmark, IconTrendingUp, IconClock, IconSparkles2, IconBrandNetflix, IconCar, IconBrandStripe, IconCloud, IconBrandAws, IconBrandGithub, IconBrandMeta, IconBrandSpotify, IconBrandX } from "@tabler/icons-react"
 import { Button } from "@/components/ui/button"
 import GlowBadge from "@/components/common/GlowBadge"
-import { earlyAccessFormLink, githubRepoLink } from "@/config/constant"
+import { earlyAccessFormLink } from "@/config/constant"
+import Link from "next/link"
 
 const trendingTopics = [
   "System Design", "Kubernetes", "Rust", "AI/ML", "Performance"
@@ -33,14 +34,55 @@ const topArticles = [
 
 export default function HeroSection() {
   return (
-    <section className="relative flex flex-col items-center justify-center overflow-hidden md:pb-24 px-4">
+    <section className="relative flex flex-col items-center justify-center overflow-hidden pt-24 pb-16 md:pb-24 px-4">
+      <div className="absolute inset-0 bg-primary/10 [mask-image:radial-gradient(ellipse_at_top,black_30%,transparent_70%)] pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_bottom_left,black_30%,transparent_70%)] pointer-events-none" />
 
-      <div className="absolute inset-0 .bg-\[radial-gradient\(ellipse_at_top\,_var\(--tw-gradient-stops\)\)\] {
- background-image: radial-gradient(ellipse at top, var(--tw-gradient-stops));
-} from-primary/10 via-transparent to-transparent pointer-events-none" />
-      <div className="absolute inset-0 .bg-\[radial-gradient\(ellipse_at_bottom_left\,_var\(--tw-gradient-stops\)\)\] {
- background-image: radial-gradient(ellipse at bottom left, var(--tw-gradient-stops));
-} from-primary/5 via-transparent to-transparent pointer-events-none" />
+      {/* Floating orbs */}
+      <motion.div
+        animate={{ y: [0, -20, 0], x: [0, 10, 0] }}
+        transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
+        className="absolute top-32 left-[10%] size-72 rounded-full bg-primary/8 blur-[100px] pointer-events-none"
+      />
+      <motion.div
+        animate={{ y: [0, 15, 0], x: [0, -8, 0] }}
+        transition={{ duration: 10, repeat: Infinity, ease: "easeInOut", delay: 1 }}
+        className="absolute top-48 right-[8%] size-56 rounded-full bg-primary/6 blur-[80px] pointer-events-none"
+      />
+      <motion.div
+        animate={{ y: [0, -12, 0] }}
+        transition={{ duration: 7, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+        className="absolute bottom-32 left-[20%] size-40 rounded-full bg-primary/5 blur-[60px] pointer-events-none"
+      />
+
+      {/* Floating company badges */}
+      {[
+        { icon: IconBrandNetflix, label: "Netflix", top: "18%", left: "8%", y: [0, -20, 0], dur: 6, delay: 0 },
+        { icon: IconCar, label: "Uber", top: "25%", right: "6%", y: [0, 18, 0], dur: 7, delay: 0.5 },
+        { icon: IconBrandStripe, label: "Stripe", top: "55%", left: "5%", y: [0, -15, 0], dur: 8, delay: 1 },
+        { icon: IconBrandGithub, label: "GitHub", top: "15%", right: "15%", y: [0, 22, 0], dur: 6.5, delay: 1.5 },
+        { icon: IconCloud, label: "Cloudflare", top: "60%", right: "8%", y: [0, -18, 0], dur: 7.5, delay: 2 },
+        { icon: IconBrandAws, label: "AWS", top: "70%", left: "12%", y: [0, 16, 0], dur: 8.5, delay: 0.8 },
+        { icon: IconBrandMeta, label: "Meta", top: "40%", left: "3%", y: [0, -22, 0], dur: 9, delay: 2.5 },
+        { icon: IconBrandSpotify, label: "Spotify", top: "45%", right: "4%", y: [0, 14, 0], dur: 7, delay: 1.2 },
+        { icon: IconBrandX, label: "X", top: "75%", right: "18%", y: [0, -16, 0], dur: 8, delay: 3 },
+        { icon: IconBrandNetflix, label: "Netflix", top: "80%", left: "22%", y: [0, 20, 0], dur: 6, delay: 0.3 },
+      ].map((item) => (
+        <motion.div
+          key={`${item.label}-${item.top}-${item.left ?? item.right}`}
+          animate={{ y: item.y, opacity: [0.25, 0.55, 0.25] }}
+          transition={{ duration: item.dur, repeat: Infinity, ease: "easeInOut", delay: item.delay }}
+          className="absolute flex items-center justify-center size-10 rounded-xl border border-border/30 bg-card/40 backdrop-blur-sm shadow-glow-sm pointer-events-none hidden lg:flex"
+          style={{ top: item.top, left: item.left, right: item.right }}
+        >
+          <item.icon className="size-5 text-muted-foreground" />
+        </motion.div>
+      ))}
+
+      {/* Grid lines overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.03] [mask-image:radial-gradient(ellipse_at_center,black_40%,transparent_70%)]">
+        <div className="absolute inset-0" style={{ backgroundImage: "linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)", backgroundSize: "60px 60px" }} />
+      </div>
 
       <div className="relative z-10 mx-auto max-w-6xl w-full flex flex-col items-center text-center py-20">
         <motion.div
@@ -49,9 +91,9 @@ export default function HeroSection() {
           transition={{ duration: 0.6, ease: [0.25, 0.4, 0.25, 1] }}
           className="mb-6 mt-10"
         >
-          <GlowBadge className="py-3 px-5 text-xs  font-medium [&>svg]:size-5!">
+          <GlowBadge className="py-3 px-5 text-xs font-medium [&>svg]:size-5!">
             <IconSparkles2 className="" />
-            AI-Powered Engineering Blog Aggregator
+            Engineering Knowledge, Curated for You
           </GlowBadge>
         </motion.div>
 
@@ -59,11 +101,11 @@ export default function HeroSection() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.1, ease: [0.25, 0.4, 0.25, 1] }}
-          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tight leading-[1.1] mb-6 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text "
+          className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-extrabold tracking-tight leading-[1.1] mb-6 bg-linear-to-b from-foreground to-foreground/70 bg-clip-text"
         >
-          Every Engineering Blog.
+          The Best Engineering
           <br />
-          <span className="bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent">One Feed.</span>
+          <span className="bg-linear-to-r from-primary to-primary/50 bg-clip-text text-transparent">Content is Already Out There.</span>
         </motion.h1>
 
         <motion.p
@@ -72,7 +114,7 @@ export default function HeroSection() {
           transition={{ duration: 0.6, delay: 0.2, ease: [0.25, 0.4, 0.25, 1] }}
           className="text-base sm:text-lg text-muted-foreground max-w-2xl mb-10 leading-relaxed"
         >
-          Follow Netflix, Stripe, Uber, Cloudflare, AWS and hundreds of engineering blogs in a single personalized feed powered by AI.
+          BlogDrop curates articles from the world&apos;s top engineering teams — so you can stay informed without the overwhelm. One feed, only what matters.
         </motion.p>
 
         <motion.div
@@ -81,16 +123,15 @@ export default function HeroSection() {
           transition={{ duration: 0.6, delay: 0.3, ease: [0.25, 0.4, 0.25, 1] }}
           className="flex flex-col sm:flex-row gap-4 mb-16"
         >
-          <Button size="lg" className="h-12 px-6 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/95 shadow-glow hover:shadow-glow-lg transition-shadow duration-300" asChild>
-            <a href={earlyAccessFormLink} target="_blank">
-              Get Early Access
+          <Button size="lg" className="h-12 px-6 text-base rounded-xl bg-primary text-primary-foreground hover:bg-primary/80 shadow-glow hover:shadow-glow-lg transition-shadow duration-300" asChild>
+            <Link href="/feed">
+              Go to Feed
               <IconArrowRight className="size-4 ml-1" />
-            </a>
+            </Link>
           </Button>
           <Button size="lg" variant="outline" className="h-12 px-6 text-base rounded-xl border-border hover:bg-muted/50 hover:shadow-glow-foreground transition-shadow duration-300" asChild>
-            <a href={githubRepoLink} target="_blank">
-              <IconBrandGithub className="size-4 mr-2" />
-              View Sources
+            <a href={earlyAccessFormLink} target="_blank">
+              Get Early Access
             </a>
           </Button>
         </motion.div>
@@ -129,7 +170,7 @@ export default function HeroSection() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-sm font-semibold text-foreground">Your Feed</h3>
                   <GlowBadge className="text-xs px-3 py-0.5">
-                    AI Curated
+                    Curated for You
                   </GlowBadge>
                 </div>
 
@@ -140,7 +181,7 @@ export default function HeroSection() {
                   >
                     <div className="flex items-start justify-between mb-2">
                       <div className="flex items-center gap-2">
-                        <div className="size-5 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-[10px] font-bold text-white shadow-glow-xs">
+                        <div className="size-5 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-[10px] font-bold text-primary-foreground shadow-glow-xs">
                           {article.company[0]}
                         </div>
                         <span className="text-xs text-muted-foreground">{article.company}</span>
@@ -151,7 +192,7 @@ export default function HeroSection() {
                     </div>
                     <h4 className="text-sm font-medium text-foreground mb-2">{article.title}</h4>
                     <p className="text-xs text-muted-foreground mb-3 line-clamp-2">
-                      AI summary: Exploring the architecture and engineering decisions behind their latest infrastructure improvements and scalability solutions.
+                      Quick summary: Key architectural decisions and engineering insights from their latest infrastructure improvements.
                     </p>
                     <div className="flex items-center gap-2">
                       {article.tags.map((tag) => (

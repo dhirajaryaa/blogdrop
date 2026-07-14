@@ -10,42 +10,40 @@ import { Card, CardContent } from "@/components/ui/card"
 const features = [
   {
     icon: IconSparkles,
-    title: "AI Summaries",
-    description: "Get concise two-sentence summaries of every article. Know if it's worth your time before reading.",
+    title: "Understand before you read",
+    description: "Every article comes with a quick summary. Know what it covers and decide if it's worth your time — in under 10 seconds.",
   },
   {
     icon: IconThumbUp,
-    title: "Smart Recommendations",
-    description: "The more you read, the better your feed gets. Personalized recommendations that improve over time.",
+    title: "Gets smarter the more you use it",
+    description: "Your feed learns from what you actually read. The articles get more relevant every week, not less.",
   },
   {
     icon: IconTag,
-    title: "Topic Detection",
-    description: "Articles are automatically tagged by topic. Filter by Kubernetes, Rust, AI, or any engineering domain.",
+    title: "Follow only what matches your stack",
+    description: "Articles are tagged by topic automatically. Filter by Kubernetes, Rust, AI, databases — whatever you work with.",
   },
   {
     icon: IconMail,
-    title: "Daily Digest",
-    description: "A curated morning digest with the top 5 engineering articles you shouldn't miss.",
+    title: "Your morning engineering briefing",
+    description: "A curated daily digest with the top articles you shouldn't miss. One email, five minutes, fully caught up.",
   },
   {
     icon: IconSearch,
-    title: "Smart Search",
-    description: "Full-text search across hundreds of blogs. Find that article you read three months ago instantly.",
+    title: "That article you read three months ago",
+    description: "Full-text search across hundreds of blogs. Find that one post about database indexing you bookmarked and forgot about.",
   },
   {
     icon: IconBookmark,
-    title: "Bookmarks",
-    description: "Build your personal library of engineering knowledge. Organize with tags and collections.",
+    title: "Your personal knowledge library",
+    description: "Save the best articles and build a collection you can actually find later. No more lost bookmarks in browser history.",
   },
 ]
 
 export default function FeaturesGrid() {
   return (
     <section className="relative py-24 px-4">
-      <div className="absolute inset-0 b.bg-\[radial-gradient\(ellipse_at_bottom\,_var\(--tw-gradient-stops\)\)\] {
- background-image: radial-gradient(ellipse at bottom, var(--tw-gradient-stops));
-} from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_bottom,black_30%,transparent_70%)] pointer-events-none" />
 
       <div className="mx-auto max-w-6xl relative z-10">
         <motion.div
@@ -57,10 +55,10 @@ export default function FeaturesGrid() {
         >
           <p className="text-sm font-medium text-muted-foreground uppercase tracking-widest mb-3">Features</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Everything you need to stay informed
+            Every feature serves a purpose
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            Powerful features designed for developers who want to stay on top of engineering trends.
+            Built for developers who want to stay informed without drowning in content.
           </p>
         </motion.div>
 

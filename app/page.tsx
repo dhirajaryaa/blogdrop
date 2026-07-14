@@ -2,7 +2,6 @@ import HeroSection from "@/components/home/HeroSection";
 import TrustedSources from "@/components/home/TrustedSources";
 import ProblemSection from "@/components/home/ProblemSection";
 import SolutionSection from "@/components/home/SolutionSection";
-import ProductPreview from "@/components/home/ProductPreview";
 import HowItWorks from "@/components/home/HowItWorks";
 import FeaturesGrid from "@/components/home/FeaturesGrid";
 import Testimonials from "@/components/home/Testimonials";
@@ -19,7 +18,6 @@ export default function Home() {
       <TrustedSources />
       <ProblemSection />
       <SolutionSection />
-      <ProductPreview />
       <HowItWorks />
       <FeaturesGrid />
       <Testimonials />
