@@ -19,12 +19,12 @@ export default function Footer() {
           <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
               <div className="size-7 rounded-lg bg-linear-to-br from-primary to-primary/50 flex items-center justify-center shadow-glow-sm">
-                <IconBrandTabler className="size-4 text-white" />
+                <IconBrandTabler className="size-4 text-primary-foreground" />
               </div>
               <span className="text-base font-bold tracking-tight">BlogDrop</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              One feed for every engineering blog. AI-powered curation for developers who value their time.
+              Engineering knowledge, curated for developers who value their time. Never miss the articles that matter.
             </p>
           </div>
 

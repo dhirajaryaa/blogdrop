@@ -31,7 +31,7 @@ export default function Navbar() {
       <div className="mx-auto max-w-7xl flex items-center justify-between px-4 sm:px-6 lg:px-8 h-16">
         <Link href="/" className="flex items-center gap-2 group">
           <div className="size-8 rounded-lg bg-linear-to-br from-primary to-primary/50 flex items-center justify-center shadow-glow-article">
-            <IconBrandTabler className="size-5 text-white" />
+            <IconBrandTabler className="size-5 text-primary-foreground" />
           </div>
           <span className="text-lg font-bold tracking-tight">BlogDrop</span>
         </Link>

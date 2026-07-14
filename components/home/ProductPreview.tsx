@@ -31,7 +31,7 @@ const articles = [
 export default function ProductPreview() {
   return (
     <section className="relative py-24 px-4 overflow-hidden">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] pointer-events-none" />
 
       <div className="mx-auto max-w-6xl relative z-10">
         <motion.div
@@ -48,7 +48,7 @@ export default function ProductPreview() {
             See BlogDrop in action
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            A clean, focused reading experience designed for engineers who value their time.
+            A focused reading experience designed for engineers who value their time. No clutter, no noise.
           </p>
         </motion.div>
 
@@ -60,9 +60,9 @@ export default function ProductPreview() {
           className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm overflow-hidden shadow-glow-xl"
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border/30 bg-muted/20">
-            <div className="size-2.5 rounded-full bg-red-500/80" />
-            <div className="size-2.5 rounded-full bg-yellow-500/80" />
-            <div className="size-2.5 rounded-full bg-green-500/80" />
+            <div className="size-2.5 rounded-full bg-muted/60" />
+            <div className="size-2.5 rounded-full bg-muted/40" />
+            <div className="size-2.5 rounded-full bg-muted/20" />
             <span className="text-xs text-muted-foreground ml-2">BlogDrop Dashboard</span>
           </div>
 
@@ -71,7 +71,7 @@ export default function ProductPreview() {
             <div className="lg:w-48 border-r border-border/30 p-3 space-y-0.5 hidden lg:block bg-muted/10">
               {[
                 { icon: IconStar, label: "Feed", count: "42", active: true },
-                { icon: IconSparkles, label: "AI Digest", count: "3", active: false },
+                { icon: IconSparkles, label: "Digest", count: "3", active: false },
                 { icon: IconBookmark, label: "Bookmarks", count: "18", active: false },
                 { icon: IconClock, label: "History", active: false },
               ].map((item) => (
@@ -103,7 +103,7 @@ export default function ProductPreview() {
                 </div>
                 <GlowBadge className="text-xs px-3 py-0.5 flex items-center gap-1">
                   <IconSparkles className="size-3" />
-                  AI Curated
+                  Curated for You
                 </GlowBadge>
               </div>
 
@@ -117,7 +117,7 @@ export default function ProductPreview() {
                   className="group rounded-xl border border-border/30 bg-card/20 p-4 hover:bg-card/50 hover:border-primary/20 hover:shadow-glow-article transition-all duration-300"
                 >
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                    <div className="size-4 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-[8px] font-bold text-white">
+                    <div className="size-4 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-[8px] font-bold text-primary-foreground">
                       {article.company[0]}
                     </div>
                     <span>{article.company}</span>

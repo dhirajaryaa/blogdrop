@@ -52,7 +52,7 @@ export default function TrustedSources() {
               {company.icon ? (
                 <company.icon className="size-8 text-muted-foreground group-hover:text-foreground transition-colors" />
               ) : (
-                <div className="size-8 rounded-full bg-linear-to-br from-destructive to-destructive/70 flex items-center justify-center text-[10px] font-bold text-white">
+                <div className="size-8 rounded-full bg-linear-to-br from-destructive to-destructive/70 flex items-center justify-center text-[10px] font-bold text-primary-foreground">
                   MF
                 </div>
               )}

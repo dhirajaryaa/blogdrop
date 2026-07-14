@@ -1,25 +1,25 @@
 "use client"
 
 import { motion } from "motion/react"
-import { IconTarget, IconSparkles, IconBrain, IconArrowDown } from "@tabler/icons-react"
+import { IconTarget, IconSparkles, IconFilter, IconArrowDown } from "@tabler/icons-react"
 
 const steps = [
   {
     icon: IconTarget,
-    title: "Select Your Interests",
-    description: "Pick the companies and topics you care about. From Netflix to Cloudflare, choose your sources.",
+    title: "Pick what matters to you",
+    description: "Choose the companies and topics you care about. Kubernetes, system design, databases — whatever keeps you up at night.",
     step: "01",
   },
   {
     icon: IconSparkles,
-    title: "AI Curates Content",
-    description: "Our AI reads, summarizes, and ranks every article. You get only the signal, none of the noise.",
+    title: "BlogDrop curates everything",
+    description: "Every article is read, summarized, and ranked. You get only the signal — the rest stays out of sight.",
     step: "02",
   },
   {
-    icon: IconBrain,
-    title: "Read Smarter",
-    description: "Dive into AI-powered summaries, save what matters, and stay ahead of engineering trends.",
+    icon: IconFilter,
+    title: "Read smarter, not more",
+    description: "Quick summaries help you decide in seconds. Save what matters, skip what doesn't. Stay ahead without the guilt.",
     step: "03",
   },
 ]
