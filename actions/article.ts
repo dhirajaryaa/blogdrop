@@ -1,11 +1,17 @@
 "use server"
 
 import { db } from "@/db"
-import { article, articleMetaData, source } from "@/db/schema"
-import { eq } from "drizzle-orm"
+import { article, articleMetaData, bookmark, source } from "@/db/schema"
+import { getCurrentUser } from "@/lib/auth/get-user";
+import { and, eq, isNotNull, sql } from "drizzle-orm"
+
 
 export async function getArticleBySlug(slug: string) {
-  const rows = await db
+
+  //? step 1: validate user
+  const user = await getCurrentUser();
+
+  const [rows] = await db
     .select({
       id: article.id,
       slug: article.slug,
@@ -23,12 +29,17 @@ export async function getArticleBySlug(slug: string) {
       difficulty: articleMetaData.difficulty,
       whyRead: articleMetaData.whyRead,
       readingTime: articleMetaData.readingTime,
+      bookmark: isNotNull(bookmark.id)
     })
     .from(article)
     .leftJoin(source, eq(article.sourceId, source.id))
     .leftJoin(articleMetaData, eq(article.id, articleMetaData.articleId))
+    .leftJoin(bookmark,
+      user?.id ? and(eq(article.id, bookmark.articleId), eq(bookmark.userId, user.id)) :
+        sql`false`
+    )
     .where(eq(article.slug, slug))
     .limit(1)
 
-  return rows[0] ?? null
+  return rows
 }

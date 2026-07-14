@@ -2,13 +2,15 @@ import { notFound } from "next/navigation"
 import { constructMetadata } from "@/lib/utils"
 import { Metadata } from "next"
 import Link from "next/link"
-import { IconArrowLeft, IconCalendar, IconCircleCheck, IconClock, IconExternalLink, IconHash, IconSparkles, IconUser } from "@tabler/icons-react"
+import { IconCalendar, IconCircleCheck, IconClock, IconExternalLink, IconHash, IconSparkles, IconUser } from "@tabler/icons-react"
 import { getArticleBySlug } from "@/actions/article"
 import { buttonVariants } from "@/components/ui/button"
 import GlowBadge from "@/components/common/GlowBadge"
 import { formatDate } from "@/utils/format-date"
 import { ensureAuthUser } from "@/lib/auth/get-user"
 import { Badge } from "@/components/ui/badge"
+import GoBack from "@/components/common/back-button"
+import BookmarkButton from "@/components/article/bookmark-button"
 
 interface ArticlePageProps {
   params: Promise<{ slug: string }>
@@ -17,7 +19,7 @@ interface ArticlePageProps {
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
-  
+
   if (!article) {
     return constructMetadata({
       title: "Article Not Found - BlogDrop",
@@ -44,37 +46,35 @@ async function ArticlePage({ params }: ArticlePageProps) {
 
   return (
     <div className="max-w-4xl mx-auto space-y-8 my-4 px-4 relative py-8">
-      <Link
-        href="/feed"
-        className={buttonVariants({ variant: "outline", size: "sm" })}
-      >
-        <IconArrowLeft className="size-4" />
-        Back to feed
-      </Link>
+      <GoBack variant={"outline"} size={"sm"} />
 
       <article className="space-y-6">
         {/* topbar  */}
         <div className="space-y-4">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-            <span className="inline-flex items-center gap-2 text-foreground/70 tracking-normal font-semibold text-sm">
-              <img loading="lazy" decoding="async" src={faviconUrl} alt={article?.sourceName || "logo"} className="size-5 rounded-full object-cover" />
-              {article.sourceName}
-            </span>
-            {article.readingTime && (
-              <>
-                <span>•</span>
-                <span className="flex items-center gap-1">
-                  <IconClock className="size-3.5" />
-                  {article.readingTime} min read
-                </span>
-              </>
-            )}
-            {article.difficulty && (
-              <>
-                <span>•</span>
-                <GlowBadge className="capitalize">{article.difficulty}</GlowBadge>
-              </>
-            )}
+          <div className="flex items-center gap-4 justify-between">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-2 text-foreground/70 tracking-normal font-semibold text-sm">
+                <img loading="lazy" decoding="async" src={faviconUrl} alt={article?.sourceName || "logo"} className="size-5 rounded-full object-cover" />
+                {article.sourceName}
+              </span>
+              {article.readingTime && (
+                <>
+                  <span>•</span>
+                  <span className="flex items-center gap-1">
+                    <IconClock className="size-3.5" />
+                    {article.readingTime} min read
+                  </span>
+                </>
+              )}
+              {article.difficulty && (
+                <>
+                  <span>•</span>
+                  <GlowBadge className="capitalize">{article.difficulty}</GlowBadge>
+                </>
+              )}
+            </div>
+
+            <BookmarkButton articleId={article.id} isBookmark={article.bookmark as boolean} />
           </div>
 
           <h1 className="text-2xl sm:text-4xl font-bold tracking-tight leading-tight">

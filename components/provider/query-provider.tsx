@@ -3,6 +3,7 @@
 import {
   QueryClient,
   QueryClientProvider,
+  useQueryClient,
 } from "@tanstack/react-query";
 import { useState } from "react";
 
@@ -30,4 +31,4 @@ export function QueryProvider({
       {children}
     </QueryClientProvider>
   );
-}
+};
