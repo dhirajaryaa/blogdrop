@@ -1,7 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import { IconBrandTabler, IconBrandGithub, IconBrandX } from "@tabler/icons-react"
+import Image from "next/image"
+import { IconBrandGithub, IconBrandX } from "@tabler/icons-react"
 import { Separator } from "@/components/ui/separator"
 import { githubRepoLink, twitterLink } from "@/config/constant"
 
@@ -18,13 +19,13 @@ export default function Footer() {
         <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
           <div>
             <Link href="/" className="flex items-center gap-2 mb-4">
-              <div className="size-7 rounded-lg bg-linear-to-br from-primary to-primary/50 flex items-center justify-center shadow-glow-sm">
-                <IconBrandTabler className="size-4 text-white" />
+              <div className="size-7 rounded-lg overflow-hidden shadow-glow-sm">
+                <Image src="/logo.png" alt="BlogDrop" width={28} height={28} className="size-7 object-cover" />
               </div>
               <span className="text-base font-bold tracking-tight">BlogDrop</span>
             </Link>
             <p className="text-sm text-muted-foreground leading-relaxed max-w-xs">
-              One feed for every engineering blog. AI-powered curation for developers who value their time.
+              Engineering knowledge, curated for developers who value their time. Never miss the articles that matter.
             </p>
           </div>
 

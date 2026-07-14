@@ -2,48 +2,48 @@
 
 import { motion } from "motion/react"
 import {
-  IconSparkles, IconLayoutList, IconTrendingUp,
-  IconMail, IconSearch, IconBookmark,
+  IconClock, IconLayoutList, IconTrendingUp,
+  IconFilter, IconSearch, IconBookmark,
 } from "@tabler/icons-react"
 import { Card, CardContent } from "@/components/ui/card"
 
 const solutions = [
   {
-    icon: IconSparkles,
-    title: "AI Summaries",
-    description: "Read key insights in seconds, not minutes. Get the gist before diving deep.",
+    icon: IconClock,
+    title: "Never miss what matters",
+    description: "The most important engineering articles surface automatically — no RSS feeds to manage, no tabs to track.",
   },
   {
     icon: IconLayoutList,
-    title: "Personalized Feed",
-    description: "See only what matters to you. The more you read, the smarter your feed gets.",
+    title: "Read only what's relevant",
+    description: "Your feed learns from what you read. Over time, you see less noise and more of what actually helps you.",
   },
   {
     icon: IconTrendingUp,
-    title: "Trending Topics",
-    description: "Discover the hottest engineering discussions across the entire blogosphere.",
+    title: "Discover trending insights",
+    description: "See which articles engineers are reading right now. Catch the conversations before they fade.",
   },
   {
-    icon: IconMail,
-    title: "Daily Digest",
-    description: "A concise daily rundown of the most important engineering content, delivered to you.",
+    icon: IconFilter,
+    title: "Decide in seconds",
+    description: "Every article comes with a quick summary. Know if it&apos;s worth your time before you invest a single minute.",
   },
   {
     icon: IconSearch,
-    title: "Smart Search",
-    description: "Search across hundreds of blogs at once. Find exactly what you need, instantly.",
+    title: "Find anything, instantly",
+    description: "Remember that article about database migrations from three months ago? It&apos;s one search away.",
   },
   {
     icon: IconBookmark,
-    title: "Bookmarks",
-    description: "Save articles for later. Build your own reference library of engineering wisdom.",
+    title: "Build your knowledge library",
+    description: "Save the best articles and build a personal reference collection of engineering wisdom you can return to.",
   },
 ]
 
 export default function SolutionSection() {
   return (
     <section id="features" className="relative py-24 px-4">
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-primary/5 via-transparent to-transparent pointer-events-none" />
+      <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_top_right,black_30%,transparent_70%)] pointer-events-none" />
 
       <div className="mx-auto max-w-6xl relative z-10">
         <motion.div
@@ -55,10 +55,10 @@ export default function SolutionSection() {
         >
           <p className="text-sm font-medium text-primary uppercase tracking-widest mb-3">The Solution</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            BlogDrop fixes the signal-to-noise problem.
+            One feed. Only the articles worth reading.
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            AI-powered curation that surfaces the engineering content you actually care about.
+            BlogDrop collects engineering knowledge from the best sources and helps you understand what&apos;s worth your time — without the overwhelm.
           </p>
         </motion.div>
 

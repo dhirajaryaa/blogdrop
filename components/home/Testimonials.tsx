@@ -6,19 +6,19 @@ import { Card, CardContent } from "@/components/ui/card"
 
 const testimonials = [
   {
-    quote: "BlogDrop replaced 15 RSS feeds for me. The AI summaries alone save me about an hour every morning.",
+    quote: "I used to spend 30 minutes every morning skimming blogs. Now I spend 5 minutes and actually find better articles. BlogDrop completely changed how I stay current.",
     author: "Sarah Chen",
     role: "Senior Engineer at Vercel",
     initials: "SC",
   },
   {
-    quote: "I finally stopped falling behind on engineering blogs. The daily digest is my new morning ritual.",
+    quote: "The problem was never finding engineering content — it was finding the right content. BlogDrop solved that. The daily digest is the first thing I read every morning.",
     author: "Marcus Johnson",
     role: "Staff Engineer at Shopify",
     initials: "MJ",
   },
   {
-    quote: "The topic detection is unreal. I can follow Rust content from every blog without manually filtering anything.",
+    quote: "I follow Kubernetes across twelve different company blogs. Before BlogDrop, I missed half of them. Now I miss none. The summaries save me hours every week.",
     author: "Priya Patel",
     role: "Engineering Manager at Linear",
     initials: "PP",
@@ -60,7 +60,7 @@ export default function Testimonials() {
                     &ldquo;{testimonial.quote}&rdquo;
                   </p>
                   <div className="flex items-center gap-3 pt-4 border-t border-border/20">
-                    <div className="size-9 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-xs font-bold text-white">
+                    <div className="size-9 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-xs font-bold text-primary-foreground">
                       {testimonial.initials}
                     </div>
                     <div>
