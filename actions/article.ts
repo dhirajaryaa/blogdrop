@@ -18,7 +18,6 @@ export async function getArticleBySlug(slug: string) {
       title: article.title,
       originalUrl: article.originalUrl,
       author: article.author,
-      content: article.content,
       publicAt: article.publicAt,
       image: article.imageUrl,
       sourceName: source.title,

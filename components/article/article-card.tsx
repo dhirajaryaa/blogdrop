@@ -68,16 +68,6 @@ export function ArticleCard({ article }: { article: FeedType }) {
                     </div>
                 </div>
             </div>
-            {/* bookmark it  */}
-            <div className="z-10 absolute right-3 top-3">
-                <Button
-                    className="hidden group-hover:inline-flex items-center justify-center text-muted-foreground hover:text-primary"
-                    variant="ghost"
-                    size="icon"
-                >
-                    <IconBookmark className="size-5" />
-                </Button>
-            </div>
         </article>
     );
 }

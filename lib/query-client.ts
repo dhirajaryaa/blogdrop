@@ -9,7 +9,7 @@ function makeQueryClient() {
         defaultOptions: {
             queries: {
                 staleTime: 1000 * 60 * 5, // 5 min — same as provider
-                refetchOnWindowFocus: false,
+                refetchOnWindowFocus: true,
                 refetchOnMount: true,
             },
             dehydrate: {

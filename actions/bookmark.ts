@@ -5,10 +5,9 @@ import { bookmarkInput } from "@/schema/article-schema"
 import { getCurrentUser } from "@/lib/auth/get-user";
 import { redirect } from "next/navigation";
 import { db } from "@/db";
-import { bookmark, article } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
+import { bookmark, article, source, articleMetaData } from "@/db/schema";
+import { and, desc, eq, sql } from "drizzle-orm";
 
-// type 
 export type BookmarkInput = z.infer<typeof bookmarkInput>;
 
 export const bookmarkArticle = async ({ articleId }: BookmarkInput) => {
@@ -18,14 +17,12 @@ export const bookmarkArticle = async ({ articleId }: BookmarkInput) => {
         throw new Error("Invalid Input")
     };
 
-    //? step 1: validate user
     const user = await getCurrentUser();
 
     if (!user) {
         redirect("/login")
     };
 
-    //? step 2: valid article id 
     const validArticle = await db.query.article.findFirst({
         where: eq(article.id, articleId),
     });
@@ -34,9 +31,7 @@ export const bookmarkArticle = async ({ articleId }: BookmarkInput) => {
         throw new Error("Article not found");
     };
 
-    //? step 3: check already saved so toggle it
     await db.transaction(async (tx) => {
-
         const existing = await tx.query.bookmark.findFirst({
             where: and(
                 eq(bookmark.userId, user.id),
@@ -58,6 +53,38 @@ export const bookmarkArticle = async ({ articleId }: BookmarkInput) => {
         });
 
         return { bookmarked: true };
-
     })
-}
+};
+
+export const getBookmarkArticles = async () => {
+    const user = await getCurrentUser();
+
+    if (!user) {
+        redirect("/login");
+    }
+
+    return await db
+        .select({
+            id: article.id,
+            slug: article.slug,
+            title: article.title,
+            originalUrl: article.originalUrl,
+            author: article.author,
+            publicAt: article.publicAt,
+            imageUrl: article.imageUrl,
+            sourceName: sql<string>`coalesce(${source.title}, '')`,
+            summary: articleMetaData.summary,
+            whyRead: articleMetaData.whyRead,
+            readingTime: articleMetaData.readingTime,
+            difficulty: articleMetaData.difficulty,
+            tags: articleMetaData.tags,
+            categories: articleMetaData.categories,
+            matchScore: sql<number>`0`,
+        })
+        .from(bookmark)
+        .innerJoin(article, eq(bookmark.articleId, article.id))
+        .leftJoin(source, eq(article.sourceId, source.id))
+        .leftJoin(articleMetaData, eq(article.id, articleMetaData.articleId))
+        .where(eq(bookmark.userId, user.id))
+        .orderBy(desc(bookmark.createdAt));
+};
