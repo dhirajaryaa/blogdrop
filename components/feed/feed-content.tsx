@@ -1,36 +1,32 @@
 "use client";
 
 import Fuse from "fuse.js";
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { getPersonalizedFeed } from "@/actions/feed";
 import { FeedList, FeedLoadingList } from "./FeedList";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { FeedSidebar } from "@/components/feed/feed-sidebar";
 import LinkTab from "../common/link-tab";
-import { authClient } from "@/lib/auth/auth-client";
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
 import SearchBox from "../common/search-box";
 import { Button } from "../ui/button";
-import { IconFilter2 } from "@tabler/icons-react";
+import { IconFilter2, IconLoader2 } from "@tabler/icons-react";
 import { toast } from "sonner";
 
 const PAGE_SIZE = 20;
+const INITIAL_PAGES = 2;
 
 function FeedContent() {
+    const [infiniteScrollActive, setInfiniteScrollActive] = useState(false);
+    const loadMoreRef = useRef<HTMLDivElement>(null);
+    const fetchedSecondPage = useRef(false);
 
-    // get articles 
-    const { data,
-        isPending,
-        isError,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage
-    } = useInfiniteQuery({
+    const query = useInfiniteQuery({
         queryKey: ["feed"],
         initialPageParam: 1,
         queryFn: async ({ pageParam }) => {
-            return await getPersonalizedFeed(pageParam, PAGE_SIZE)
+            return await getPersonalizedFeed(pageParam, PAGE_SIZE);
         },
         getNextPageParam: (lastPage, allPages) => {
             if (lastPage.length < PAGE_SIZE) return undefined;
@@ -38,58 +34,84 @@ function FeedContent() {
         },
     });
 
+    const { data, isPending, isError, fetchNextPage, hasNextPage, isFetchingNextPage } = query;
+
     const allArticles = data?.pages.flatMap(page => page) ?? [];
 
-    // search filer 
+    // Auto-fetch second page once first page is done
+    useEffect(() => {
+        if (!fetchedSecondPage.current && !isPending && data && data.pages.length === 1 && hasNextPage) {
+            fetchedSecondPage.current = true;
+            fetchNextPage();
+        }
+    }, [isPending, data, hasNextPage, fetchNextPage]);
+
+    // Infinite scroll
+    const handleLoadMore = useCallback(() => {
+        setInfiniteScrollActive(true);
+        fetchNextPage();
+    }, [fetchNextPage]);
+
+    useEffect(() => {
+        if (!infiniteScrollActive) return;
+
+        const observer = new IntersectionObserver(
+            (entries) => {
+                if (entries[0].isIntersecting && hasNextPage && !isFetchingNextPage) {
+                    fetchNextPage();
+                }
+            },
+            { threshold: 0.1 }
+        );
+
+        const el = loadMoreRef.current;
+        if (el) observer.observe(el);
+
+        return () => {
+            if (el) observer.unobserve(el);
+        };
+    }, [infiniteScrollActive, hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+    // Search filter
     const [searchInput, setSearchInput] = useState("");
     const [selectedCategory, setSelectedCategory] = useState<string>("");
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
 
     const fuse = useMemo(() => {
         return new Fuse(allArticles, {
-            keys: [
-                "title",
-                "summary",
-                "author",
-                "tags",
-                "categories",
-                "sourceName",
-            ],
+            keys: ["title", "summary", "author", "tags", "categories", "sourceName"],
             threshold: 0.3,
             ignoreLocation: true,
-        })
+        });
     }, [allArticles]);
 
-    //! handle search filter 
     const filteredSearchArticles = useMemo(() => {
         if (!searchInput.trim()) return allArticles;
-
         return fuse.search(searchInput).map((result) => result.item);
-
     }, [allArticles, fuse, searchInput]);
 
-    //! handle filter or  tags
     const filteredArticles = useMemo(() => {
         return filteredSearchArticles.filter(article => {
-            const categoryMatch = selectedCategory.trim() ? article.categories?.includes(selectedCategory) : article;
-
+            const categoryMatch = selectedCategory.trim()
+                ? article.categories?.includes(selectedCategory)
+                : true;
             const tagMatch =
                 selectedTags.length === 0 ||
-                selectedTags.some(tag =>
-                    article.tags?.includes(tag)
-                );
-
+                selectedTags.some(tag => article.tags?.includes(tag));
             return categoryMatch && tagMatch;
         });
     }, [filteredSearchArticles, selectedCategory, selectedTags]);
 
+    const showLoadMore = !infiniteScrollActive && allArticles.length >= PAGE_SIZE * INITIAL_PAGES && hasNextPage;
+
+    const displayArticles = infiniteScrollActive
+        ? filteredArticles
+        : filteredArticles.slice(0, PAGE_SIZE * INITIAL_PAGES);
 
     return (
         <section className="w-full max-w-6xl mx-auto">
-            {/* links tab  */}
             <LinkTab />
             <div className="w-full flex flex-col gap-4 md:flex-row md:gap-6">
-                {/* sidebar for desktop view */}
                 <FeedSidebar
                     searchInput={searchInput}
                     setSearchInput={setSearchInput}
@@ -99,10 +121,8 @@ function FeedContent() {
                     setSelectedTags={setSelectedTags}
                 />
 
-                {/* mobile view search bar  */}
                 <div className="w-full flex items-center gap-2 md:hidden">
-                    <SearchBox searchInput={searchInput}
-                        setSearchInput={setSearchInput} />
+                    <SearchBox searchInput={searchInput} setSearchInput={setSearchInput} />
                     <Button
                         variant="outline"
                         onClick={() => toast.info("Mobile filters are coming soon. You can use search for now.")}
@@ -112,16 +132,45 @@ function FeedContent() {
                     </Button>
                 </div>
 
-                {/* feed list show  */}
-                {
-                    isPending ?
-                        <FeedLoadingList /> :
-                        <FeedList articles={filteredArticles} />
-                }
-            </div>
+                {isPending ? (
+                    <FeedLoadingList />
+                ) : (
+                    <div className="flex flex-col gap-6">
+                        <FeedList articles={displayArticles} />
 
+                        {showLoadMore && (
+                            <div className="flex justify-center py-6">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={handleLoadMore}
+                                    className="px-8 text-primary"
+                                    disabled={isFetchingNextPage}
+                                >
+                                    {isFetchingNextPage && <IconLoader2 className="size-4 mr-2 animate-spin" />}
+                                    Load More
+                                </Button>
+                            </div>
+                        )}
+
+                        {infiniteScrollActive && hasNextPage && (
+                            <div ref={loadMoreRef} className="flex justify-center py-6">
+                                {isFetchingNextPage && (
+                                    <IconLoader2 className="size-6 text-muted-foreground animate-spin" />
+                                )}
+                            </div>
+                        )}
+
+                        {!hasNextPage && allArticles.length > 0 && (
+                            <p className="text-center text-sm text-muted-foreground py-6">
+                                You&apos;ve reached the end of your feed.
+                            </p>
+                        )}
+                    </div>
+                )}
+            </div>
         </section>
-    )
+    );
 }
 
-export default FeedContent
+export default FeedContent;

@@ -5,7 +5,7 @@ import RefreshButton from "../common/refresh-button";
 
 export default function EmptyFeed() {
     return (
-        <div className="max-w-xl mx-auto col-span-4">
+        <div className="max-w-xl mx-auto col-span-4 w-full">
             <div className="flex flex-col items-center justify-center py-16 text-center">
                 <div className="mb-4 rounded-full bg-muted p-4">
                     <IconNewsOff className="size-8 text-muted-foreground" />

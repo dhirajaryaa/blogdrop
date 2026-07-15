@@ -113,7 +113,9 @@ export function ArticlePageContent({ slug }: { slug: string }) {
                             {article.keyTakeaways.map((takeaway, i) => (
                                 <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                                     <IconCircleCheck className="text-primary size-5" />
+                                    <span className="flex-1">
                                     {takeaway}
+                                    </span>
                                 </li>
                             ))}
                         </ul>
