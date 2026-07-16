@@ -85,6 +85,34 @@ END
     abs(hashtext(${article.id}::text || CURRENT_DATE::text)) % 6
   `;
 
+  // difficulty score
+  const userLevel = user?.experienceLevel ?? "mid";
+
+  // const difficultyScore = sql<number>`
+  // CASE
+  //   WHEN ${articleMetaData.difficulty} = ${userLevel} THEN 15 ELSE 0
+  // END
+  // `;
+  const difficultyScore = sql<number>`
+CASE
+  -- user junior
+  WHEN ${userLevel} = 'junior' AND ${articleMetaData.difficulty} = 'junior' THEN 15
+  WHEN ${userLevel} = 'junior' AND ${articleMetaData.difficulty} = 'mid' THEN 8
+  WHEN ${userLevel} = 'junior' AND ${articleMetaData.difficulty} = 'senior' THEN 2
+
+  -- user mid
+  WHEN ${userLevel} = 'mid' AND ${articleMetaData.difficulty} = 'mid' THEN 15
+  WHEN ${userLevel} = 'mid' AND ${articleMetaData.difficulty} IN ('junior','senior') THEN 10
+
+  -- user senior
+  WHEN ${userLevel} = 'senior' AND ${articleMetaData.difficulty} = 'senior' THEN 15
+  WHEN ${userLevel} = 'senior' AND ${articleMetaData.difficulty} = 'mid' THEN 8
+  WHEN ${userLevel} = 'senior' AND ${articleMetaData.difficulty} = 'junior' THEN 2
+
+  ELSE 0
+END
+`;
+
   // Final recommendation score
   const recommendationScore = sql<number>`
     (
@@ -92,6 +120,7 @@ END
       + ${categoryScore}
       + ${freshnessScore}
       + ${randomScore}
+      + ${difficultyScore}
     )
   `;
 
@@ -122,7 +151,6 @@ END
     .where(
       and(
         eq(article.status, "completed"),
-        eq(articleMetaData.difficulty, user?.experienceLevel as string || "mid"), // if guest user so mid show
         inArray(articleMetaData.categories, categories)
       )
     )
