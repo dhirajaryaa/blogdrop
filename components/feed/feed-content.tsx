@@ -7,8 +7,6 @@ import { FeedList, FeedLoadingList } from "./FeedList";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import { FeedSidebar } from "@/components/feed/feed-sidebar";
 import LinkTab from "../common/link-tab";
-import { articleCategories } from "@/config/category";
-import { userTags } from "@/config/tags";
 import SearchBox from "../common/search-box";
 import { Button } from "../ui/button";
 import { IconFilter2, IconLoader2 } from "@tabler/icons-react";
@@ -121,15 +119,8 @@ function FeedContent() {
                     setSelectedTags={setSelectedTags}
                 />
 
-                <div className="w-full flex items-center gap-2 md:hidden">
+                <div className="w-full flex items-center gap-2 md:hidden pt-1">
                     <SearchBox searchInput={searchInput} setSearchInput={setSearchInput} />
-                    <Button
-                        variant="outline"
-                        onClick={() => toast.info("Mobile filters are coming soon. You can use search for now.")}
-                    >
-                        <IconFilter2 />
-                        Filters
-                    </Button>
                 </div>
 
                 {isPending ? (

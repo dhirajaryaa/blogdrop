@@ -2,7 +2,7 @@ import { constructMetadata } from "@/lib/utils"
 import BookmarksContent from "@/components/article/bookmarks-content"
 
 export const metadata = constructMetadata({
-  title: "Bookmarks - BlogDrop",
+  title: "Saved - BlogDrop",
   description: "Your saved engineering articles.",
   noIndex: true,
 })

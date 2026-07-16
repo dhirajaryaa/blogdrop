@@ -10,7 +10,7 @@ function LinkTab() {
     const links = [
         { href: "/feed", name: "For You" },
         { href: "/trending", name: "Trending" },
-        { href: "/bookmarks", name: "Bookmarks" },
+        { href: "/saved", name: "Saved" },
         { href: "/history", name: "Reading History" },
     ];
 

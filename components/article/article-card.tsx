@@ -4,15 +4,12 @@ import Link from "next/link";
 import { FeedType } from "@/actions/feed";
 import {
     IconArrowRight,
-    IconBookmark,
     IconBulb,
     IconClock,
-    IconSparkles,
     IconUser,
 } from "@tabler/icons-react";
 import { formatAuthors } from "@/utils/format-author";
 import { formatDate } from "@/utils/format-date";
-import { Button } from "@/components/ui/button";
 
 export function ArticleCard({ article }: { article: FeedType }) {
     const domain = new URL(article.originalUrl).hostname;
@@ -70,4 +67,4 @@ export function ArticleCard({ article }: { article: FeedType }) {
             </div>
         </article>
     );
-}
+};

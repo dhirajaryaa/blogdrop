@@ -1,6 +1,7 @@
-import { Skeleton } from "@/components/ui/skeleton"
+import { Skeleton } from "@/components/ui/skeleton";
+import { SectionHeader } from "@/components/common/section-header";
 
-function ArticleSkeleton() {
+export function ArticleSkeleton() {
     return (
         <div className="max-w-4xl mx-auto space-y-8 my-4 px-4 relative py-8">
             {/* Go Back */}
@@ -96,4 +97,25 @@ function ArticleSkeleton() {
     )
 }
 
-export default ArticleSkeleton;
+export function BookmarkSkeleton(){
+     return (
+         <SectionHeader title="Saved" description="Keep your favorite engineering articles in one place and read them whenever you're ready.">
+                    <section className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-6xl mx-auto">
+                        {[1, 2, 3, 4].map((i) => (
+                            <div key={i} className="flex flex-col gap-4 p-4 rounded-2xl bg-card border-2">
+                                <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                        <Skeleton className="w-4 h-4 rounded-full" />
+                                        <Skeleton className="w-20 h-4" />
+                                    </div>
+                                    <Skeleton className="w-full h-5" />
+                                    <Skeleton className="w-4/5 h-5" />
+                                    <Skeleton className="w-full h-4" />
+                                    <Skeleton className="w-3/4 h-4" />
+                                </div>
+                            </div>
+                        ))}
+                    </section>
+                </SectionHeader>
+            );
+}

@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/common/theme-toggle";
-import { Button } from "../ui/button";
+import { Button } from "@/components/ui/button";
 import { IconNews } from "@tabler/icons-react";
 
 function AppHeader() {
@@ -16,7 +16,7 @@ function AppHeader() {
         { href: "/feed", label: "For You" },
         { href: "/explore", label: "Explore" },
         { href: "/trending", label: "Trending" },
-        { href: "/bookmarks", label: "Bookmarks" },
+        { href: "/saved", label: "Saved" },
     ];
 
     return (

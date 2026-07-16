@@ -5,13 +5,12 @@ import Link from "next/link"
 import { IconCalendar, IconCircleCheck, IconClock, IconExternalLink, IconHash, IconSparkles, IconUser } from "@tabler/icons-react"
 import { getArticleBySlug } from "@/actions/article"
 import { buttonVariants } from "@/components/ui/button"
-import GlowBadge from "@/components/common/GlowBadge"
 import { formatDate } from "@/utils/format-date"
 import { Badge } from "@/components/ui/badge"
 import GoBack from "@/components/common/back-button"
 import BookmarkButton from "@/components/article/bookmark-button"
 import { useQuery } from "@tanstack/react-query"
-import ArticleSkeleton from "./article-skelton";
+import {ArticleSkeleton} from "./article-skelton";
 
 
 export function ArticlePageContent({ slug }: { slug: string }) {
@@ -91,7 +90,7 @@ export function ArticlePageContent({ slug }: { slug: string }) {
                             <Badge
                                 key={tag + i}
                                 variant={"secondary"}
-                                className="capitalize py-2.5 gap-0.5 bg-primary/10 text-primary"
+                                className="lowercase py-2.5 gap-0.5 bg-primary/10 text-primary"
                             >
                                 <IconHash /> {tag}
                             </Badge>
