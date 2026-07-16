@@ -1,16 +1,16 @@
 "use client";
 
-import FeedArticleSkeleton from "@/components/feed/feed-article-skeleton";
 import EmptyFeed from "@/components/article/empty-feed";
 import { ArticleCard } from "@/components/article/article-card";
 import { FeedType } from "@/actions/feed";
+import { ArticleSkeleton } from "../article/article-skelton";
 
 
 export function FeedLoadingList() {
     return (
         <section className="flex flex-col overflow-y-auto gap-6 w-full">
             {Array.from({ length: 8 }).map((_, i) => (
-                <FeedArticleSkeleton key={i} />
+                <ArticleSkeleton key={i} />
             ))}
         </section>
     );

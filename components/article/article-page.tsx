@@ -10,7 +10,7 @@ import { Badge } from "@/components/ui/badge"
 import GoBack from "@/components/common/back-button"
 import BookmarkButton from "@/components/article/bookmark-button"
 import { useQuery } from "@tanstack/react-query"
-import {ArticleSkeleton} from "./article-skelton";
+import {ArticlePageSkeleton} from "./article-skelton";
 
 
 export function ArticlePageContent({ slug }: { slug: string }) {
@@ -20,7 +20,7 @@ export function ArticlePageContent({ slug }: { slug: string }) {
         queryFn: () => getArticleBySlug(slug),
     });
 
-    if (isPending) return <ArticleSkeleton />;
+    if (isPending) return <ArticlePageSkeleton />;
     if (isError) return <div className="text-3xl text-center py-10 px-8">Oops, something went wrong!</div>;
     if (!article) return notFound();
 

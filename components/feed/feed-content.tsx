@@ -126,7 +126,7 @@ function FeedContent() {
                 {isPending ? (
                     <FeedLoadingList />
                 ) : (
-                    <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-6 w-full">
                         <FeedList articles={displayArticles} />
 
                         {showLoadMore && (
