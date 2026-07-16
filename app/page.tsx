@@ -20,7 +20,7 @@ export default function Home() {
       <SolutionSection />
       <HowItWorks />
       <FeaturesGrid />
-      <Testimonials />
+      {/* <Testimonials /> */}
       <FinalCTA />
       <Footer />
     </main>
