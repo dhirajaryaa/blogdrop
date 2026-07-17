@@ -45,7 +45,7 @@ const footerSections = [
 
 export default function Footer() {
   return (
-    <footer className="mt-8 bg-muted/30">
+    <footer className="bg-muted/30">
       <div className="mx-auto max-w-6xl px-4 py-14 sm:px-6 lg:px-8 border-t">
         <div className="grid gap-12 lg:grid-cols-[1.2fr_2fr]">
           {/* Brand */}
@@ -95,7 +95,7 @@ export default function Footer() {
           {/* Footer Links */}
           <div className="grid grid-cols-2 gap-10 sm:grid-cols-4">
             {footerSections.map((section) => (
-              <div key={section.title}>
+              <div key={section.title} className="w-fit">
                 <h3 className="mb-4 text-xs font-semibold uppercase tracking-widest text-foreground">
                   {section.title}
                 </h3>

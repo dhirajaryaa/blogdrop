@@ -1,4 +1,5 @@
-import { SeedSourceBtn } from "@/components/settings/SeedSource"
+import { ComingSoon } from "@/components/common/coming-soon";
+import { SectionHeader } from "@/components/common/section-header";
 import { constructMetadata } from "@/lib/utils"
 
 export const metadata = constructMetadata({
@@ -9,14 +10,15 @@ export const metadata = constructMetadata({
 
 function SettingsPage() {
     return (
-        <div className='max-w-4xl mx-auto'>
+       <>
+             <SectionHeader title="Settings" description="Manage your BlogDrop settings.">
+              
+                 <ComingSoon />
+               
+             </SectionHeader>
+           </>
 
-            <section className='w-full bg-accent p-4 rounded-xl'>
-                <h3 className='text-xl font-semibold mb-4'>feed source</h3>
-                <SeedSourceBtn />
-            </section>
 
-        </div>
     )
 }
 

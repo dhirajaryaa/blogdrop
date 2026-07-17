@@ -12,13 +12,13 @@ export function SocialLinks() {
         </Link>
       </Button>
       <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
-        <Link href="https://x.com/blogdrop" target="_blank" rel="noopener noreferrer">
+        <Link href="https://x.com/dhirajarya01" target="_blank" rel="noopener noreferrer">
           <IconBrandX className="h-5 w-5" />
           <span className="sr-only">X (Twitter)</span>
         </Link>
       </Button>
       <Button variant="ghost" size="icon" asChild className="text-muted-foreground hover:text-foreground">
-        <Link href="mailto:hello@blogdrop.com">
+        <Link href="mailto:dhirajarya.ptn@gmail.com">
           <IconMail className="h-5 w-5" />
           <span className="sr-only">Email</span>
         </Link>

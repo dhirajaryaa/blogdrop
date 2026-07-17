@@ -47,10 +47,6 @@ function AppHeader() {
                 </div>
 
                 <div className="flex items-center gap-2">
-                    <Button variant="link" size="lg">
-                        <IconNews className="size-4" />
-                        Daily Digest
-                    </Button>
                     <ThemeToggle />
                     <UserProfile />
                 </div>

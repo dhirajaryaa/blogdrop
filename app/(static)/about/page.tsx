@@ -3,6 +3,7 @@ import { ContentSection } from "@/components/static/ContentSection";
 import { SectionTitle } from "@/components/static/SectionTitle";
 import { MarkdownContent } from "@/components/static/MarkdownContent";
 import { constructMetadata } from "@/lib/utils";
+import { SectionHeader } from "@/components/common/section-header";
 
 export const metadata = constructMetadata({
   title: "About BlogDrop",

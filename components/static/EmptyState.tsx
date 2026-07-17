@@ -17,7 +17,7 @@ export function EmptyState({ icon, title, description, actionText, actionHref }:
         {icon}
       </div>
       <h3 className="text-xl font-semibold mb-2 text-foreground">{title}</h3>
-      <p className="text-muted-foreground max-w-[400px] mb-6">{description}</p>
+      <p className="text-muted-foreground max-w-100 mb-6">{description}</p>
       {actionText && actionHref && (
         <Button asChild>
           <Link href={actionHref}>{actionText}</Link>

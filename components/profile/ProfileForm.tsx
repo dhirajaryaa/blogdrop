@@ -139,7 +139,7 @@ export function ProfileForm({
         </ToggleGroup>
       </section>
 
-      <Button type="submit" size="lg" className="rounded-full mt-8 shadow-none" disabled={loading}>
+      <Button type="submit" size="lg" className="rounded-full w-full mt-8 shadow-none" disabled={loading}>
         {loading ? "Saving..." : "Save changes"}
       </Button>
     </form>

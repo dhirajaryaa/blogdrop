@@ -19,7 +19,7 @@ export function SectionHeader({
     className,
 }: SectionHeaderProps) {
     return (
-        <div className={cn("space-y-6 max-w-6xl", className)}>
+        <div className={cn("space-y-6 max-w-6xl pt-2", className)}>
             <section className="flex items-start justify-between gap-4 pt-2">
                 <div className="min-w-0">
                     <div className="flex gap-2 items-center">
