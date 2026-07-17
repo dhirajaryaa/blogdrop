@@ -1,5 +1,6 @@
 import { constructMetadata } from "@/lib/utils"
 import BookmarksContent from "@/components/article/bookmarks-content"
+import { ensureAuthUser } from "@/lib/auth/get-user"
 
 export const metadata = constructMetadata({
   title: "Saved - BlogDrop",
@@ -7,7 +8,9 @@ export const metadata = constructMetadata({
   noIndex: true,
 })
 
-function BookmarksPage() {
+async function BookmarksPage() {
+  await ensureAuthUser();
+  
   return <BookmarksContent />
 }
 

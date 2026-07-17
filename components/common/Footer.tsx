@@ -5,7 +5,7 @@ import Link from "next/link";
 import { IconBrandGithub, IconBrandX } from "@tabler/icons-react";
 
 import { Separator } from "@/components/ui/separator";
-import { githubRepoLink, twitterLink } from "@/config/constant";
+import { githubRepo, twitterLink } from "@/config/constant";
 
 const footerSections = [
   {
@@ -29,7 +29,7 @@ const footerSections = [
     links: [
       { title: "About", href: "/about" },
       { title: "Contact", href: "/contact" },
-      { title: "GitHub", href: githubRepoLink },
+      { title: "GitHub", href: githubRepo },
     ],
   },
   {
@@ -71,7 +71,7 @@ export default function Footer() {
 
             <div className="mt-6 flex items-center gap-2">
               <a
-                href={githubRepoLink}
+                href={githubRepo}
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="GitHub"

@@ -4,6 +4,7 @@ import { ContactCard } from "@/components/static/ContactCard";
 import { IconMail, IconBug, IconRss } from "@tabler/icons-react";
 import { SocialLinks } from "@/components/static/SocialLinks";
 import { constructMetadata } from "@/lib/utils";
+import { contactEmail, githubIssues } from "@/config/constant";
 
 export const metadata = constructMetadata({
   title: "Contact Us - BlogDrop",
@@ -23,21 +24,21 @@ export default function ContactPage() {
             title="Add your blog"
             description="Send us your RSS feed URL. We prioritize consistent, technical, first-hand writing."
             icon={<IconRss className="w-8 h-8" />}
-            href="mailto:contact@blogdrop.dev"
+            href={`mailto:${contactEmail}`}
             actionText="Submit Blog"
           />
           <ContactCard 
             title="Found a bug or bad tag?"
             description="Tell us what's wrong and we'll fix it. Your feedback makes our AI better."
             icon={<IconBug className="w-8 h-8" />}
-            href="https://github.com/blogdrop/issues"
+            href={githubIssues}
             actionText="Report Issue"
           />
           <ContactCard 
             title="Something else?"
             description="For general questions, feedback, or any other inquiries."
             icon={<IconMail className="w-8 h-8" />}
-            href="mailto:contact@blogdrop.dev"
+            href={`mailto:${contactEmail}`}
             actionText="Email Us"
           />
         </div>

@@ -1,6 +1,5 @@
 "use client"
 
-import { motion } from "motion/react"
 import { IconSparkles, IconBookmark, IconClock, IconStar } from "@tabler/icons-react"
 import GlowBadge from "@/components/common/GlowBadge"
 
@@ -34,11 +33,7 @@ export default function ProductPreview() {
       <div className="absolute inset-0 bg-primary/10 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] pointer-events-none" />
 
       <div className="mx-auto max-w-6xl relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+        <div
           className="text-center mb-16"
         >
           <GlowBadge className="mb-4 px-3 py-1 text-xs">
@@ -50,13 +45,9 @@ export default function ProductPreview() {
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             A focused reading experience designed for engineers who value their time. No clutter, no noise.
           </p>
-        </motion.div>
+        </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: [0.25, 0.4, 0.25, 1] }}
+        <div
           className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm overflow-hidden shadow-glow-xl"
         >
           <div className="flex items-center gap-2 px-4 py-3 border-b border-border/30 bg-muted/20">
@@ -108,12 +99,8 @@ export default function ProductPreview() {
               </div>
 
               {articles.map((article, i) => (
-                <motion.div
+                <div
                   key={article.title}
-                  initial={{ opacity: 0, x: -10 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.4, delay: i * 0.1 }}
                   className="group rounded-xl border border-border/30 bg-card/20 p-4 hover:bg-card/50 hover:border-primary/20 hover:shadow-glow-article transition-all duration-300"
                 >
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
@@ -137,7 +124,7 @@ export default function ProductPreview() {
                       </span>
                     ))}
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
 
@@ -176,7 +163,7 @@ export default function ProductPreview() {
               </div>
             </div>
           </div>
-        </motion.div>
+        </div>
       </div>
     </section>
   )

@@ -13,7 +13,7 @@ import { eq } from "drizzle-orm"
 import { SectionHeader } from "@/components/common/section-header"
 import { Button, buttonVariants } from "@/components/ui/button"
 import { toast } from "sonner"
-import { githubRepoLink } from "@/config/constant"
+import { githubRepo } from "@/config/constant"
 import { IconBrandGithub } from "@tabler/icons-react"
 
 async function ProfilePage() {

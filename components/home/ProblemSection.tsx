@@ -1,81 +1,61 @@
-"use client"
-
-import { motion } from "motion/react"
 import { IconMessageCircle, IconNews, IconHash, IconMail, IconBrowser, IconAlertTriangle } from "@tabler/icons-react"
 
 const problems = [
   {
     icon: IconMessageCircle,
-    title: "Twitter threads vanish overnight",
-    description: "That brilliant thread on distributed systems? Buried under memes by morning. No way to save or find it again.",
+    title: "Twitter threads disappear",
+    desc: "That great thread on distributed systems? Gone by morning. No way to save it.",
   },
   {
     icon: IconNews,
-    title: "Hacker News moves too fast",
-    description: "Great articles hit the front page for a few hours, then disappear forever. If you missed it, you missed it.",
+    title: "Hacker News moves fast",
+    desc: "Good articles are on the front page for a few hours. Then they're gone.",
   },
   {
     icon: IconHash,
-    title: "Reddit is a rabbit hole",
-    description: "You came for one post on system design. Two hours later you&apos;re reading about something completely unrelated.",
+    title: "Reddit pulls you in",
+    desc: "You came for one post about system design. Two hours later, you're still scrolling.",
   },
   {
     icon: IconMail,
-    title: "Newsletters pile up unread",
-    description: "You subscribed to five engineering newsletters. Now you have 200 unread emails and zero guilt about deleting them all.",
+    title: "Newsletters pile up",
+    desc: "Five engineering newsletters. 200 unread emails. You just delete them all.",
   },
   {
     icon: IconBrowser,
-    title: "Endless open tabs",
-    description: "37 tabs open — blog posts, articles, guides. You&apos;ll read them later. You won&apos;t.",
+    title: "Too many open tabs",
+    desc: "37 tabs open — articles, guides, blog posts. You'll read them later. You won't.",
   },
   {
     icon: IconAlertTriangle,
-    title: "The important stuff slips through",
-    description: "The one article about that exact problem you&apos;re facing? You never saw it. It was published last Tuesday.",
+    title: "You miss the good stuff",
+    desc: "The article you needed? Published last week. You never even saw it.",
   },
 ]
 
 export default function ProblemSection() {
   return (
-    <section className="relative py-24 px-4">
-      <div className="absolute inset-0 bg-destructive/5 [mask-image:radial-gradient(ellipse_at_center,black_30%,transparent_70%)] pointer-events-none" />
-
-      <div className="mx-auto max-w-6xl relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <p className="text-sm font-medium text-destructive uppercase tracking-widest mb-3">The Problem</p>
+    <section className="py-24 px-4">
+      <div className="mx-auto max-w-5xl">
+        <div className="text-center mb-16">
+          <p className="text-xs font-medium text-destructive uppercase tracking-widest mb-3">The Problem</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            Engineering knowledge is everywhere.
-            <br />
-            <span className="text-muted-foreground">You just can&apos;t keep up.</span>
+            Good content is everywhere. But you can&apos;t find it.
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            The best engineering insights are scattered across dozens of platforms. You&apos;re missing articles you&apos;d actually want to read.
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            The best articles are spread across dozens of sites. You&apos;re missing the ones you&apos;d actually love to read.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {problems.map((problem, i) => (
-            <motion.div
-              key={problem.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.08 }}
-              className="group relative rounded-2xl border border-border/30 bg-card/30 p-6 hover:bg-card/60 hover:border-destructive/20 hover:shadow-glow-amber transition-all duration-300"
-            >
-              <div className="size-10 rounded-xl bg-destructive/10 flex items-center justify-center mb-4 group-hover:bg-destructive/20 transition-colors shadow-glow-amber-sm">
-                <problem.icon className="size-5 text-destructive" />
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {problems.map((p) => (
+            <div key={p.title} className="group rounded-xl border border-border bg-card p-7 hover:border-destructive/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+              <div className="size-9 rounded-lg bg-destructive/10 flex items-center justify-center mb-3 group-hover:bg-destructive/15 transition-colors">
+                <p.icon className="size-4.5 text-destructive" />
               </div>
-              <h3 className="text-base font-semibold mb-2">{problem.title}</h3>
-              <p className="text-sm text-muted-foreground leading-relaxed">{problem.description}</p>
-            </motion.div>
+              <h3 className="text-sm font-semibold mb-1.5">{p.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{p.desc}</p>
+            </div>
           ))}
         </div>
       </div>

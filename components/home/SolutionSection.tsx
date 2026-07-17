@@ -1,86 +1,37 @@
-"use client"
-
-import { motion } from "motion/react"
-import {
-  IconClock, IconLayoutList, IconTrendingUp,
-  IconFilter, IconSearch, IconBookmark,
-} from "@tabler/icons-react"
-import { Card, CardContent } from "@/components/ui/card"
+import { IconClock, IconLayoutList, IconTrendingUp, IconFilter, IconSearch, IconBookmark } from "@tabler/icons-react"
 
 const solutions = [
-  {
-    icon: IconClock,
-    title: "Never miss what matters",
-    description: "The most important engineering articles surface automatically — no RSS feeds to manage, no tabs to track.",
-  },
-  {
-    icon: IconLayoutList,
-    title: "Read only what's relevant",
-    description: "Your feed learns from what you read. Over time, you see less noise and more of what actually helps you.",
-  },
-  {
-    icon: IconTrendingUp,
-    title: "Discover trending insights",
-    description: "See which articles engineers are reading right now. Catch the conversations before they fade.",
-  },
-  {
-    icon: IconFilter,
-    title: "Decide in seconds",
-    description: "Every article comes with a quick summary. Know if it&apos;s worth your time before you invest a single minute.",
-  },
-  {
-    icon: IconSearch,
-    title: "Find anything, instantly",
-    description: "Remember that article about database migrations from three months ago? It&apos;s one search away.",
-  },
-  {
-    icon: IconBookmark,
-    title: "Build your knowledge library",
-    description: "Save the best articles and build a personal reference collection of engineering wisdom you can return to.",
-  },
+  { icon: IconClock, title: "Never miss what matters", desc: "The best articles show up in your feed. No RSS. No searching." },
+  { icon: IconLayoutList, title: "Only read what fits you", desc: "The more you read, the better your feed gets. Less noise every week." },
+  { icon: IconTrendingUp, title: "See what's hot right now", desc: "Find out which articles engineers are reading. Jump into the conversation early." },
+  { icon: IconFilter, title: "Decide in 10 seconds", desc: "Every article has a short summary. Know if it's worth your time before you start." },
+  { icon: IconSearch, title: "Find anything, fast", desc: "That article about databases from three months ago? One search away." },
+  { icon: IconBookmark, title: "Build your own library", desc: "Save the best articles. Come back to them whenever you need." },
 ]
 
 export default function SolutionSection() {
   return (
-    <section id="features" className="relative py-24 px-4">
-      <div className="absolute inset-0 bg-primary/5 [mask-image:radial-gradient(ellipse_at_top_right,black_30%,transparent_70%)] pointer-events-none" />
-
-      <div className="mx-auto max-w-6xl relative z-10">
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
-          className="text-center mb-16"
-        >
-          <p className="text-sm font-medium text-primary uppercase tracking-widest mb-3">The Solution</p>
+    <section id="features" className="py-24 px-4 bg-muted/30" style={{ maskImage: "linear-gradient(to bottom, transparent, black 8%, black 92%, transparent)", WebkitMaskImage: "linear-gradient(to bottom, transparent, black 8%, black 92%, transparent)" }}>
+      <div className="mx-auto max-w-5xl">
+        <div className="text-center mb-16">
+          <p className="text-xs font-medium text-primary uppercase tracking-widest mb-3">The Solution</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
-            One feed. Only the articles worth reading.
+            One feed. Only the good stuff.
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            BlogDrop collects engineering knowledge from the best sources and helps you understand what&apos;s worth your time — without the overwhelm.
+          <p className="text-lg text-muted-foreground max-w-xl mx-auto">
+            We collect the best engineering articles and help you pick the ones worth your time.
           </p>
-        </motion.div>
+        </div>
 
-        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {solutions.map((solution, i) => (
-            <motion.div
-              key={solution.title}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: i * 0.1 }}
-            >
-              <Card className="group h-full border border-border/30 bg-card/30 hover:bg-card/60 hover:border-primary/20 transition-all duration-300 hover:shadow-glow-lg">
-                <CardContent className="p-6">
-                  <div className="size-10 rounded-xl bg-primary/10 flex items-center justify-center mb-4 group-hover:bg-primary/20 transition-colors shadow-glow-sm">
-                    <solution.icon className="size-5 text-primary" />
-                  </div>
-                  <h3 className="text-base font-semibold mb-2">{solution.title}</h3>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{solution.description}</p>
-                </CardContent>
-              </Card>
-            </motion.div>
+        <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          {solutions.map((s) => (
+            <div key={s.title} className="group rounded-xl border border-border bg-card p-7 hover:border-primary/20 hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300">
+              <div className="size-9 rounded-lg bg-primary/10 flex items-center justify-center mb-3 group-hover:bg-primary/15 transition-colors">
+                <s.icon className="size-4.5 text-primary" />
+              </div>
+              <h3 className="text-sm font-semibold mb-1.5">{s.title}</h3>
+              <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
+            </div>
           ))}
         </div>
       </div>
