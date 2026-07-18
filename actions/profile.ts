@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { user } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { getCurrentUser } from "@/lib/auth/get-user";
+import { redirect } from "next/navigation";
 
 export async function updateProfile(data: {
   about: string
@@ -13,7 +14,7 @@ export async function updateProfile(data: {
 }) {
   const currentUser = await getCurrentUser();
   if (!currentUser?.id) {
-    return { error: "Not authenticated" };
+    redirect("/login")
   };
 
   await db
@@ -27,4 +28,4 @@ export async function updateProfile(data: {
     .where(eq(user.id, currentUser.id))
 
   return { success: true };
-}
+};

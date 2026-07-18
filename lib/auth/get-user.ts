@@ -17,10 +17,11 @@ export async function ensureAuthUser() {
     const user = await getCurrentUser();
 
     if (!user) redirect("/login");
+    
 
     if (!user.onboarded) {
         redirect("/onboarding");
-    }
+    };
 
     return user;
 };

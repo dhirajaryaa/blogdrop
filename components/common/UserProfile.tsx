@@ -60,7 +60,7 @@ function UserProfile() {
                         Profile
                       </Link>
                     </DropdownMenuItem>
-                  
+
                     <DropdownMenuItem asChild>
                       <Link href={"/history"}>
                         <IconHistory />
@@ -68,7 +68,7 @@ function UserProfile() {
                       </Link>
                     </DropdownMenuItem>
 
-                      <DropdownMenuItem asChild>
+                    <DropdownMenuItem asChild>
                       <Link href={"/settings"}>
                         <IconSettings />
                         Settings
@@ -76,7 +76,7 @@ function UserProfile() {
                     </DropdownMenuItem>
                   </DropdownMenuGroup>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
+                  <DropdownMenuItem asChild variant="destructive" >
                     <Button onClick={handleLogout} variant={"destructive"} className="w-full">
                       <IconLogout />
                       Sign Out
@@ -85,7 +85,7 @@ function UserProfile() {
                 </DropdownMenuContent>
               </DropdownMenu>
             ) :
-            <Link href={"/login"} className={buttonVariants({ size: "lg", className: "rounded-xl" })}>
+            <Link href={"/auth/login"} className={buttonVariants({ size: "lg", className: "rounded-xl" })}>
               Get Started
               <IconArrowRight className="size-4 ml-2" />
             </Link>

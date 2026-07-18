@@ -33,10 +33,10 @@ export default function HeroSection() {
         <Badge className="mb-4 text-xs sm:text-sm py-2 px-4 h-7 bg-primary/80 shadow-glow-sm">
           ✨ Read Smarter, Not More
         </Badge>
-        <h1 className="text-5xl sm:text-6xl md:text-7xl font-bold tracking-tight mb-6 leading-[1.05] animate-fade-up" style={{ animationDelay: "0.1s" }}>
-          Great engineering articles
+        <h1 className="text-5xl sm:text-6xl md:text-7xl font-extrabold capitalize tracking-tight mb-6 leading-[1.05] animate-fade-up" style={{ animationDelay: "0.1s" }}>
+          Great <span className="text-primary">engineering articles</span>
           <br />
-          don&apos;t have to be hard to find.
+          don&apos;t have to be <span className="text-primary">hard</span> to find.
         </h1>
         <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto mb-10 leading-relaxed animate-fade-up" style={{ animationDelay: "0.2s" }}>
           Stop digging through Twitter, Reddit, and newsletters. We bring the best engineering content to one place — summarized, sorted, and ready to read.

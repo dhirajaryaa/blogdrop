@@ -24,8 +24,12 @@ export default async function LoginPage() {
   const user = await getCurrentUser();
 
   if (user) {
+    if (!user.onboarded) {
+      redirect("/onboarding");
+    };
+
     redirect(authCallbackPath);
-  };
+  }
 
   return (
     <main className="flex-1 flex items-center justify-center px-4">

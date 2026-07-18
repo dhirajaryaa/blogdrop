@@ -1,13 +1,13 @@
 import { OnboardingForm } from "@/components/onboard/onboarding-form";
 import { constructMetadata } from "@/lib/utils"
+import { getCurrentUser } from "@/lib/auth/get-user";
+import { redirect } from "next/navigation";
 
 export const metadata = constructMetadata({
   title: "Onboarding - BlogDrop",
   description: "Setup your BlogDrop feed.",
   noIndex: true,
 })
-import { getCurrentUser } from "@/lib/auth/get-user";
-import { redirect } from "next/navigation";
 
 async function OnboardingPage() {
   const user = await getCurrentUser();
