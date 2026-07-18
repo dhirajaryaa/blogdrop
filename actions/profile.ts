@@ -14,7 +14,7 @@ export async function updateProfile(data: {
 }) {
   const currentUser = await getCurrentUser();
   if (!currentUser?.id) {
-    redirect("/login")
+    redirect("/auth/login")
   };
 
   await db

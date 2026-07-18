@@ -12,7 +12,7 @@ export const metadata = constructMetadata({
 async function OnboardingPage() {
   const user = await getCurrentUser();
 
-  if (!user) redirect("/login")
+  if (!user) redirect("/auth/login")
   if (user.onboarded) redirect("/feed");
 
   return (

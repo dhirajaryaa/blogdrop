@@ -16,7 +16,7 @@ export async function getCurrentUser() {
 export async function ensureAuthUser() {
     const user = await getCurrentUser();
 
-    if (!user) redirect("/login");
+    if (!user) redirect("/auth/login");
     
 
     if (!user.onboarded) {

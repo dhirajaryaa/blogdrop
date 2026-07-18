@@ -17,7 +17,7 @@ export async function completeOnboarding(data: {
   });
 
   if (!session?.user?.id) {
-    redirect("/login");
+    redirect("/auth/login");
   };
 
   await db

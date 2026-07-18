@@ -20,7 +20,7 @@ export const bookmarkArticle = async ({ articleId }: BookmarkInput) => {
     const user = await getCurrentUser();
 
     if (!user) {
-        redirect("/login")
+        redirect("/auth/login")
     };
 
     const validArticle = await db.query.article.findFirst({
@@ -60,8 +60,8 @@ export const getBookmarkArticles = async () => {
     const user = await getCurrentUser();
 
     if (!user) {
-        redirect("/login");
-    }
+        redirect("/auth/login")
+    };
 
     return await db
         .select({
