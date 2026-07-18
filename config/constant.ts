@@ -1,5 +1,5 @@
 const email = "dhirajarya.ptn@gmail.com"
-const contactEmail = "contact@blogdrop.dev"
+const contactEmail = "dhirajarya.ptn@gmail.com"
 const githubProfile = "https://github.com/blogdrop"
 const githubRepo = "https://github.com/dhirajaryaa/blogdrop"
 const githubIssues = "https://github.com/blogdrop/issues"
