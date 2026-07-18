@@ -6,8 +6,6 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/common/theme-toggle";
-import { Button } from "@/components/ui/button";
-import { IconNews } from "@tabler/icons-react";
 
 function AppHeader() {
     const pathname = usePathname();
@@ -20,7 +18,7 @@ function AppHeader() {
     ];
 
     return (
-        <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300 border-b border-border/50 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 h-16 shadow-none">
+        <header className="fixed top-0 inset-x-0 z-50 transition-all duration-300 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 h-16 shadow-none mask-b-from-80%">
             <div className="flex items-center justify-between px-4 sm:px-6 h-16 w-full max-w-7xl mx-auto gap-3">
                 <div className="flex items-center gap-2 flex-1">
                     <Logo href="/" />

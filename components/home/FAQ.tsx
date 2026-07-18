@@ -9,35 +9,47 @@ import {
 
 const faqs = [
   {
-    q: "Where does the content come from?",
-    a: "We pull from engineering blogs of companies like Netflix, Stripe, Cloudflare, AWS, Meta, Uber, Spotify, and hundreds more. Only good sources.",
+    q: "Why does BlogDrop exist?",
+    a: "Developers spend too much time searching through Twitter, Reddit, RSS feeds, and dozens of blogs to find a few great articles. BlogDrop exists to filter the noise and help you discover the engineering content that's actually worth your time.",
+  },
+  {
+    q: "Why use BlogDrop if I already use daily.dev?",
+    a: "daily.dev is great for discovering developer content across the web. BlogDrop focuses on high-quality engineering blogs, AI summaries, personalized recommendations, and a distraction-free reading experience. Many developers use both together.",
   },
   {
     q: "Is this an RSS reader?",
-    a: "No. RSS shows you everything and makes you filter. We only show the articles worth reading — with summaries and rankings.",
+    a: "No. RSS gives you every post. BlogDrop filters the noise, ranks articles by quality and relevance, and adds AI-powered summaries so you can find the best content faster.",
   },
   {
-    q: "How does summarization work?",
-    a: "Every article gets a short summary. You can decide in seconds if you want to read the full thing.",
+    q: "Where does the content come from?",
+    a: "We curate articles from trusted engineering blogs like Netflix, Stripe, Cloudflare, AWS, Meta, Uber, Spotify, Vercel, and many more. No clickbait, just high-quality engineering content.",
   },
   {
-    q: "Is it free?",
-    a: "Yes. There's a free plan so you can try it before you commit.",
+    q: "How does AI summarization work?",
+    a: "Every article is analyzed and summarized into a quick overview, helping you decide in seconds whether it's worth reading the full article.",
   },
   {
-    q: "Can I save articles?",
-    a: "Yes. Bookmark anything. It's saved, organized, and easy to find later.",
+    q: "How is BlogDrop different from newsletters?",
+    a: "Newsletters send the same content to everyone on a schedule. BlogDrop updates continuously and personalizes recommendations based on your interests.",
   },
   {
-    q: "How is this different from a newsletter?",
-    a: "Newsletters send the same thing to everyone. We learn what you like and show you more of that.",
+    q: "Can I save articles for later?",
+    a: "Yes. Bookmark articles with one click and access them anytime from your personal reading library.",
+  },
+  {
+    q: "Do I need an account?",
+    a: "You can explore articles without signing up. Create a free account to personalize your feed, save articles, and sync your reading history across devices.",
+  },
+  {
+    q: "Is BlogDrop free?",
+    a: "Yes. BlogDrop offers a free plan so you can start discovering and reading the best engineering articles without any upfront cost.",
   },
 ]
 
 export default function FAQ() {
   return (
     <section className="py-24 px-4">
-      <div className="mx-auto max-w-2xl">
+      <div className="mx-auto max-w-4xl">
         <div className="text-center mb-12">
           <p className="text-xs font-medium text-muted-foreground uppercase tracking-widest mb-3">FAQ</p>
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">

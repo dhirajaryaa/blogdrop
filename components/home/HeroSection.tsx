@@ -18,7 +18,7 @@ export default function HeroSection() {
         style={{
           backgroundImage:
             "linear-gradient(var(--foreground) 1px, transparent 1px), linear-gradient(90deg, var(--foreground) 1px, transparent 1px)",
-          backgroundSize: "64px 64px",
+          backgroundSize: "30px 30px",
         }}
       />
 
