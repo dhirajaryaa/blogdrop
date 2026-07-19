@@ -18,7 +18,7 @@ export default function HowItWorks() {
         </div>
 
         <div className="grid md:grid-cols-3 gap-8 md:gap-12 relative">
-          <div className="hidden md:block absolute top-8 left-0 right-0 h-px bg-border" />
+          <div className="hidden md:block absolute top-8 left-0 right-0 h-px bg-border mask-x-from-70%" />
 
           {steps.map((s) => (
             <div key={s.step} className="relative flex flex-col items-center text-center group">

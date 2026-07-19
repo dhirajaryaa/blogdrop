@@ -15,7 +15,7 @@ function LinkTab() {
     ];
 
     return (
-        <div className="sticky top-16 z-40 w-full h-fit bg-background pb-2">
+        <div className="sticky top-12 z-40 w-full h-fit bg-background">
             {/* tab navigation */}
             <ScrollArea className="block md:hidden w-full p-0!">
                 <nav className="flex w-full items-center gap-6 border-b border-border/50 bg-background/95 backdrop-blur my-4">
