@@ -2,6 +2,7 @@
 
 import { IconSearch, IconSparkles, IconBookmark, IconClock } from "@tabler/icons-react"
 import GlowBadge from "@/components/common/GlowBadge"
+import Image from "next/image"
 
 const articles = [
   {
@@ -101,11 +102,10 @@ export default function ProductPreview() {
                   {categories.map((cat) => (
                     <span
                       key={cat.label}
-                      className={`text-[10px] px-2 py-1 rounded-full cursor-default transition-colors ${
-                        cat.active
+                      className={`text-[10px] px-2 py-1 rounded-full cursor-default transition-colors ${cat.active
                           ? "bg-primary/15 text-primary font-medium"
                           : "bg-muted text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       {cat.label}
                     </span>
@@ -122,11 +122,10 @@ export default function ProductPreview() {
                   {tags.map((tag) => (
                     <span
                       key={tag.label}
-                      className={`text-[10px] px-2 py-1 rounded-full cursor-default transition-colors ${
-                        tag.active
+                      className={`text-[10px] px-2 py-1 rounded-full cursor-default transition-colors ${tag.active
                           ? "bg-primary/15 text-primary font-medium"
                           : "bg-muted text-muted-foreground hover:text-foreground"
-                      }`}
+                        }`}
                     >
                       {tag.label}
                     </span>
@@ -151,17 +150,18 @@ export default function ProductPreview() {
               {articles.map((article) => (
                 <div
                   key={article.title}
-                  className="group rounded-xl border border-border/30 bg-card/20 p-4 hover:bg-card/50 hover:border-primary/20 hover:shadow-glow-article/70 transition-all duration-300"
+                  className="group rounded-xl border border-border/30 bg-accent/70 p-4 hover:bg-accent/50 hover:border-primary/20 hover:shadow-glow-article/70 transition-all duration-300"
                 >
                   <div className="flex items-center gap-2 text-xs text-muted-foreground mb-2">
-                    <div className="size-4 rounded-full bg-linear-to-br from-primary to-primary/50 flex items-center justify-center text-[8px] font-bold text-primary-foreground">
-                      {article.company[0]}
-                    </div>
+                    <Image src={`/icons/${article.company.toLocaleLowerCase()}.svg`} alt={article.company}
+                    width="32"
+                    height="32"
+                    className="size-5 rounded-full p-0.5" />
                     <span>{article.company}</span>
                     <span>·</span>
                     <span>{article.time} read</span>
                   </div>
-                  <h4 className="text-sm font-semibold mb-1.5 group-hover:text-primary transition-colors">
+                  <h4 className="text-sm font-semibold mb-1.5">
                     {article.title}
                   </h4>
                   <p className="text-xs text-muted-foreground mb-3 leading-relaxed">
