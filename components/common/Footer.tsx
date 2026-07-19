@@ -121,7 +121,7 @@ export default function Footer() {
 
         <div className="flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
           <p className="text-xs text-muted-foreground">
-            © {new Date().getFullYear()} BlogDrop. All rights reserved.
+            © 2026 <span className="hover:text-foreground hover:underline">Blogdrop</span>. All rights reserved.
           </p>
 
           <p className="text-xs text-muted-foreground">
