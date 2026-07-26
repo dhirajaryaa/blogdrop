@@ -10,20 +10,20 @@ export function cn(...inputs: ClassValue[]) {
 export function constructMetadata({
   title = "BlogDrop — Every Engineering Blog. One Feed.",
   description = "AI-powered engineering blog aggregator. Follow Netflix, Stripe, Uber, Cloudflare and hundreds of engineering blogs in a single personalized feed.",
-  image,
+  image = "/main-og.png",
   icons = "/favicon.ico",
   noIndex = false
 }: {
   title?: string
   description?: string
-  image?: string
+  image?: string | null
   icons?: string
   noIndex?: boolean
 } = {}): Metadata {
   return {
     title,
     description,
-    ...(image && {
+    ...(image ? {
       openGraph: {
         title,
         description,
@@ -36,8 +36,11 @@ export function constructMetadata({
         images: [image],
         creator: "@blogdrop",
       },
-    }),
-    ...(!image && {
+    } : {
+      openGraph: {
+        title,
+        description,
+      },
       twitter: {
         card: "summary_large_image",
         title,

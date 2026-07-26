@@ -25,6 +25,7 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   return constructMetadata({
     title: `${article.title} - BlogDrop`,
     description: article.summary || "Read this engineering article on BlogDrop.",
+    image: null,
   });
 }
 
