@@ -10,7 +10,7 @@ interface ArticlePageProps {
   params: Promise<{ slug: string }>;
 }
 
-// metadata 
+//! metadata 
 export async function generateMetadata({ params }: ArticlePageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticleBySlug(slug);
@@ -25,7 +25,6 @@ export async function generateMetadata({ params }: ArticlePageProps): Promise<Me
   return constructMetadata({
     title: `${article.title} - BlogDrop`,
     description: article.summary || "Read this engineering article on BlogDrop.",
-    image: article.image || "/thumbnail.png",
   });
 }
 

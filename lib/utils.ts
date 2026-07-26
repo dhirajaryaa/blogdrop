@@ -1,6 +1,7 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
 import { Metadata } from "next"
+import { siteUrl } from "@/config/constant"
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
@@ -9,7 +10,7 @@ export function cn(...inputs: ClassValue[]) {
 export function constructMetadata({
   title = "BlogDrop — Every Engineering Blog. One Feed.",
   description = "AI-powered engineering blog aggregator. Follow Netflix, Stripe, Uber, Cloudflare and hundreds of engineering blogs in a single personalized feed.",
-  image = "/thumbnail.png",
+  image,
   icons = "/favicon.ico",
   noIndex = false
 }: {
@@ -22,29 +23,35 @@ export function constructMetadata({
   return {
     title,
     description,
-    openGraph: {
-      title,
-      description,
-      images: [
-        {
-          url: image
-        }
-      ]
-    },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-      images: [image],
-      creator: "@blogdrop"
-    },
+    ...(image && {
+      openGraph: {
+        title,
+        description,
+        images: [{ url: image }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [image],
+        creator: "@blogdrop",
+      },
+    }),
+    ...(!image && {
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        creator: "@blogdrop",
+      },
+    }),
     icons,
-    metadataBase: new URL('https://blogdrop.dev'),
+    metadataBase: new URL(siteUrl),
     ...(noIndex && {
       robots: {
         index: false,
-        follow: false
-      }
-    })
+        follow: false,
+      },
+    }),
   }
 }
