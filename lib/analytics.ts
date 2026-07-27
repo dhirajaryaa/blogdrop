@@ -8,5 +8,12 @@ export function track(
     event: string,
     params: EventParams = {}
 ) {
-    sendGAEvent("event", event, params);
+    const eventParams = {
+        ...params,
+        ...(process.env.NODE_ENV !== "production"
+            ? { debug_mode: true }
+            : {}),
+    };
+
+    sendGAEvent("event", event, eventParams);
 }

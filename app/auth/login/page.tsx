@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import { authCallbackPath } from "@/config/constant";
 import GoBack from "@/components/common/back-button";
 import Image from "next/image";
+import { track } from "@/lib/analytics";
 
 export const metadata: Metadata = {
   title: "Login — BlogDrop",
@@ -25,6 +26,10 @@ export default async function LoginPage() {
 
   if (user) {
     if (!user.onboarded) {
+      track("go-to-onboarding", {
+        userId: user.id,
+        name: user.name
+      })
       redirect("/onboarding");
     };
 
@@ -33,7 +38,7 @@ export default async function LoginPage() {
 
   return (
     <main className="flex-1 flex items-center justify-center px-4">
-      <GoBack className="absolute top-4 left-4" variant={"outline"}/>
+      <GoBack className="absolute top-4 left-4" variant={"outline"} />
       <div className="w-full max-w-md space-y-8">
         <div className="text-center space-y-2">
           <div className="flex justify-center">

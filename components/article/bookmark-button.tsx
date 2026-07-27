@@ -2,6 +2,7 @@
 
 import { bookmarkArticle } from "@/actions/bookmark";
 import { Button } from "@/components/ui/button";
+import { track } from "@/lib/analytics";
 import { IconBookmark, IconBookmarkFilled, IconLoader2 } from "@tabler/icons-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -13,6 +14,9 @@ function BookmarkButton({ articleId, isBookmark, slug }: { articleId: string, is
     const { mutate: toggleBookmark, isPending } = useMutation({
         mutationFn: () => bookmarkArticle({ articleId }),
         onSuccess: () => {
+            track("article-saved", {
+                articleId
+            })
             queryClient.invalidateQueries({ queryKey: ["article", slug] });
         },
     });

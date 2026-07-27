@@ -9,6 +9,7 @@ import { toast } from "sonner"
 import { completeOnboarding } from "@/actions/onboarding"
 import { CategoryTagSelector } from "@/components/common/category-tag-selector"
 import { IconArrowLeft } from "@tabler/icons-react"
+import { track } from "@/lib/analytics"
 
 export function OnboardingForm() {
   const router = useRouter()
@@ -48,6 +49,10 @@ export function OnboardingForm() {
 
     if (result.success) {
       toast.success("Welcome to BlogDrop!")
+      track("onboarding_completed", {
+        categories_count: selectedCategories.size,
+        tags_count: selectedTags.size,
+      });
       router.push("/feed")
     } else {
       toast.error("Something went wrong")

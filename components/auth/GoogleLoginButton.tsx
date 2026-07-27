@@ -5,6 +5,7 @@ import { authClient } from "@/lib/auth/auth-client"
 import { Button } from "@/components/ui/button"
 import { authCallbackPath } from "@/config/constant"
 import { toast } from "sonner"
+import { track } from "@/lib/analytics"
 
 export default function GoogleLoginButton() {
   const [loading, setLoading] = useState(false)
@@ -12,6 +13,11 @@ export default function GoogleLoginButton() {
   const handleLogin = async () => {
     setLoading(true);
     await authClient.signIn.social({ provider: "google", callbackURL: authCallbackPath }, {
+      onSuccess: () => {
+        track("login", {
+          method: "google"
+        })
+      },
       onError: (err) => {
         toast.error("Login Failed! Try Again");
         console.error("Login Error:", err);

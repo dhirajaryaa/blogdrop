@@ -42,8 +42,8 @@ export default function RootLayout({
           {children}
           <Toaster richColors position="top-center" />
         </ThemeProvider>
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID!} debugMode={true} />
       </body>
-      <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTIC_ID!} /> // add google analytics for statists
     </html>
   );
 }
