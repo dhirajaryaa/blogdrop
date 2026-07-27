@@ -1,9 +1,10 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, DM_Sans, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { DM_Sans, JetBrains_Mono } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/sonner";
+import { GoogleAnalytics } from '@next/third-parties/google';
+
 
 const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -39,9 +40,10 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           {children}
-          <Toaster richColors position="top-center"/>
+          <Toaster richColors position="top-center" />
         </ThemeProvider>
       </body>
+      <GoogleAnalytics gaId={process.env.GOOGLE_ANALYTIC_ID!} /> // add google analytics for statists
     </html>
   );
 }
