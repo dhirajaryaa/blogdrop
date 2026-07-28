@@ -22,7 +22,7 @@ export function extractArticleContent({ url, html }: { url: string, html: string
         const unwantedElements = document.querySelectorAll(
             "script, style, noscript, img, iframe, footer, header, nav, .advertisement, .sidebar, .menu"
         );
-        unwantedElements.forEach((element) => element.remove());
+        unwantedElements.forEach((element:any) => element.remove());
 
         // Use Readability to extract article content
         const reader = new Readability(document);
