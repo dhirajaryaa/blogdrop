@@ -10,7 +10,8 @@ import { Badge } from "@/components/ui/badge"
 import GoBack from "@/components/common/back-button"
 import BookmarkButton from "@/components/article/bookmark-button"
 import { useQuery } from "@tanstack/react-query"
-import {ArticlePageSkeleton} from "./article-skelton";
+import { ArticlePageSkeleton } from "./article-skelton";
+import { userTags } from "@/config/tags";
 
 
 export function ArticlePageContent({ slug }: { slug: string }) {
@@ -90,9 +91,9 @@ export function ArticlePageContent({ slug }: { slug: string }) {
                             <Badge
                                 key={tag + i}
                                 variant={"secondary"}
-                                className="lowercase py-2.5 gap-0.5 bg-primary/10 text-primary"
+                                className="py-2.5 gap-0.5 bg-primary/10 text-primary"
                             >
-                                <IconHash /> {tag}
+                                <IconHash /> {userTags.find((item) => item.value === tag)?.label || tag}
                             </Badge>
                         ))}
                     </div>
@@ -113,7 +114,7 @@ export function ArticlePageContent({ slug }: { slug: string }) {
                                 <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                                     <IconCircleCheck className="text-primary size-5" />
                                     <span className="flex-1">
-                                    {takeaway}
+                                        {takeaway}
                                     </span>
                                 </li>
                             ))}
