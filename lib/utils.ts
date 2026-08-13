@@ -12,7 +12,7 @@ export function constructMetadata({
   description = "AI-powered engineering blog aggregator. Follow Netflix, Stripe, Uber, Cloudflare and hundreds of engineering blogs in a single personalized feed.",
   image = "/main-og.png",
   icons = "/favicon.ico",
-  noIndex = false
+  noIndex = false,
 }: {
   title?: string
   description?: string
@@ -20,36 +20,44 @@ export function constructMetadata({
   icons?: string
   noIndex?: boolean
 } = {}): Metadata {
+  const imageUrl = image
+    ? new URL(image, siteUrl).toString()
+    : undefined
+
   return {
     title,
     description,
-    ...(image ? {
+
+    metadataBase: new URL(siteUrl),
+
+    ...(imageUrl && {
       openGraph: {
         title,
         description,
-        images: [{ url: image }],
+        url: siteUrl,
+        siteName: "BlogDrop",
+        type: "website",
+        images: [
+          {
+            url: imageUrl,
+            width: 1200,
+            height: 630,
+            alt: title,
+          },
+        ],
       },
+
       twitter: {
         card: "summary_large_image",
         title,
         description,
-        images: [image],
-        creator: "@blogdrop",
-      },
-    } : {
-      openGraph: {
-        title,
-        description,
-      },
-      twitter: {
-        card: "summary_large_image",
-        title,
-        description,
+        images: [imageUrl],
         creator: "@blogdrop",
       },
     }),
+
     icons,
-    metadataBase: new URL(siteUrl),
+
     ...(noIndex && {
       robots: {
         index: false,

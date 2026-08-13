@@ -13,7 +13,7 @@ const footerSections = [
     links: [
       { title: "Features", href: "#features" },
       { title: "Trending", href: "/trending" },
-      { title: "Bookmarks", href: "/bookmarks" },
+      { title: "Saved", href: "/saved" },
     ],
   },
   {
