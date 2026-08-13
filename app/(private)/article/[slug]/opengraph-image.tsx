@@ -5,6 +5,7 @@ import { db } from "@/db";
 import { article, source, articleMetaData } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { siteUrl } from "@/config/constant";
+import { userTags } from "@/config/tags";
 
 export const runtime = "nodejs";
 export const alt = "BlogDrop article";
@@ -43,7 +44,12 @@ export default async function Image({
 
   // Tag handling: display up to 5 tags and show "+X more" pill for remaining tags
   const allTags = row?.tags || [];
-  const displayTags = allTags.slice(0, 4);
+
+  const displayTags = allTags
+    .map((tag) => userTags.find((item) => item.value === tag))
+    .filter(Boolean)
+    .slice(0, 4);
+
   const remainingTagsCount = allTags.length - displayTags.length;
 
   const siteHost = siteUrl ||"blogdrop.dev";
@@ -374,7 +380,7 @@ export default async function Image({
                   gap: "12px",
                 }}
               >
-                {displayTags.map((tag: string, i: number) => (
+                {displayTags.map((tag, i) => (
                   <div
                     key={i}
                     style={{
@@ -396,7 +402,7 @@ export default async function Image({
                         letterSpacing: "0.2px",
                       }}
                     >
-                      {tag}
+                      {tag?.label ?? "Unknown"}
                     </span>
                   </div>
                 ))}

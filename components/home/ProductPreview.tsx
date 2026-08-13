@@ -71,7 +71,7 @@ export default function ProductPreview() {
           </p>
         </div>
 
-        <div className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm overflow-hidden shadow-lg">
+        <div className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-sm overflow-hidden shadow-glow/40">
           {/* Browser bar */}
           <div className="flex items-center gap-1 px-4 py-3 border-b border-border/30 bg-muted/20">
             <div className="size-2.5 rounded-full bg-red-500" />
