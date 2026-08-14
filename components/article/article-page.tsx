@@ -101,8 +101,8 @@ export function ArticlePageContent({ slug }: { slug: string }) {
 
                 {article.summary && (
                     <div className="space-y-3 bg-primary/8 border-l-4 border-primary p-4">
-                        <h2 className="text-[17px] uppercase flex items-center text-primary font-semibold tracking-tight"><IconSparkles className="size-5" /> AI Summary</h2>
-                        <p className="text-base leading-5 text-muted-foreground">{article.summary}</p>
+                        <h2 className="text-sm sm:text-base uppercase flex items-center text-primary font-semibold tracking-tight"><IconSparkles className="size-5" /> AI Summary</h2>
+                        <p className="text-sm sm:text-base leading-5 text-muted-foreground">{article.summary}</p>
                     </div>
                 )}
 
@@ -131,16 +131,14 @@ export function ArticlePageContent({ slug }: { slug: string }) {
                         Read full article
                         <IconExternalLink className="size-4" />
                     </Link>
-                    {article.sourceSiteUrl && (
-                        <Link
-                            href={`${article.sourceSiteUrl}?ref=blogdrop`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={buttonVariants({ variant: "link", size: "lg" })}
-                        >
-                            Visit {article.sourceName}
-                        </Link>
-                    )}
+                    <Link
+                        href={`${article.sourceSiteUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={buttonVariants({ variant: "link", size: "lg" })}
+                    >
+                        Visit {article.sourceName}
+                    </Link>
                 </div>
             </article>
         </div>
