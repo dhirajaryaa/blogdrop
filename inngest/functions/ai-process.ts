@@ -38,13 +38,13 @@ export const articleAIProcessing = inngest.createFunction({
 
         const { categories, difficulty, keyTakeaways, summary, tags, whyRead, author, isPromotional } = metadata.data; // come form metadata extraction AI
 
-        //? step 2: remove promotional article
-        await step.run("remove-promotion", async () => {
-            if (isPromotional) {
-                await db.delete(article).where(eq(article.id, event.data.articleId));
-            };
-            return;
-        });
+        //? step 2: remove promotional article and abort for there steps
+        if (isPromotional) {
+            await step.run("remove-promotion", async () => {
+                return await db.delete(article).where(eq(article.id, event.data.articleId));
+            });
+            return { id: event.id, status: "Article removed (promotional)" };
+        };
 
         //? step 3: tags & categories mapping with predefined tags-categories
         const canonicalMapping = await step.run("map-original-tags", async () => {
