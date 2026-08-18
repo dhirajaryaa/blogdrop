@@ -36,12 +36,18 @@ export const articleAIProcessing = inngest.createFunction({
         };
 
 
-        const { categories, difficulty, keyTakeaways, summary, tags, whyRead, author } = metadata.data; // come form metadata extraction AI
+        const { categories, difficulty, keyTakeaways, summary, tags, whyRead, author, isPromotional } = metadata.data; // come form metadata extraction AI
 
+        //? step 2: remove promotional article
+        await step.run("remove-promotion", async () => {
+            if (isPromotional) {
+                await db.delete(article).where(eq(article.id, event.data.articleId));
+            };
+            return;
+        });
 
-        //? step 2: tags & categories mapping with predefined tags-categories
+        //? step 3: tags & categories mapping with predefined tags-categories
         const canonicalMapping = await step.run("map-original-tags", async () => {
-
             const canonicalCategories = categoriesMapping(categories);
             const canonicalTags = tagsMapping(tags);
 
@@ -49,12 +55,11 @@ export const articleAIProcessing = inngest.createFunction({
         });
 
 
-        //? step 3: save metadata on db [status later on Addon ] 
+        //? step 4: save metadata on db [status later on Addon ] 
 
         await step.run("save-metadata", async () => {
 
             return await db.transaction(async (tx) => {
-
                 await tx.insert(articleMetaData).values({
                     articleId: sourceArticle.id,
                     summary,
@@ -74,7 +79,7 @@ export const articleAIProcessing = inngest.createFunction({
 
         });
 
-        //? step 4: sleep so ai processing
+        //? step 5: sleep so ai processing
         await step.sleep("wait-to-new-event-run", "5s");
 
         return { id: event.id, status: "Article processing Done.", totalTokenUsed: metadata.tokenUsed };

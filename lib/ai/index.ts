@@ -21,7 +21,11 @@ const client = new GoogleGenAI({
 const prompt = `
 You are an expert technical content analyst.
 Analyze the provided Markdown article and extract accurate metadata.
-Return only valid JSON that strictly follows the provided schema. Base every field only on the article content, infer missing information conservatively, and never hallucinate facts.
+Return only valid JSON that strictly follows the provided schema.
+For isPromotional:
+- Set true only when the article's primary purpose is promotion, marketing, selling, or driving adoption of a product, service, or company.
+- Set false for genuine technical content, tutorials, engineering insights, research, or case studies, even when a company or product is mentioned.
+Base every field only on the article content, infer missing information conservatively, and never hallucinate facts.
 `;
 
 

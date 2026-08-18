@@ -14,7 +14,10 @@ export const metadataSchema = z.object({
     whyRead: z.string().describe(
         "One concise sentence (8–15 words). Start with an action verb like Learn, Understand, Discover, Explore, or See. Explain the key learning from the article. No marketing language. Maximum 90 characters."
     ),
-    author: z.string().describe("authors of this article if not found. Company Name with Team. like: Github Team., Slack Team.")
+    author: z.string().describe("authors of this article if not found. Company Name with Team. like: Github Team., Slack Team."),
+    isPromotional: z.boolean().describe(
+        "Whether the article is primarily promotional or marketing content."
+    ),
 });
 
 // zod convert schema

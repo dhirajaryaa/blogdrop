@@ -21,8 +21,6 @@ export const seedSourcesOnDB = async (inputRowSources: InputSource[]) => {
 
     const seed = await db.insert(source).values(
         inputRowSources.map((item) => {
-
-
             return {
                 title: item.name.trim(),
                 rssUrl: item.rssUrl.trim(),
