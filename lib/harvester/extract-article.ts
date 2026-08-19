@@ -1,31 +1,31 @@
-import { JSDOM } from "jsdom";
+import { parseHTML } from "linkedom";
 import { Readability } from "@mozilla/readability";
 
-// main readability 
-export function extractArticleContent({ url, html }: { url: string, html: string }) {
+export function extractArticleContent({
+    url,
+    html,
+}: {
+    url: string;
+    html: string;
+}) {
     try {
-        // Create a JSDOM document from the HTML
-        const dom = new JSDOM(html, {
-            url: url,
-            contentType: "text/html",
-        });
+        const { document } = parseHTML(html);
 
-        const document = dom.window.document;
-
-        const image = document.querySelector("meta[property='og:image']")
-            ?.getAttribute("content") ||
+        const image =
+            document
+                .querySelector("meta[property='og:image']")
+                ?.getAttribute("content") ||
             document
                 .querySelector("meta[name='twitter:image']")
                 ?.getAttribute("content");
 
-        // Optional: Clean unwanted elements first
         const unwantedElements = document.querySelectorAll(
             "script, style, noscript, img, iframe, footer, header, nav, .advertisement, .sidebar, .menu"
         );
-        unwantedElements.forEach((element:any) => element.remove());
 
-        // Use Readability to extract article content
-        const reader = new Readability(document);
+        unwantedElements.forEach((element) => element.remove());
+
+        const reader = new Readability(document as any);
         const article = reader.parse();
 
         if (!article) {
@@ -42,10 +42,10 @@ export function extractArticleContent({ url, html }: { url: string, html: string
             dir: article.dir || "",
             siteName: article.siteName || "",
             lang: article.lang || "",
-            image
+            image,
         };
     } catch (error) {
         console.error("Error extracting article content:", error);
         return null;
     }
-};
+}
