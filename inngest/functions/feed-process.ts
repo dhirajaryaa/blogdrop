@@ -5,7 +5,7 @@ import { article } from "@/db/schema";
 import { randomUUID } from "node:crypto";
 
 export const feedProcess = inngest.createFunction({
-    id: "feed-process", concurrency: 20, triggers: { event: "feed/process" }
+    id: "feed-process", concurrency: 5, triggers: { event: "feed/process" }
 }, async ({ step, event }) => {
 
     const source = event.data;
