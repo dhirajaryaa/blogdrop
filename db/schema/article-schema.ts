@@ -7,6 +7,7 @@ export const articleStatusEnum = pgEnum("article_status", [
     "pending",      // RSS se mila, process nahi hua
     "processing",   // Harvester/AI pipeline chal rahi hai
     "completed",    // Successfully process ho gaya 
+    "failed",       // Pipeline permanently fail ho gaya
 ]);
 
 //! article 
@@ -54,12 +55,19 @@ export const articleMetaData = pgTable("article_metadata", {
 ]));
 
 
+//! ai daily usage [free tier RPD cap tracking]
+export const aiUsage = pgTable("ai_usage", {
+    day: text("day").primaryKey(), // "YYYY-MM-DD" (UTC)
+    used: integer("used").default(0).notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
+});
+
 //! bookmark Articles
 export const bookmark = pgTable("bookmark", {
     id: uuid("id").primaryKey().defaultRandom(),
     articleId: uuid("article_id")
         .notNull()
-        .references(() => article.id),
+        .references(() => article.id, { onDelete: "cascade" }),
     userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()

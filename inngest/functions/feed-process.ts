@@ -1,27 +1,46 @@
 import { db } from "@/db";
-import { inngest } from "../client";
+import { inngest, feedProcessEvent } from "../client";
 import Parser from "rss-parser"
 import { article } from "@/db/schema";
 import { randomUUID } from "node:crypto";
 
+const toIsoDate = (value?: string): string => {
+    if (!value) return "";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString();
+}
+
+const buildSlug = (title: string): string => {
+    const base = title
+        .toLowerCase()
+        .trim()
+        .replace(/[^\w\s-]/g, "")
+        .replace(/\s+/g, "-")
+        .replace(/-+/g, "-")
+        .slice(0, 30)
+        .replace(/^-+|-+$/g, "");
+
+    return [base, randomUUID().slice(0, 6)].filter(Boolean).join("-");
+}
+
 export const feedProcess = inngest.createFunction({
-    id: "feed-process", concurrency: 5, triggers: { event: "feed/process" }
+    id: "feed-process", concurrency: 5, triggers: { event: feedProcessEvent }
 }, async ({ step, event }) => {
 
-    const source = event.data;
     //? step1 : parse rss using rss-parser
     const articles = await step.run("rss-parsed", async () => {
 
         const parser = new Parser();
 
-        const feed = await parser.parseURL(source.rssUrl);
+        const feed = await parser.parseURL(event.data.rssUrl);
 
         return feed.items.map((item) => ({
             title: item.title ?? "",
             link: item.link ?? item.guid ?? "",
             author: item.creator ?? "",
-            pubDate: item.pubDate ?? "",
-        })).filter((item) => item.link !== "")
+            pubDate: toIsoDate(item.isoDate ?? item.pubDate),
+        }))
+            .filter((item) => item.link !== "" && item.title !== "")
     });
 
     //? step2 : all rss returned articles save in database
@@ -29,28 +48,14 @@ export const feedProcess = inngest.createFunction({
         return await db
             .insert(article)
             .values(
-                articles.map((item) => {
-                    const slug =
-                        item.title
-                            .toLowerCase()
-                            .trim()
-                            .replace(/[^\w\s-]/g, "")
-                            .replace(/\s+/g, "-")
-                            .replace(/-+/g, "-")
-                            .slice(0, 30)
-                            .replace(/-$/, "") +
-                        "-" +
-                        randomUUID().slice(0, 6);
-
-                    return {
-                        title: item.title,
-                        originalUrl: item.link,
-                        author: item.author,
-                        publicAt: item.pubDate,
-                        sourceId: source.id,
-                        slug: slug
-                    }
-                })
+                articles.map((item) => ({
+                    title: item.title,
+                    originalUrl: item.link,
+                    author: item.author,
+                    publicAt: item.pubDate,
+                    sourceId: event.data.id,
+                    slug: buildSlug(item.title)
+                }))
             )
             .onConflictDoNothing({
                 target: article.originalUrl
@@ -58,16 +63,20 @@ export const feedProcess = inngest.createFunction({
             .returning({ id: article.id });
     });
 
+    if (savedArticles.length === 0) {
+        return { totalNewArticle: 0 };
+    }
+
     //? step3 : new articles saved run content fetch and ai processing 
     await step.sendEvent(
         "queue-article-processing",
-        savedArticles.map((article) => ({
+        savedArticles.map((item) => ({
             name: "article/process",
             data: {
-                articleId: article.id,
+                articleId: item.id,
             },
         }))
     );
 
-    return { id: event.id, totalNewArticle: savedArticles.length };
+    return { totalNewArticle: savedArticles.length };
 })

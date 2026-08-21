@@ -1,34 +1,40 @@
-
-
 import { db } from "@/db";
-import { inngest } from "../client"; //! @ import not work in inngest
+import { inngest, refreshSourceEvent } from "../client"; //! @ import not work in inngest
 import { source } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq, isNotNull } from "drizzle-orm";
 
+const SEND_EVENT_CHUNK = 100;
 
 export const refreshAllSource = inngest.createFunction(
     {
         id: "refresh-source-list",
-        triggers: [{ event: "cron/refresh-Source", }, { cron: "0 0 * * *" }]
+        triggers: [{ event: refreshSourceEvent }, { cron: "0 0 * * *" }]
     },
-    async ({ event, step }) => {
-        // trigger all source refresh
-        const sources = await db
-            .select()
-            .from(source)
-            .where(eq(source.isActive, true));
+    async ({ step }) => {
+        const sources = await step.run("fetch-active-sources", async () => {
+            return await db
+                .select({ id: source.id, rssUrl: source.rssUrl })
+                .from(source)
+                .where(and(eq(source.isActive, true), isNotNull(source.rssUrl)));
+        });
 
-        await step.sendEvent(
-            "dispatch-feeds",
-            sources.map((item) => ({
+        if (sources.length === 0) {
+            return { totalSource: 0 };
+        }
+
+        //? dispatch in chunks so payload size stays bounded
+        for (let i = 0; i < sources.length; i += SEND_EVENT_CHUNK) {
+            const chunk = sources.slice(i, i + SEND_EVENT_CHUNK);
+
+            await step.sendEvent(`dispatch-feeds-${i}`, chunk.map((item) => ({
                 name: "feed/process",
                 data: {
                     id: item.id,
-                    rssUrl: item.rssUrl,
+                    rssUrl: item.rssUrl!,
                 },
-            }))
-        );
+            })));
+        }
 
-        return { id: event.id, totalSource: sources.length };
+        return { totalSource: sources.length };
     }
 );
