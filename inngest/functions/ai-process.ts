@@ -10,7 +10,7 @@ import { categoriesMapping, tagsMapping } from "@/lib/harvester/tag-mapping";
 export const articleAIProcessing = inngest.createFunction({
     id: "ai-article-processing",
     concurrency: 5,
-    throttle: { limit: 10, period: "1m" },
+    throttle: { limit: 5, period: "1m" },
     triggers: { event: "article/ai-processing" }
 },
     async ({ step, event }) => {
