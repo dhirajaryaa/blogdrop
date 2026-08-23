@@ -69,7 +69,7 @@ export default function Footer() {
               Read what matters. Skip the noise.
             </p>
 
-            <div className="mt-6 flex items-center gap-2">
+            <div className="mt-4 flex items-center gap-2">
               <a
                 href={githubRepo}
                 target="_blank"
@@ -90,6 +90,11 @@ export default function Footer() {
                 <IconBrandX className="size-5" />
               </a>
             </div>
+
+{/* embed producthunt */}
+              <a href="https://www.producthunt.com/products/blogdrop?embed=true&amp;utm_source=badge-featured&amp;utm_medium=badge&amp;utm_campaign=badge-blogdrop" target="_blank" rel="noopener noreferrer"><img alt="BlogDrop - Discover great articles. Learn without the noise. | Product Hunt" width="250" height="54" src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1228652&amp;theme=light&amp;t=1787446063071"
+              className="w-50 mt-4 object-contain hover:scale-102 transition-transform duration-300"
+              /></a>
           </div>
 
           {/* Footer Links */}
