@@ -9,7 +9,7 @@ export const sourceScan = inngest.createFunction(
     {
         id: "all-source-scan",
         description: "Refresh all active sources and get all new articles.",
-        triggers: [{ event: "app/task.created" }, { cron: "0 0 * * *" }]
+        triggers: [{ event: "app/allSourceScan" }, { cron: "0 0 * * *" }]
     },
     async ({ event, step }) => {
 

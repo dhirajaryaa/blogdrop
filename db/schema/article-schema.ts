@@ -1,14 +1,9 @@
 import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
-import { source } from "./source-schema";
+import { source, statusEnum } from "./source-schema";
 import { relations } from "drizzle-orm";
 import { user } from "./user-schema";
-
-export const articleStatusEnum = pgEnum("article_status", [
-    "pending",      // RSS se mila, process nahi hua
-    "processing",   // Harvester/AI pipeline chal rahi hai
-    "completed",    // Successfully process ho gaya 
-    "failed",       // Pipeline permanently fail ho gaya
-]);
+import { articleTag } from "./tag-schema";
+import { articleCategory } from "./category-schema";
 
 //! article 
 export const article = pgTable("article", {
@@ -23,7 +18,7 @@ export const article = pgTable("article", {
     publicAt: text("public_at").notNull(),
     imageUrl: text("image_url").default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    status: articleStatusEnum().default("pending"),
+    status: statusEnum().default("pending"),
     slug: text("slug").notNull().unique(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 },
@@ -42,8 +37,6 @@ export const articleMetaData = pgTable("article_metadata", {
             onDelete: "cascade",
         }),
     summary: text("summary"),
-    categories: text("categories").notNull(),
-    tags: text("tags").array().default([]),
     keyTakeaways: text("key_takeaways").array().default([]),
     difficulty: text("difficulty").default("junior"), //[junior / mid / senior]
     whyRead: text("why_read").default(""),
@@ -59,6 +52,7 @@ export const articleMetaData = pgTable("article_metadata", {
 export const aiUsage = pgTable("ai_usage", {
     day: text("day").primaryKey(), // "YYYY-MM-DD" (UTC)
     used: integer("used").default(0).notNull(),
+    apiId: integer("api_id").default(1).notNull(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 });
 
@@ -75,8 +69,6 @@ export const bookmark = pgTable("bookmark", {
     unique("bookmark_article_unique").on(table.articleId, table.userId),
 ]));
 
-
-
 //? relation ship 
 export const articleRelations = relations(article, ({ one, many }) => ({
     metadata: one(articleMetaData, {
@@ -87,5 +79,7 @@ export const articleRelations = relations(article, ({ one, many }) => ({
         fields: [article.sourceId],
         references: [source.id]
     }),
-    bookmark: many(bookmark)
+    bookmark: many(bookmark),
+    tags: many(articleTag),
+    categories: many(articleCategory)
 }))

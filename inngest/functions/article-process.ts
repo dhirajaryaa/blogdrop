@@ -1,10 +1,10 @@
 import { db } from "@/db";
-import { inngest, articleProcessEvent } from "../client";
+import { inngest } from "../client";
 import { article } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { RetryAfterError } from "inngest";
 import { extractArticleContent } from "@/lib/harvester/extract-article";
 import { convertHtmlToMarkdown } from "@/lib/harvester/html-markdown";
-import { RetryAfterError } from "inngest";
 
 const FETCH_TIMEOUT_MS = 15_000;
 const USER_AGENT = "Mozilla/5.0 (compatible; BlogdropBot/1.0)";
@@ -12,7 +12,7 @@ const USER_AGENT = "Mozilla/5.0 (compatible; BlogdropBot/1.0)";
 export const articleProcessing = inngest.createFunction({
     id: "article-processing",
     concurrency: 5,
-    triggers: { event: articleProcessEvent },
+    triggers: { event: "app/ArticleProcessing" },
     onFailure: async ({ event, error }) => {
         const articleId = event.data.event.data?.articleId;
         if (!articleId) return;
@@ -20,8 +20,6 @@ export const articleProcessing = inngest.createFunction({
         await db.update(article)
             .set({ status: "failed" })
             .where(eq(article.id, articleId));
-
-        console.error(`article-processing failed for ${articleId}:`, error.message);
     }
 }, async ({ step, event }) => {
 
