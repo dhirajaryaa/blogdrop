@@ -50,6 +50,13 @@
       "when": 1788268747800,
       "tag": "0006_unusual_firebird",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788275708364,
+      "tag": "0007_wide_barracuda",
+      "breakpoints": true
     }
   ]
 }
