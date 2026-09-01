@@ -6,8 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "studio": "pnpm drizzle-kit studio",
-    "inngest": "pnpm dlx inngest-cli@latest dev",
+    "studio": "bun drizzle-kit studio",
     "lint": "eslint"
   },
   "dependencies": {

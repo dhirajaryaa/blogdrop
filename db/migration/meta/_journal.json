@@ -43,6 +43,13 @@
       "when": 1784044230717,
       "tag": "0005_normal_inhumans",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788268747800,
+      "tag": "0006_unusual_firebird",
+      "breakpoints": true
     }
   ]
 }

@@ -9,6 +9,7 @@ const earlyAccessFormLink = "https://forms.gle/d4tk9RwVmGqHcjTk8"
 const authCallbackPath = "/auth/callback"
 const siteUrl = process.env.BETTER_AUTH_URL!
 
+
 export {
   email,
   contactEmail,

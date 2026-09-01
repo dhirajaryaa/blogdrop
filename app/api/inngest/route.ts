@@ -1,4 +1,4 @@
-import { articleAIProcessing, articleProcessing, feedProcess, refreshAllSource } from "@/inngest/functions";
+import { sourceScan } from "@/inngest/functions";
 import { inngest } from "../../../inngest/client";
 import { serve } from "inngest/next";
 
@@ -7,9 +7,6 @@ export const maxDuration = 60;
 export const { GET, POST, PUT } = serve({
     client: inngest,
     functions: [
-        refreshAllSource,
-        feedProcess,
-        articleProcessing,
-        articleAIProcessing
+        sourceScan
     ],
 });
