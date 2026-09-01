@@ -1,11 +1,5 @@
-import {refreshAllSource} from "./refresh-source";
-import { feedProcess } from "./feed-process";
-import { articleProcessing } from "./article-process";
-import { articleAIProcessing } from "./ai-process";
+import { sourceScan } from "./source-scan"; // all source scan and get new articles
 
 export {
-   refreshAllSource,
-   feedProcess,
-   articleProcessing,
-   articleAIProcessing
+   sourceScan,
 };

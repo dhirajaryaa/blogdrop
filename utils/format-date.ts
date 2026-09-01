@@ -14,4 +14,10 @@ export function formatDate(dateStr: string) {
         day: "numeric",
         year: "numeric",
     })
+};
+
+export function convertInIsoDate(value: string|undefined): string {
+    if (!value) return "";
+    const date = new Date(value);
+    return Number.isNaN(date.getTime()) ? "" : date.toISOString()
 }
