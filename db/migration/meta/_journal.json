@@ -57,6 +57,13 @@
       "when": 1788275708364,
       "tag": "0007_wide_barracuda",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788276239949,
+      "tag": "0008_giant_jasper_sitwell",
+      "breakpoints": true
     }
   ]
 }
