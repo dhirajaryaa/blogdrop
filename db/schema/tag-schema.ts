@@ -1,4 +1,4 @@
-import { integer, pgTable, text, unique, uuid } from "drizzle-orm/pg-core";
+import { integer, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 import { article } from "./article-schema";
 import { relations } from "drizzle-orm";
 
@@ -20,7 +20,9 @@ export const articleTag = pgTable("article_tag", {
         .references(() => tag.id, { onDelete: "cascade" }),
 },
     (table) => [
-        unique("article_tag_unique").on(table.articleId, table.tagId),
+        primaryKey({
+            columns: [table.articleId, table.tagId],
+        }),
     ],);
 
 //? article tag relation

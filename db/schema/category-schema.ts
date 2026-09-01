@@ -1,4 +1,4 @@
-import { integer, pgTable, text, unique, uuid } from "drizzle-orm/pg-core";
+import { integer, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
 import { article } from "./article-schema";
 import { relations } from "drizzle-orm";
 
@@ -11,19 +11,26 @@ export const category = pgTable("category", {
 })
 
 //! article-category
-export const articleCategory = pgTable("article_category", {
-    articleId: uuid("article_id")
-        .notNull()
-        .references(() => article.id, {
-            onDelete: "cascade",
+export const articleCategory = pgTable(
+    "article_category",
+    {
+        articleId: uuid("article_id")
+            .notNull()
+            .references(() => article.id, {
+                onDelete: "cascade",
+            }),
+
+        categoryId: integer("category_id")
+            .notNull()
+            .references(() => category.id, {
+                onDelete: "cascade",
+            }),
+    },
+    (table) => [
+        primaryKey({
+            columns: [table.articleId, table.categoryId],
         }),
-    categoryId: integer("category_id")
-        .notNull()
-        .references(() => category.id, {
-            onDelete: "cascade"
-        })
-},
-    (table) => [unique("article_category_unique").on(table.articleId, table.categoryId)]
+    ]
 );
 
 //? article category relation
