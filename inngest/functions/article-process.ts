@@ -2,28 +2,18 @@ import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { article } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { RetryAfterError } from "inngest";
 import { extractArticleContent } from "@/lib/harvester/extract-article";
 import { convertHtmlToMarkdown } from "@/lib/harvester/html-markdown";
 
-const FETCH_TIMEOUT_MS = 15_000;
-const USER_AGENT = "Mozilla/5.0 (compatible; BlogdropBot/1.0)";
+export const FETCH_TIMEOUT_MS = 15_000;
+
+export const USER_AGENT =
+    "BlogdropBot/1.0 (+https://blogdrop.in; contact@blogdrop.in)";
 
 export const articleProcessing = inngest.createFunction({
     id: "article-processing",
     concurrency: 5,
-    triggers: { event: "app/ArticleProcessing" },
-    onFailure: async ({ event, error }): Promise<IngestResult> => {
-        //* if processing  failed so mark status "failed"
-        const { articleId } = event.data.event.data;
-        if (!articleId) return { status: "error", reason: "article id required to proceed" };
-
-        await db.update(article)
-            .set({ status: "error" })
-            .where(eq(article.id, articleId));
-
-        return { status: "success" }
-    }
+    triggers: { event: "app/ArticleProcessing" }
 }, async ({ step, event }): Promise<IngestResult> => {
 
     const { articleId, articleUrl } = event.data;
@@ -31,7 +21,10 @@ export const articleProcessing = inngest.createFunction({
 
     //? step 1: fetch article content 
     const response = await step.fetch(articleUrl, {
-        redirect: "follow"
+        redirect: "follow",
+        headers: { "User-Agent": USER_AGENT, 
+            "Accept": "text/html,application/xhtml+xml" },
+        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
     });
 
     //* if error on fetch article
@@ -45,12 +38,14 @@ export const articleProcessing = inngest.createFunction({
 
     //? step 2: get clean html content [readability.js parser]
     const articleData = await step.run("extract-text", async () => {
+        // console.log("CONTENT-TYPE:", response.headers.get("content-type"));
         const text = await response.text();
+
         return extractArticleContent({
             url: articleUrl,
             html: text
         });
-    });
+    });    
 
     if (!articleData) {
         await step.run("mark-failed-extract", async () => {
@@ -74,14 +69,7 @@ export const articleProcessing = inngest.createFunction({
             .returning({ id: article.id });
 
         return updated;
-    })
-
-    // if (!processed) {
-    //     await step.run("mark-failed-convert", async () => {
-    //         await db.update(article).set({ status: "failed" }).where(eq(article.id, articleId));
-    //     });
-    //     return { error: "article processing failed!" };
-    // }
+    });
 
     //? step 4: trigger metadata gen. jobs
     await step.sendEvent(
