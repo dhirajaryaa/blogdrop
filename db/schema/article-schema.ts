@@ -1,9 +1,17 @@
 import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
-import { source, statusEnum } from "./source-schema";
+import { source } from "./source-schema";
 import { relations } from "drizzle-orm";
 import { user } from "./user-schema";
 import { articleTag } from "./tag-schema";
 import { articleCategory } from "./category-schema";
+
+export const articleStatusEnum = pgEnum("article_status", [
+    "pending",
+    "processing",
+    "done",
+    "failed",
+    "error",
+]);
 
 //! article 
 export const article = pgTable("article", {
@@ -18,7 +26,7 @@ export const article = pgTable("article", {
     publicAt: text("public_at").notNull(),
     imageUrl: text("image_url").default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    status: statusEnum().default("pending"),
+    status: articleStatusEnum().default("pending"),
     slug: text("slug").notNull().unique(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 },
@@ -68,6 +76,19 @@ export const bookmark = pgTable("bookmark", {
 }, ((table) => [
     unique("bookmark_article_unique").on(table.articleId, table.userId),
 ]));
+
+//? bookmarks relations
+export const bookmarkRelations = relations(bookmark, ({ one }) => ({
+    article: one(article, {
+        fields: [bookmark.articleId],
+        references: [article.id],
+    }),
+
+    user: one(user, {
+        fields: [bookmark.userId],
+        references: [user.id],
+    }),
+}));
 
 //? relation ship 
 export const articleRelations = relations(article, ({ one, many }) => ({

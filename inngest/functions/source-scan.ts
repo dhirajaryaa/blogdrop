@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { inngest } from "../client";
+import { IngestResult, inngest } from "../client";
 import { article, source } from "@/db/schema";
 import { and, eq, isNotNull } from "drizzle-orm";
 import { fetchRSS } from "@/lib/harvester/feed-process";
@@ -11,7 +11,7 @@ export const sourceScan = inngest.createFunction(
         description: "Refresh all active sources and get all new articles.",
         triggers: [{ event: "app/allSourceScan" }, { cron: "0 0 * * *" }]
     },
-    async ({ event, step }) => {
+    async ({ event, step }): Promise<IngestResult> => {
 
         //? step 1: all active source get form db 
         const sources = await step.run("fetch-active-sources", async () => {
@@ -22,7 +22,7 @@ export const sourceScan = inngest.createFunction(
         });
 
         if (sources.length === 0) {
-            return { totalSource: 0, reason: "active source not found" };
+            return { status: "error", reason: "no active source found", error: sources };
         };
 
         //? step 2: run parallel all sources 
@@ -55,8 +55,14 @@ export const sourceScan = inngest.createFunction(
                     target: article.originalUrl
                 }) //* so already saved articles ignore it */
                 .returning({ id: article.id });
-        })
+        });
+
+        //? step 4: trigger article process-metadata generation
+        await step.sendEvent("article-batch-dispatcher", {
+            name: "app/ArticleBatchDispatcher",
+            data: {}
+        });
 
 
-        return { totalNewArticle: savedArticles.length };
+        return { status: "success" };
     })

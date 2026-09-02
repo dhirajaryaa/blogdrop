@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { inngest } from "../client";
+import { IngestResult, inngest } from "../client";
 import { article } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { RetryAfterError } from "inngest";
@@ -13,102 +13,77 @@ export const articleProcessing = inngest.createFunction({
     id: "article-processing",
     concurrency: 5,
     triggers: { event: "app/ArticleProcessing" },
-    onFailure: async ({ event, error }) => {
-        const articleId = event.data.event.data?.articleId;
-        if (!articleId) return;
+    onFailure: async ({ event, error }): Promise<IngestResult> => {
+        //* if processing  failed so mark status "failed"
+        const { articleId } = event.data.event.data;
+        if (!articleId) return { status: "error", reason: "article id required to proceed" };
 
         await db.update(article)
-            .set({ status: "failed" })
+            .set({ status: "error" })
             .where(eq(article.id, articleId));
-    }
-}, async ({ step, event }) => {
 
-    const sourceArticle = await step.run("load-article", async () => {
-        const [row] = await db.select().from(article).where(eq(article.id, event.data.articleId));
-        return row ?? null;
+        return { status: "success" }
+    }
+}, async ({ step, event }): Promise<IngestResult> => {
+
+    const { articleId, articleUrl } = event.data;
+    if (!(articleId && articleUrl)) return { status: "error", reason: "article id and article url required to proceed" };
+
+    //? step 1: fetch article content 
+    const response = await step.fetch(articleUrl, {
+        redirect: "follow"
     });
 
-    if (!sourceArticle) return { error: "article not found" };
-
-    //? skip reprocessing on event redelivery
-    if (sourceArticle.status === "completed") {
-        return { status: "skipped: already completed" };
-    }
-
-    //? step 1: fetch the article in text;
-    const response = await step.run("fetch-article", async () => {
-        const res = await fetch(sourceArticle.originalUrl, {
-            headers: { "User-Agent": USER_AGENT },
-            signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
-            redirect: "follow",
-        });
-
-        if (res.status === 429) {
-            const retryAfterSec = Number(res.headers.get("retry-after")) || 60;
-            throw new RetryAfterError("Rate-Limit-hit", retryAfterSec * 1000);
-        }
-
-        if (res.status === 404) {
-            return null;
-        }
-
-        if (!res.ok) {
-            throw new Error(`Fetch failed: ${res.status}`);
-        }
-
+    //* if error on fetch article
+    if (!response.ok) {
         return {
-            status: res.status,
-            html: await res.text(),
+            status: "error",
+            reason: `Failed to fetch article: ${response.status} ${response.statusText}`,
+            error: response
         };
-    });
-
-    if (!response) {
-        await step.run("mark-failed-404", async () => {
-            await db.update(article).set({ status: "failed" }).where(eq(article.id, sourceArticle.id));
-        });
-        return { error: "article not found (404)" };
     }
 
-    //? step 2: readability js parse
-    const articleData = await step.run("extract-article", async () => {
-        return extractArticleContent({ html: response.html, url: sourceArticle.originalUrl });
+    //? step 2: get clean html content [readability.js parser]
+    const articleData = await step.run("extract-text", async () => {
+        const text = await response.text();
+        return extractArticleContent({
+            url: articleUrl,
+            html: text
+        });
     });
 
     if (!articleData) {
         await step.run("mark-failed-extract", async () => {
-            await db.update(article).set({ status: "failed" }).where(eq(article.id, sourceArticle.id));
+            await db.update(article).set({ status: "failed" }).where(eq(article.id, articleId));
         });
-        return { error: "article extraction failed!" };
-    }
+        return { status: "error", reason: "article extraction failed!" };
+    };
 
-    //? step 3: article html to markdown [so low token on AI gen]
+    //? step 3: convert in clean markdown
     const processed = await step.run("convert-html-to-markdown", async () => {
 
         const data = await convertHtmlToMarkdown(articleData.content);
 
-        if (!data?.markdown) return null;
-
         // save to db 
         const [updated] = await db.update(article).set({
-            content: data.markdown,
-            author: articleData.byline || data.author || sourceArticle.author,
+            content: data?.markdown ?? articleData.textContent,
+            author: articleData.byline ?? data?.author,
             imageUrl: articleData.image ?? undefined,
-            status: "processing"
         })
-            .where(eq(article.id, sourceArticle.id))
-            .returning({ id: article.id })
+            .where(eq(article.id, articleId))
+            .returning({ id: article.id });
 
-        return updated ?? null;
+        return updated;
     })
 
-    if (!processed) {
-        await step.run("mark-failed-convert", async () => {
-            await db.update(article).set({ status: "failed" }).where(eq(article.id, sourceArticle.id));
-        });
-        return { error: "article processing failed!" };
-    }
+    // if (!processed) {
+    //     await step.run("mark-failed-convert", async () => {
+    //         await db.update(article).set({ status: "failed" }).where(eq(article.id, articleId));
+    //     });
+    //     return { error: "article processing failed!" };
+    // }
 
-    //? step 4: article meta data generation [function] so rate-limit after retry auto
+    //? step 4: trigger metadata gen. jobs
     await step.sendEvent(
         "ai-article-processing",
         {
@@ -119,6 +94,8 @@ export const articleProcessing = inngest.createFunction({
         }
     );
 
-    return { queuedAiProcessing: true };
+
+
+    return { status: "success" }
 
 })

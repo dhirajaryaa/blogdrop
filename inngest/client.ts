@@ -24,6 +24,19 @@ import { z } from "zod";
 //     }),
 // });
 
+
+export type IngestResult =
+    | {
+        status: "success";
+        data?: unknown;
+    }
+    | {
+        status: "error";
+        reason: string;
+        error?: unknown;
+    };
+
+
 //? inngest app initiation
 export const inngest = new Inngest({
     id: "blogdrop",
