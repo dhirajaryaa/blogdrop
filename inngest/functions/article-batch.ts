@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { aiUsage, article } from "@/db/schema";
-import { eq, inArray } from "drizzle-orm";
+import { eq, inArray, sql } from "drizzle-orm";
 
 const BATCH_SIZE = 100;
 const AI_API_LIMIT = 500;
@@ -16,12 +16,23 @@ export const articleBatchDispatcher = inngest.createFunction({
         const aiCredit = await step.run("ai-credit-check", async () => {
             const today = new Date().toISOString().slice(0, 10);
 
-            const [aiCredit] = await db.select({
-                used: aiUsage.used,
-                apiId: aiUsage.apiId
-            })
-                .from(aiUsage)
-                .where(eq(aiUsage.day, today));
+            const [aiCredit] = await db
+                .insert(aiUsage)
+                .values({
+                    day: today,
+                    used: 0,
+                    apiId: 1
+                })
+                .onConflictDoUpdate({
+                    target: aiUsage.day,
+                    set: {
+                        used: sql`${aiUsage.used}`
+                    }
+                })
+                .returning({
+                    used: aiUsage.used,
+                    apiId: aiUsage.apiId
+                });
 
 
             const used = aiCredit?.used ?? 0;
@@ -70,7 +81,7 @@ export const articleBatchDispatcher = inngest.createFunction({
         //? step 3: trigger article precessing job
         await Promise.all(
             processingArticles.map((article) => (
-              step.sendEvent("article-processing", {
+                step.sendEvent("article-processing", {
                     name: "app/ArticleProcessing",
                     data: {
                         articleId: article.id,
