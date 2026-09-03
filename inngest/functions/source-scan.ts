@@ -9,11 +9,12 @@ export const sourceScan = inngest.createFunction(
     {
         id: "all-source-scan",
         description: "Refresh all active sources and get all new articles.",
+        retries: 2,
         triggers: [{ event: "app/allSourceScan" }, { cron: "0 0 * * *" }]
     },
     async ({ event, step }): Promise<IngestResult> => {
 
-        //? step 1: all active source get form db 
+        //? step 1: all active source get from db
         const sources = await step.run("fetch-active-sources", async () => {
             return await db
                 .select({ id: source.id, rssUrl: source.rssUrl })
@@ -22,20 +23,30 @@ export const sourceScan = inngest.createFunction(
         });
 
         if (sources.length === 0) {
-            return { status: "error", reason: "no active source found", error: sources };
+            return { status: "error", reason: "no active source found" };
         };
 
-        //? step 2: run parallel all sources 
+        //? step 2: run parallel all sources (individual failures don't block the rest)
         const rssResults = await Promise.all(
             sources.map(source =>
                 step.run(`fetch-${source.id}`, async () => {
-                    const articles = await fetchRSS(source.rssUrl);
-
-                    return articles.map((article) => ({ ...article, sourceId: source.id }))
+                    try {
+                        const articles = await fetchRSS(source.rssUrl);
+                        return articles.map((article) => ({ ...article, sourceId: source.id }));
+                    } catch (err) {
+                        //* individual source failure — log and return empty so other sources still process
+                        console.error(`RSS fetch failed for source ${source.id}:`, err);
+                        return [];
+                    }
                 })
             )
         );
         const articles = rssResults.flat();
+
+        //* no articles found from any source
+        if (articles.length === 0) {
+            return { status: "success", data: "no new articles found from any source" };
+        }
 
         //? step 3: all articles save on db
         const savedArticles = await step.run("save-articles", async () => {
@@ -58,11 +69,12 @@ export const sourceScan = inngest.createFunction(
         });
 
         //? step 4: trigger article process-metadata generation
-        await step.sendEvent("article-batch-dispatcher", {
-            name: "app/ArticleBatchDispatcher",
-            data: {}
-        });
+        if (savedArticles.length > 0) {
+            await step.sendEvent("article-batch-dispatcher", {
+                name: "app/ArticleBatchDispatcher",
+                data: {}
+            });
+        }
 
-
-        return { status: "success" };
+        return { status: "success", data: { sourcesScanned: sources.length, articlesFound: articles.length, articlesSaved: savedArticles.length } };
     })

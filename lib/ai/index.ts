@@ -6,7 +6,7 @@ import { PROMPT } from "./prompt";
 type Response = {
     success: true,
     data: ArticleMetaData,
-    tokenUsed: number | undefined
+    tokenUsed?: number
 } | {
     success: false,
     error: string

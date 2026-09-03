@@ -8,6 +8,8 @@ const AI_API_LIMIT = 450;
 
 export const articleBatchDispatcher = inngest.createFunction({
     id: "article-batch-dispatcher",
+    concurrency: 1, //* prevent two dispatchers from racing for the same articles
+    retries: 2,
     triggers: { event: "app/ArticleBatchDispatcher" }
 },
     async ({ step, event }): Promise<IngestResult> => {
@@ -73,12 +75,17 @@ export const articleBatchDispatcher = inngest.createFunction({
                     .update(article)
                     .set({ status: "processing" })
                     .where(inArray(article.id, ids))
-                    .returning()
+                    .returning();
             });
 
         });
 
-        //? step 3: trigger article precessing job
+        //* no pending articles to process — exit early
+        if (!processingArticles.length) {
+            return { status: "success", data: "no pending articles" };
+        }
+
+        //? step 3: trigger article processing job
         await Promise.all(
             processingArticles.map((article) => (
                 step.sendEvent("article-processing", {
