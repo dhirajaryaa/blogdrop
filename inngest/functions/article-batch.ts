@@ -4,7 +4,7 @@ import { aiUsage, article } from "@/db/schema";
 import { eq, inArray, sql } from "drizzle-orm";
 
 const BATCH_SIZE = 100;
-const AI_API_LIMIT = 500;
+const AI_API_LIMIT = 450;
 
 export const articleBatchDispatcher = inngest.createFunction({
     id: "article-batch-dispatcher",

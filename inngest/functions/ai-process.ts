@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { inngest, IngestResult } from "../client";
-import { article, articleMetaData, aiUsage, tag, category } from "@/db/schema";
+import { article, articleMetaData, aiUsage, tag, category, articleTag, articleCategory } from "@/db/schema";
 import { and, eq, lt, sql } from "drizzle-orm";
 import { calculateReadingTime } from "@/lib/harvester/reading-time";
 import { llmGeneration } from "@/lib/ai";
@@ -8,7 +8,7 @@ import { categoriesMapping, tagsMapping } from "@/lib/harvester/tag-mapping";
 import { userInterests } from "@/config/tags";
 import { articleCategories } from "@/config/category";
 
-const MAX_AI_PER_DAY = 500;
+const MAX_AI_PER_DAY = 450;
 
 export const articleAIProcessing = inngest.createFunction({
     id: "ai-article-processing",
@@ -25,11 +25,6 @@ export const articleAIProcessing = inngest.createFunction({
             .where(and(eq(article.id, event.data.articleId), eq(article.status, "processing")));
 
         if (!sourceArticle) return { status: "error", reason: "article not found", error: sourceArticle };
-
-        //* skip reprocessing on event redelivery
-        if (sourceArticle.status === "done") {
-            return { status: "success", data: "skipped: already completed" };
-        };
 
         //* head+tail truncation for token saving [full content if short]
         const rawContent = sourceArticle.content ?? "";
@@ -52,11 +47,18 @@ export const articleAIProcessing = inngest.createFunction({
             });
         //* llm generation failed
         if (!llmOutput.success) {
+            await step.run("mark-ai-failed", async () => {
+                await db
+                    .update(article)
+                    .set({ status: "failed" })
+                    .where(eq(article.id, sourceArticle.id));
+            });
+
             return {
                 status: "error",
                 reason: llmOutput.error ?? "AI metadata generation failed",
             };
-        };
+        }
         //* promotional article remove 
         if (llmOutput.data.isPromotional) {
             await step.run("remove-promotion", async () => {
@@ -86,12 +88,17 @@ export const articleAIProcessing = inngest.createFunction({
         const canonicalCategories = categoriesMapping(categories);
         const canonicalTags = tagsMapping(tags);
 
+        //* reading time calculate
+        const readingTime = calculateReadingTime(
+            sourceArticle.content ?? ""
+        );
 
         //? step 4: metadata save on db, ai credit, tags-categories and status=done in one transition
-        await step.run("save-metadata",
+        const today = new Date().toISOString().slice(0, 10);
+
+        await step.run("save-metadata-and-tags-update",
             async () => {
                 await db.transaction((async (tx) => {
-                    const today = new Date().toISOString().slice(0, 10);
 
                     //* update credit */
                     await tx.update(aiUsage)
@@ -120,41 +127,64 @@ export const articleAIProcessing = inngest.createFunction({
 
                     //* tag create-save */
 
-                    const selectedTags = canonicalTags
-                        .map((value) =>
-                            userInterests.find((item) => item.value === value)
-                        )
-                        .filter((item): item is NonNullable<typeof item> => Boolean(item));
+                    const selectedTags = userInterests.filter((interest) =>
+                        canonicalTags.includes(interest.value)
+                    );
 
-                    await tx.insert(tag).values(
-                        selectedTags.map((tag) => ({
-                            name: tag.label,
-                            slug: tag.value,
-                        }))
-                    ).onConflictDoUpdate({
-                        target: tag.slug,
-                        set: {
-                            name: sql`excluded.name`,
-                        },
-                    });
+                    if (selectedTags.length > 0) {
+                        const savedTags = await tx.insert(tag).values(
+                            selectedTags.map((tag) => ({
+                                name: tag.label,
+                                slug: tag.value,
+                            }))
+                        ).onConflictDoUpdate({
+                            target: tag.slug,
+                            set: {
+                                name: sql`excluded.name`,
+                            },
+                        }).returning({ tagId: tag.id });
+
+                        await tx
+                            .insert(articleTag)
+                            .values(
+                                savedTags.map(({ tagId }) => ({
+                                    articleId: sourceArticle.id,
+                                    tagId,
+                                }))
+                            )
+                            .onConflictDoNothing();
+                    }
 
                     //* categories create-save */
 
-                    const selectedCategories = canonicalCategories
-                        .map((value) => articleCategories.find((item) => item.value === value))
-                        .filter((item): item is NonNullable<typeof item> => Boolean(item));
+                    const selectedCategories = articleCategories.filter((category) =>
+                        canonicalCategories.includes(category.value)
+                    );
 
-                    await tx.insert(category).values(
-                        selectedCategories.map((category) => ({
-                            name: category.label,
-                            slug: category.value,
-                        }))
-                    ).onConflictDoUpdate({
-                        target: category.slug,
-                        set: {
-                            name: sql`excluded.name`,
-                        },
-                    });
+                    if (selectedCategories.length > 0) {
+
+                        const savedCategories = await tx.insert(category).values(
+                            selectedCategories.map((category) => ({
+                                name: category.label,
+                                slug: category.value,
+                            }))
+                        ).onConflictDoUpdate({
+                            target: category.slug,
+                            set: {
+                                name: sql`excluded.name`,
+                            },
+                        }).returning({ categoryId: category.id })
+
+                        await tx
+                            .insert(articleCategory)
+                            .values(
+                                savedCategories.map(({ categoryId }) => ({
+                                    articleId: sourceArticle.id,
+                                    categoryId,
+                                }))
+                            )
+                            .onConflictDoNothing();
+                    }
 
                     //* article status update and author add */
                     await tx.update(article).set({
@@ -166,7 +196,11 @@ export const articleAIProcessing = inngest.createFunction({
             }
         )
 
-        //? step 5: ai credit if remaining so next batch trigger it
+        //? step 5: next batch trigger it
+        await step.sendEvent("article-batch-dispatcher", {
+            name: "app/ArticleBatchDispatcher",
+            data: {}
+        });
 
         return { status: "success", data: llmOutput }
     })
