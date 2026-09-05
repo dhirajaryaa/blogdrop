@@ -1,3 +1,4 @@
+import { IconArrowRight } from '@tabler/icons-react';
 import ArticleBanner from '../common/article-banner';
 
 function FeaturedFeed() {
@@ -11,7 +12,7 @@ function FeaturedFeed() {
       readingTime: "12 min",
       company: "Stripe",
       logo: "https://www.google.com/s2/favicons?domain=stripe.com&sz=128",
-      url: "https://stripe.com/blog/how-stripes-document-databases-supported-99999-uptime-with-zero-downtime-data-migrations",
+      url: "https://stripe.dev/blog/how-stripes-document-databases-supported-99.999-uptime-with-zero-downtime-data-migrations",
     },
     {
       title: "Recommending Items to More Than a Billion People",
@@ -38,51 +39,64 @@ function FeaturedFeed() {
   ];
 
   return (
-    <section className="space-y-6 my-10">
+    <section className="space-y-8 my-10">
       <div className="flex items-end justify-between">
-        <h2 className="text-xl font-semibold tracking-wide">
+        <h2 className="text-2xl font-semibold tracking-wide">
           Featured
         </h2>
 
         <a
-          href="/articles"
+          href="/feed"
           className="text-sm text-muted-foreground hover:text-foreground"
         >
           View all →
         </a>
       </div>
 
-      <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        {featuredArticles.slice(0, 6).map((article) => (
-          <article key={article.title} className="group cursor-pointer">
-            {/* Image / Brand Banner */}
-              <ArticleBanner url={article.logo}/>
+      <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
+        {featuredArticles.slice(0, 6).map((article, index) => (
 
-            {/* Content */}
-            <div className="mt-4 space-y-2">
-              <h3 className="text-lg font-semibold leading-snug tracking-tight">
-                {article.title}
-              </h3>
-
-              <p className="line-clamp-2 text-sm leading-6 text-muted-foreground">
-                {article.description}
-              </p>
-
-              <div className="flex items-center gap-2 pt-3 text-xs text-muted-foreground">
-                <img
-                  src={article.logo}
-                  alt=""
-                  className="h-4 w-4 object-contain"
-                />
+          <a href={article.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`
+    relative group rounded-lg cursor-pointer
+    before:absolute before:-left-8 before:top-0
+    before:h-full before:w-px
+    before:bg-border before:inset-y-0
+    ${index === 0 ? "before:hidden" : ""}`}
+            key={article.title}
+          >
+            <article key={article.title} className="flex flex-col gap-6 h-full">
+              {/* Image / Brand Banner */}
+              <ArticleBanner url={article.logo} title={article.company} />
+              {/* Content */}
+              <div className="space-y-2">
+                <h3 className="text-lg line-clamp-2 font-medium leading-relaxed tracking-normal">
+                  {article.title}
+                </h3>
+                <p className="line-clamp-3 text-sm leading-6 text-muted-foreground tracking-normal">
+                  {article.description}
+                </p>
+              </div>
+              {/* { company && date } */}
+              <div className="flex items-center gap-2 mt-auto text-xs text-muted-foreground">
                 <span>{article.author}</span>
                 <span>·</span>
                 <span>{article.date}</span>
-                <span>·</span>
-                <span>{article.readingTime}</span>
+                <IconArrowRight stroke={2} className='size-4 duration-300 opacity-0 group-hover:opacity-100 transition-opacity' />
               </div>
-            </div>
-          </article>
+            </article>
+          </a>
         ))}
+      </div>
+      <div className="flex items-center justify-center">
+        <a
+          href="/feed"
+          className="text-sm  text-muted-foreground hover:text-foreground duration-200 ease-linear "
+        >
+          Read More Articles →
+        </a>
       </div>
     </section>
   )

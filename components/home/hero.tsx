@@ -5,7 +5,7 @@ import { IconArrowRight } from "@tabler/icons-react"
 
 function Hero() {
     return (
-        <div className="flex flex-col w-full gap-4 px-4">
+        <div className="flex flex-col w-full gap-4">
             <div className="flex flex-col gap-2 mt-20 ">
                 <div className="flex w-full flex-col gap-4">
                     <div className="space-y-2 max-w-lg">

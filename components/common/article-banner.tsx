@@ -1,44 +1,40 @@
-"use client"
+
+import { cn } from "@/lib/utils";
 
 type ArticleBannerProps = {
     url: string;
     title?: string;
+    className?: string;
 };
 
 export default function ArticleBanner({
     url,
     title,
+    className = "",
 }: ArticleBannerProps) {
     return (
-        <div className="relative rounded-xl aspect-video w-full overflow-hidden">
+        <div className={cn("relative rounded-lg aspect-video w-full overflow-hidden ", className)}>
             {/* Blurred logo background */}
             <img
                 src={url}
-                alt=""
+                alt={title || "Article logo"}
                 aria-hidden="true"
-                className="absolute inset-0 h-full w-full scale-[2] object-contain blur-[46px"
+                className="absolute inset-0 h-full w-full scale-[2] object-contain blur-sm opacity-80  select-none"
+                draggable={false}
             />
 
             {/* Brightness / readability layer */}
-            <div className="absolute inset-0 bg-white/20 backdrop-blur-2xl dark:bg-black/20" />
+            <div className="absolute inset-0 bg-white/20 backdrop-blur-2xl dark:bg-black/20 select-none group-hover:bg-white/5 dark:group-hover:bg-black/5 duration-300"
+                draggable={false} />
 
             {/* Sharp logo */}
             <div className="relative z-10 flex h-full items-center justify-center">
                 <img
                     src={url}
-                    alt=""
-                    className="h-16 w-16 object-contain sm:h-20 sm:w-20"
+                    alt={title || "Article logo"}
+                    className="h-16 w-16 object-contain sm:h-20 sm:w-20 group-hover:scale-105 duration-300"
                 />
             </div>
-
-            {/* Optional article title */}
-            {title && (
-                <div className="absolute inset-x-5 bottom-5 z-20">
-                    <h2 className="max-w-xl text-lg font-semibold leading-snug tracking-tight text-zinc-900 sm:text-xl">
-                        {title}
-                    </h2>
-                </div>
-            )}
         </div>
     );
 }
