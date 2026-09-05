@@ -1,5 +1,5 @@
 import { relations } from "drizzle-orm";
-import { pgTable, text, timestamp, boolean, index } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, index } from "drizzle-orm/pg-core";
 import { user } from "./user-schema";
 
 
@@ -28,6 +28,7 @@ export const account = pgTable(
   {
     id: text("id").primaryKey(),
     accountId: text("account_id").notNull(),
+    issuer: text("issuer"),
     providerId: text("provider_id").notNull(),
     userId: text("user_id")
       .notNull()

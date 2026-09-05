@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@better-auth/drizzle-adapter": "^1.7.2",
     "@google/genai": "^2.10.0",
     "@mozilla/readability": "^0.6.0",
     "@next/third-parties": "^16.2.12",

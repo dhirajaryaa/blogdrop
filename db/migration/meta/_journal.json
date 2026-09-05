@@ -71,6 +71,13 @@
       "when": 1788308638166,
       "tag": "0009_large_victor_mancha",
       "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788617327111,
+      "tag": "0010_empty_roland_deschain",
+      "breakpoints": true
     }
   ]
 }
