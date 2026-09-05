@@ -1,7 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IconChevronLeft, IconBrandGithub, IconBrandGoogle, IconBrandGoogleFilled, IconBrandGithubFilled } from "@tabler/icons-react";
+import { IconChevronLeft } from "@tabler/icons-react";
+import LoginBtn from "@/components/auth/login-btn";
 
 function LoginPage() {
   return (
@@ -27,34 +28,22 @@ function LoginPage() {
             alt="BlogDrop"
             width={40}
             height={40}
-            className="size-10 rounded-xl"
+            loading="lazy"
+            className="size-8 sm:size-10 rounded-lg"
           />
 
-          <h1 className="mt-7 text-2xl font-semibold tracking-tight">
-            Welcome to BlogDrop
+          <h1 className="mt-7 text-xl sm:text-2xl font-semibold tracking-tight">
+            Welcome to Blogdrop
           </h1>
 
-          <p className="mt-2 text-sm text-muted-foreground">
+          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">
             Sign in to save and follow the stories you care about.
           </p>
         </div>
 
         <div className="mt-8 space-y-3">
-          <Button
-            // variant="outline"
-            className="h-11 w-full gap-2"
-          >
-            <IconBrandGoogleFilled className="size-5" />
-            Continue with Google
-          </Button>
-
-          <Button
-            variant="outline"
-            className="h-11 w-full gap-2"
-          >
-            <IconBrandGithubFilled className="size-5" />
-            Continue with GitHub
-          </Button>
+          <LoginBtn type="google" />
+          <LoginBtn type="github" />
         </div>
 
         <p className="mt-6 text-center text-xs leading-5 text-muted-foreground">
