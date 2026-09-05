@@ -19,10 +19,10 @@ function Navbar() {
             </Link>
 
             <div className="flex items-center gap-2">
-                <Link href={"/login"} className={cn(buttonVariants({ size: "lg", variant: "ghost", className: "font-normal gap-1 rounded-xl" }),"hidden md:flex")}>
+                <Link href={"/auth/login"} className={cn(buttonVariants({ size: "lg", variant: "ghost", className: "font-normal gap-1 rounded-xl" }),"hidden sm:flex")}>
                     Login <IconArrowUpRight stroke={2} />
                 </Link>
-                <div className="bg-neutral-300 h-7 w-px hidden md:block " />
+                <div className="bg-neutral-300 h-7 w-px hidden sm:block " />
                 <Link href={"/feed"} className={buttonVariants({ size: "lg", className: "font-normal gap-1 rounded-xl" })}>
                     Go to Feed <IconArrowNarrowRight stroke={2} />
                 </Link>
