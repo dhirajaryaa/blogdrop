@@ -1,7 +1,10 @@
 import { IconArrowDown, IconArrowRight } from '@tabler/icons-react';
-import ArticleBanner from '../common/article-banner';
+import ArticleBanner from '@/components/common/article-banner';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 function FeaturedFeed() {
+
   const featuredArticles = [
     {
       title: "How Stripe’s Document Databases Support 99.999% Uptime",
@@ -74,16 +77,17 @@ function FeaturedFeed() {
   return (
     <section className="space-y-8 my-10">
       <div className="flex items-end justify-between">
-        <h2 className="text-2xl font-semibold tracking-wide">
+        <h2 className="text-xl font-semibold tracking-wide">
           Featured
         </h2>
 
-        <a
+      <Button asChild variant={"link"} className='text-xs'>
+        <Link
           href="/feed"
-          className="text-sm text-muted-foreground hover:text-foreground"
         >
           View all →
-        </a>
+        </Link>
+      </Button>
       </div>
 
       <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">

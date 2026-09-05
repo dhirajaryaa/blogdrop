@@ -1,4 +1,4 @@
-import { IconBrandGithub, IconBrandLinkedin, IconBrandTwitter } from "@tabler/icons-react";
+import { IconBrandGithub, IconBrandLinkedin, IconBrandX } from "@tabler/icons-react";
 
 export function Footer() {
     return (
@@ -53,7 +53,7 @@ export function Footer() {
                         title="X"
                         className="transition-colors hover:text-foreground"
                     >
-                        <IconBrandTwitter className="size-3.5" />
+                        <IconBrandX className="size-3.5" />
                     </a>
 
                     <a

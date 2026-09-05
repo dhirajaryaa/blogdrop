@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 function Navbar() {
     return (
         <nav className="flex items-center justify-between py-4">
-            <Link href={"/"} className="text-lg sm:text-xl font-medium flex items-center gap-2">
+            <Link href={"/"} className="text-lg sm:text-xl flex items-center gap-2">
                 <Image
                     src="/logo.png"
                     alt="Logo"
@@ -15,15 +15,15 @@ function Navbar() {
                     height={32}
                     className="rounded-lg"
                 />
-                <span className="text-foreground ">Blogdrop</span>
+                <span className="text-foreground font-medium">Blogdrop</span>
             </Link>
 
             <div className="flex items-center gap-2">
-                <Link href={"/auth/login"} className={cn(buttonVariants({ size: "lg", variant: "ghost", className: "font-normal gap-1 rounded-xl" }),"hidden sm:flex")}>
+                <Link href={"/auth/login"} className={cn(buttonVariants({ size: "lg", variant: "ghost", className: "font-normal gap-1 rounded-xl" }),"hidden sm:flex text-sm")}>
                     Login <IconArrowUpRight stroke={2} />
                 </Link>
                 <div className="bg-neutral-300 h-7 w-px hidden sm:block " />
-                <Link href={"/feed"} className={buttonVariants({ size: "lg", className: "font-normal gap-1 rounded-xl" })}>
+                <Link href={"/feed"} className={buttonVariants({ size: "lg", className: "font-normal gap-1 rounded-xl text-sm" })}>
                     Go to Feed <IconArrowNarrowRight stroke={2} />
                 </Link>
             </div>

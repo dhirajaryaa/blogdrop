@@ -1,4 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { githubProfile } from "@/config/constant";
+import { IconArrowUpRight } from "@tabler/icons-react";
 
 function FounderNote() {
     return (
@@ -14,14 +16,14 @@ function FounderNote() {
 
                 {/* Content */}
                 <div className="max-w-3xl">
-                    <h2 className="text-3xl font-semibold leading-tight tracking-[-0.03em] text-foreground sm:text-5xl">
+                    <h2 className="text-3xl font-semibold leading-tight tracking-[-0.03em] text-foreground sm:text-4xl">
                         I built BlogDrop because <br/>
                         <span className="text-foreground/60">
                             great engineering writing shouldn't be so hard to find.
                         </span>
                     </h2>
 
-                    <div className="mt-8 max-w-2xl space-y-5 text-[15px] leading-7 text-neutral-600">
+                    <div className="mt-8 max-w-2xl space-y-5 text-sm leading-7 text-neutral-600">
                         <p>
                             There are thousands of engineering blogs, case studies, and
                             technical write-ups published every year. The good ones are
@@ -49,9 +51,14 @@ function FounderNote() {
                         </Avatar>
 
                         <div>
-                            <p className="text-sm font-medium text-neutral-900">
-                                Dhiraj Arya
-                            </p>
+                            <a
+                                href={githubProfile}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="flex group items-center gap-1 text-sm font-medium text-neutral-900"
+                            >
+                                Dhiraj Arya <IconArrowUpRight stroke={2} size={14}/>
+                            </a>
                             <p className="text-xs text-muted-foreground">
                                self-taught engineer, builder, and writer.
                             </p>
@@ -61,10 +68,10 @@ function FounderNote() {
                     {/* Small CTA */}
                     <a
                         href="mailto:hello@blogdrop.in"
-                        className="mt-8 inline-flex items-center gap-2 text-sm font-medium text-neutral-900 transition-colors hover:text-neutral-500"
+                        className="mt-8 inline-flex items-center gap-1 text-sm font-medium text-neutral-900 transition-colors hover:text-neutral-500"
                     >
                         Say hello
-                        <span aria-hidden>↗</span>
+                        <IconArrowUpRight stroke={2} size={14} />
                     </a>
                 </div>
             </div>
