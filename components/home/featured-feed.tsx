@@ -1,4 +1,4 @@
-import { IconArrowRight } from '@tabler/icons-react';
+import { IconArrowDown, IconArrowRight } from '@tabler/icons-react';
 import ArticleBanner from '../common/article-banner';
 
 function FeaturedFeed() {
@@ -36,6 +36,39 @@ function FeaturedFeed() {
       logo: "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=128",
       url: "https://blog.cloudflare.com/how-we-built-pingora-the-proxy-that-connects-cloudflare-to-the-internet/",
     },
+    {
+      title: "Discord: Why Discord is Switching from Go to Rust",
+      description:
+        "How Discord eliminated latency spikes and GC pauses in their Read States service by rewriting it from Go to Rust.",
+      author: "Discord Engineering",
+      date: "Feb 4, 2020",
+      readingTime: "9 min",
+      company: "Discord",
+      logo: "https://www.google.com/s2/favicons?domain=discord.com&sz=128",
+      url: "https://discord.com/blog/why-discord-is-switching-from-go-to-rust",
+    },
+    {
+      title: "Netflix Information Overload: Machine Learning and Recommendation at Scale",
+      description:
+        "A deep dive into Netflix's multi-layered recommendation system architecture, covering offline model training and real-time inference.",
+      author: "Netflix Technology Blog",
+      date: "Apr 6, 2012",
+      readingTime: "10 min",
+      company: "Netflix",
+      logo: "https://faviconapi.com/cdn/favicons/netflix.com.png",
+      url: "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-1-55838468f429",
+    },
+    {
+      title: "How Uber Serves Over 40 Million Reads Per Second Using Integrated Cache",
+      description:
+        "How Uber designed CacheFront, an integrated caching tier built atop Schemaless and Docstore to serve tens of millions of QPS.",
+      author: "Uber Engineering",
+      date: "Oct 27, 2021",
+      readingTime: "9 min",
+      company: "Uber",
+      logo: "https://www.google.com/s2/favicons?domain=uber.com&sz=128",
+      url: "https://www.uber.com/blog/how-uber-serves-over-40-million-reads-per-second-using-integrated-cache/",
+    },
   ];
 
   return (
@@ -56,16 +89,20 @@ function FeaturedFeed() {
       <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
         {featuredArticles.slice(0, 6).map((article, index) => (
 
-          <a href={article.url}
+          <a
+            key={article.title}
+            href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className={`
-    relative group rounded-lg cursor-pointer
-    before:absolute before:-left-8 before:top-0
-    before:h-full before:w-px
-    before:bg-border before:inset-y-0
-    ${index === 0 ? "before:hidden" : ""}`}
-            key={article.title}
+            className="group
+        relative
+        cursor-pointer
+        lg:after:absolute
+        lg:after:-right-8
+        lg:after:inset-y-0
+        lg:after:w-px
+        lg:after:bg-border
+        nth-[3n]:after:hidden"
           >
             <article key={article.title} className="flex flex-col gap-6 h-full">
               {/* Image / Brand Banner */}
@@ -84,18 +121,18 @@ function FeaturedFeed() {
                 <span>{article.author}</span>
                 <span>·</span>
                 <span>{article.date}</span>
-                <IconArrowRight stroke={2} className='size-4 duration-300 opacity-0 group-hover:opacity-100 transition-opacity' />
+                <IconArrowRight stroke={2} className='size-4 duration-300 sm:opacity-0 sm:group-hover:opacity-100 opacity-100  transition-opacity' />
               </div>
             </article>
           </a>
         ))}
       </div>
-      <div className="flex items-center justify-center">
+      <div className="flex items-center justify-center mt-16">
         <a
           href="/feed"
-          className="text-sm  text-muted-foreground hover:text-foreground duration-200 ease-linear "
+          className="text-sm  text-muted-foreground hover:text-foreground duration-200 ease-linear flex items-center gap-2 transition-colors"
         >
-          Read More Articles →
+          Load more <IconArrowDown stroke={2} size={16} />
         </a>
       </div>
     </section>

@@ -2,6 +2,8 @@ import Container from "@/components/common/container"
 import Hero from "@/components/home/hero"
 import Navbar from "@/components/common/navbar"
 import FeaturedFeed from "@/components/home/featured-feed"
+import FounderNote from "@/components/home/founder-note"
+import { Footer } from "@/components/common/footer"
 
 const HomePage = () => {
   return (
@@ -17,6 +19,8 @@ const HomePage = () => {
           <Navbar />
           <Hero />
           <FeaturedFeed />
+          <FounderNote />
+          <Footer />
         </Container>
       </div>
     </main>

@@ -1,5 +1,6 @@
 
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 type ArticleBannerProps = {
     url: string;
@@ -13,7 +14,7 @@ export default function ArticleBanner({
     className = "",
 }: ArticleBannerProps) {
     return (
-        <div className={cn("relative rounded-lg aspect-video w-full overflow-hidden ", className)}>
+        <div className={cn("relative rounded-lg aspect-video w-full overflow-hidden shadow-md", className)}>
             {/* Blurred logo background */}
             <img
                 src={url}
@@ -29,7 +30,10 @@ export default function ArticleBanner({
 
             {/* Sharp logo */}
             <div className="relative z-10 flex h-full items-center justify-center">
-                <img
+                <Image
+                    width={80}
+                    height={80}
+                    priority
                     src={url}
                     alt={title || "Article logo"}
                     className="h-16 w-16 object-contain sm:h-20 sm:w-20 group-hover:scale-105 duration-300"
