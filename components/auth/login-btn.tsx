@@ -28,10 +28,12 @@ function LoginBtn({ type }: LoginBtnProps) {
                         setIsLoading(true);
                     },
                     onError: (ctx) => {
-                        toast.error(ctx.error.message);
+                        setIsLoading(false);
+                        toast.error(ctx.error.message || "Unable to sign in. Please try again.");
                     }
                 });
         } catch (error: any) {
+            setIsLoading(false);
             toast.error("Unable to sign in. Please try again.");
             console.error(error);
             return;
