@@ -12,7 +12,7 @@ function LoginPage() {
         variant="ghost"
         size="sm"
         asChild
-        className="absolute left-4 top-4 gap-1 text-xs text-muted-foreground"
+        className="text-muted-foreground absolute top-4 left-4 gap-1 text-xs"
       >
         <Link href="/">
           <IconChevronLeft className="size-4" />
@@ -29,14 +29,14 @@ function LoginPage() {
             width={40}
             height={40}
             loading="lazy"
-            className="size-8 sm:size-10 rounded-lg"
+            className="size-8 rounded-lg sm:size-10"
           />
 
-          <h1 className="mt-7 text-xl sm:text-2xl font-semibold tracking-tight">
+          <h1 className="mt-7 text-xl font-semibold tracking-tight sm:text-2xl">
             Welcome to Blogdrop
           </h1>
 
-          <p className="mt-2 text-xs sm:text-sm text-muted-foreground">
+          <p className="text-muted-foreground mt-2 text-xs sm:text-sm">
             Sign in to save and follow the stories you care about.
           </p>
         </div>
@@ -46,7 +46,7 @@ function LoginPage() {
           <LoginBtn type="github" />
         </div>
 
-        <p className="mt-6 text-center text-xs leading-5 text-muted-foreground">
+        <p className="text-muted-foreground mt-6 text-center text-xs leading-5">
           By continuing, you agree to BlogDrop's{" "}
           <Link
             href="/terms"

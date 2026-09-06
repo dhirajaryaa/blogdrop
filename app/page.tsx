@@ -1,19 +1,19 @@
-import Container from "@/components/common/container"
-import Hero from "@/components/home/hero"
-import Navbar from "@/components/common/navbar"
-import FeaturedFeed from "@/components/home/featured-feed"
-import FounderNote from "@/components/home/founder-note"
-import { Footer } from "@/components/common/footer"
+import Container from "@/components/common/container";
+import Hero from "@/components/home/hero";
+import Navbar from "@/components/common/navbar";
+import FeaturedFeed from "@/components/home/featured-feed";
+import FounderNote from "@/components/home/founder-note";
+import { Footer } from "@/components/common/footer";
 
 const HomePage = () => {
   return (
-    <main className="flex flex-col relative">
+    <main className="relative flex flex-col">
       <div
-        className="flex flex-col items-center min-h-screen relative"
-      // style={{
-      //   background:
-      //     "radial-gradient(125% 100% at 50% 0%, #FFF 6.32%, #E0F0FF 29.28%, #E6EFFD 68.68%, #FFF 100%)",
-      // }}
+        className="relative flex min-h-screen flex-col items-center"
+        // style={{
+        //   background:
+        //     "radial-gradient(125% 100% at 50% 0%, #FFF 6.32%, #E0F0FF 29.28%, #E6EFFD 68.68%, #FFF 100%)",
+        // }}
       >
         <Container>
           <Navbar />
@@ -24,7 +24,7 @@ const HomePage = () => {
         </Container>
       </div>
     </main>
-  )
-}
+  );
+};
 
-export default HomePage
+export default HomePage;

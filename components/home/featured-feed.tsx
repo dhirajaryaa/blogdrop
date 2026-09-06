@@ -1,10 +1,9 @@
-import { IconArrowDown, IconArrowRight } from '@tabler/icons-react';
-import ArticleBanner from '@/components/common/article-banner';
-import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import { IconArrowDown, IconArrowRight } from "@tabler/icons-react";
+import ArticleBanner from "@/components/common/article-banner";
+import { Button } from "@/components/ui/button";
+import Link from "next/link";
 
 function FeaturedFeed() {
-
   const featuredArticles = [
     {
       title: "How Stripe’s Document Databases Support 99.999% Uptime",
@@ -29,7 +28,8 @@ function FeaturedFeed() {
       url: "https://engineering.fb.com/2015/06/02/core-infra/recommending-items-to-more-than-a-billion-people/",
     },
     {
-      title: "How We Built Pingora, the Proxy That Connects Cloudflare to the Internet",
+      title:
+        "How We Built Pingora, the Proxy That Connects Cloudflare to the Internet",
       description:
         "Inside Cloudflare’s Rust-based proxy architecture, built to handle Internet traffic with better performance and efficiency.",
       author: "Cloudflare Engineering",
@@ -51,7 +51,8 @@ function FeaturedFeed() {
       url: "https://discord.com/blog/why-discord-is-switching-from-go-to-rust",
     },
     {
-      title: "Netflix Information Overload: Machine Learning and Recommendation at Scale",
+      title:
+        "Netflix Information Overload: Machine Learning and Recommendation at Scale",
       description:
         "A deep dive into Netflix's multi-layered recommendation system architecture, covering offline model training and real-time inference.",
       author: "Netflix Technology Blog",
@@ -62,7 +63,8 @@ function FeaturedFeed() {
       url: "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-1-55838468f429",
     },
     {
-      title: "How Uber Serves Over 40 Million Reads Per Second Using Integrated Cache",
+      title:
+        "How Uber Serves Over 40 Million Reads Per Second Using Integrated Cache",
       description:
         "How Uber designed CacheFront, an integrated caching tier built atop Schemaless and Docstore to serve tens of millions of QPS.",
       author: "Uber Engineering",
@@ -75,72 +77,60 @@ function FeaturedFeed() {
   ];
 
   return (
-    <section className="space-y-8 my-10">
+    <section className="my-10 space-y-8">
       <div className="flex items-end justify-between">
-        <h2 className="text-xl font-semibold tracking-wide">
-          Featured
-        </h2>
+        <h2 className="text-xl font-semibold tracking-wide">Featured</h2>
 
-      <Button asChild variant={"link"} className='text-xs'>
-        <Link
-          href="/feed"
-        >
-          View all →
-        </Link>
-      </Button>
+        <Button asChild variant={"link"} className="text-xs">
+          <Link href="/feed">View all →</Link>
+        </Button>
       </div>
 
       <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
         {featuredArticles.slice(0, 6).map((article, index) => (
-
           <a
             key={article.title}
             href={article.url}
             target="_blank"
             rel="noopener noreferrer"
-            className="group
-        relative
-        cursor-pointer
-        lg:after:absolute
-        lg:after:-right-8
-        lg:after:inset-y-0
-        lg:after:w-px
-        lg:after:bg-border
-        nth-[3n]:after:hidden"
+            className="group lg:after:bg-border relative cursor-pointer nth-[3n]:after:hidden lg:after:absolute lg:after:inset-y-0 lg:after:-right-8 lg:after:w-px"
           >
-            <article key={article.title} className="flex flex-col gap-6 h-full">
+            <article key={article.title} className="flex h-full flex-col gap-6">
               {/* Image / Brand Banner */}
               <ArticleBanner url={article.logo} title={article.company} />
               {/* Content */}
               <div className="space-y-2">
-                <h3 className="text-lg line-clamp-2 font-medium leading-relaxed tracking-normal">
+                <h3 className="line-clamp-2 text-lg leading-relaxed font-medium tracking-normal">
                   {article.title}
                 </h3>
-                <p className="line-clamp-3 text-sm leading-6 text-muted-foreground tracking-normal">
+                <p className="text-muted-foreground line-clamp-3 text-sm leading-6 tracking-normal">
                   {article.description}
                 </p>
               </div>
               {/* { company && date } */}
-              <div className="flex items-center gap-2 mt-auto text-xs text-muted-foreground">
+              <div className="text-muted-foreground mt-auto flex items-center gap-2 text-xs">
                 <span>{article.author}</span>
                 <span>·</span>
                 <span>{article.date}</span>
-                <IconArrowRight stroke={2} className='size-4 duration-300 sm:opacity-0 sm:group-hover:opacity-100 opacity-100  transition-opacity' />
+                <IconArrowRight
+                  stroke={2}
+                  className="size-4 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100"
+                />
               </div>
             </article>
           </a>
         ))}
       </div>
-      <div className="flex items-center justify-center mt-16">
+      <div className="mt-16 flex items-center justify-center">
         <a
           href="/feed"
-          className="text-sm  text-muted-foreground hover:text-foreground duration-200 ease-linear flex items-center gap-2 transition-colors"
+          className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors duration-200 ease-linear"
         >
           Load more <IconArrowDown stroke={2} size={16} />
         </a>
       </div>
     </section>
-  )
+  );
 }
 
-export default FeaturedFeed
+export default FeaturedFeed;
