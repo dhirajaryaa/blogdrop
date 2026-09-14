@@ -1,36 +1,21 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
-import { IconChevronLeft } from "@tabler/icons-react";
 import LoginBtn from "@/components/auth/login-btn";
+import GoBackBtn from "@/components/common/go-back";
+import Logo from "@/components/common/logo";
+import Container from "@/components/common/container";
 
 function LoginPage() {
   return (
-    <main className="relative flex min-h-svh items-center justify-center px-6">
+    <main className="relative">
+      <Container className="relative flex min-h-svh items-center justify-center ">
+
       {/* Back */}
-      <Button
-        variant="ghost"
-        size="sm"
-        asChild
-        className="text-muted-foreground absolute top-4 left-4 gap-1 text-xs"
-      >
-        <Link href="/">
-          <IconChevronLeft className="size-4" />
-          Home
-        </Link>
-      </Button>
+    <GoBackBtn className="absolute left-4 top-4" />
 
       {/* Login */}
       <div className="w-full max-w-sm">
         <div className="flex flex-col items-center text-center">
-          <Image
-            src="/logo.png"
-            alt="BlogDrop"
-            width={40}
-            height={40}
-            loading="lazy"
-            className="size-8 rounded-lg sm:size-10"
-          />
+          <Logo className="size-8 sm:size-10"/>
 
           <h1 className="mt-7 text-xl font-semibold tracking-tight sm:text-2xl">
             Welcome to Blogdrop
@@ -64,6 +49,7 @@ function LoginPage() {
           .
         </p>
       </div>
+            </Container>
     </main>
   );
 }

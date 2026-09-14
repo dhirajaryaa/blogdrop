@@ -53,7 +53,7 @@ function LoginBtn({ type }: LoginBtnProps) {
         {isLoading ? (
           <>
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            Connecting to Google...
+            Redirect to Google...
           </>
         ) : (
           <>
@@ -75,7 +75,7 @@ function LoginBtn({ type }: LoginBtnProps) {
         {isLoading ? (
           <>
             <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
-            Connecting to GitHub...
+            Redirect to GitHub...
           </>
         ) : (
           <>
