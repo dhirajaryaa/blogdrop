@@ -6,7 +6,7 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "studio": "bun drizzle-kit studio",
+    "studio": "pnpm drizzle-kit studio",
     "lint": "eslint"
   },
   "dependencies": {

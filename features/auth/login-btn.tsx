@@ -2,10 +2,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/features/auth/lib/auth-client";
-import { authCallbackPath } from "@/features/auth/config";
+import { authClient } from "@/features/auth/auth-client";
 import { IconBrandGithub, IconBrandGoogleFilled } from "@tabler/icons-react";
 import { toast } from "sonner";
+import { authCallbackPath } from "./auth-client";
 
 type LoginBtnProps = {
   type: "google" | "github";

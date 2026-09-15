@@ -30,6 +30,9 @@ import {
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
+import { saveInterest } from "@/features/onboarding/onboarding.actions";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 const articleCategories = [
   {
@@ -160,14 +163,43 @@ const articleCategories = [
 ];
 
 function InterestSelect() {
+
+  const router = useRouter();
   const [topic, setTopic] = useState<Set<string>>(new Set());
   const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const handleInterestSet = async () => {
     if (topic.size < 3) {
-      setError(`Please select ${3 - topic.size} more topic${3 - topic.size === 1 ? "" : "s"}.`)
+      const remaining = 3 - topic.size;
+      const message = `Please select ${remaining} more topic${remaining === 1 ? "" : "s"}.`;
+      setError(message);
+      toast.error(message);
       return;
-    };
+    }
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      const res = await saveInterest(topic);
+
+      if (!res.success) {
+        const message = res.reason || "Something went wrong while saving your interests.";
+        setError(message);
+        toast.error(message);
+        return;
+      }
+      toast.success("Your interests have been saved!");
+      router.replace("/feed");
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to save your interests. Please try again.";
+      setError(message);
+      toast.error(message);
+      console.error("Failed to save interests:", err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -175,6 +207,7 @@ function InterestSelect() {
       <ToggleGroup variant={"outline"} type="multiple" className="w-full flex flex-wrap items-center sm:justify-center"
         value={[...topic]}
         onValueChange={(value) => {
+          setError(null);
           setTopic(new Set(value));
         }}
       >
@@ -198,10 +231,23 @@ function InterestSelect() {
           </p>
         )}
 
-        <Button className="w-full h-10" size="lg" onClick={handleInterestSet} disabled={topic.size < 3}>
-          {topic.size < 3
-            ? `Select ${3 - topic.size} more`
-            : "Continue"}
+        <Button
+          className="w-full h-10"
+          size="lg"
+          onClick={handleInterestSet}
+          disabled={topic.size < 3 || loading}
+          aria-busy={loading}
+        >
+          {loading ? (
+            <>
+              <span className="size-4 animate-spin rounded-full border-2 border-current border-t-transparent" />
+              Saving...
+            </>
+          ) : topic.size < 3 ? (
+            `Select ${3 - topic.size} more`
+          ) : (
+            "Continue"
+          )}
         </Button>
       </div>
 

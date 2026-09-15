@@ -78,6 +78,20 @@
       "when": 1788617327111,
       "tag": "0010_empty_roland_deschain",
       "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789446002829,
+      "tag": "0011_wonderful_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789450926436,
+      "tag": "0012_chilly_sugar_man",
+      "breakpoints": true
     }
   ]
 }

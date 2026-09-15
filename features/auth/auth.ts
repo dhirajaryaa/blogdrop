@@ -20,18 +20,6 @@ export const auth = betterAuth({
                 input: false,
                 defaultValue: ""
             },
-            categories: {
-                type: "string[]",
-                required: false,
-                input: false,
-                defaultValue: []
-            },
-            tags: {
-                type: "string[]",
-                required: false,
-                input: false,
-                defaultValue: []
-            },
             experienceLevel: {
                 type: ["mid", "junior", "senior"],
                 required: true,
