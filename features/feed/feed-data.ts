@@ -28,7 +28,7 @@ export const feedArticles: FeedArticle[] = [
     date: "Sep 12, 2026",
     readingTime: "12 min",
     company: "Stripe",
-    logo: "https://www.google.com/s2/favicons?domain=stripe.com&sz=128",
+    logo: "/icons/stripe.svg",
     category: "database",
     difficulty: "senior",
     keyPoints: [
@@ -48,7 +48,7 @@ export const feedArticles: FeedArticle[] = [
     date: "Sep 10, 2026",
     readingTime: "8 min",
     company: "Meta",
-    logo: "https://www.google.com/s2/favicons?domain=engineering.fb.com&sz=128",
+    logo: "/icons/meta.svg",
     category: "ai",
     difficulty: "mid",
     keyPoints: [
@@ -69,7 +69,7 @@ export const feedArticles: FeedArticle[] = [
     date: "Sep 8, 2026",
     readingTime: "12 min",
     company: "Cloudflare",
-    logo: "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=128",
+    logo: "/icons/cloudflare.svg",
     category: "networking",
     difficulty: "senior",
     keyPoints: [
@@ -170,7 +170,7 @@ export const feedArticles: FeedArticle[] = [
     date: "Aug 25, 2026",
     readingTime: "8 min",
     company: "GitHub",
-    logo: "https://www.google.com/s2/favicons?domain=github.blog&sz=128",
+    logo: "/icons/github.svg",
     category: "frontend",
     difficulty: "junior",
     keyPoints: [
@@ -210,7 +210,7 @@ export const feedArticles: FeedArticle[] = [
     date: "Aug 20, 2026",
     readingTime: "15 min",
     company: "Cloudflare",
-    logo: "https://www.google.com/s2/favicons?domain=blog.cloudflare.com&sz=128",
+    logo: "/icons/cloudflare.svg",
     category: "platform-engineering",
     difficulty: "senior",
     keyPoints: [
@@ -250,7 +250,7 @@ export const feedArticles: FeedArticle[] = [
     date: "Aug 10, 2026",
     readingTime: "10 min",
     company: "Netflix",
-    logo: "https://www.google.com/s2/favicons?domain=netflix.com&sz=128",
+    logo: "/icons/netflix.svg",
     category: "ai",
     difficulty: "mid",
     keyPoints: [

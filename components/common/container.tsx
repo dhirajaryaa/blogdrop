@@ -10,7 +10,7 @@ function Container({
 }) {
   return (
     <div
-      className={cn("mx-auto min-h-screen w-full max-w-5xl px-10", className)}
+      className={cn("mx-auto min-h-screen w-full max-w-5xl px-6 sm:px-10", className)}
     >
       {children}
     </div>

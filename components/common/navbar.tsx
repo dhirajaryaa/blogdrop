@@ -15,7 +15,7 @@ function Navbar() {
           height={32}
           className="rounded-lg"
         />
-        <span className="text-foreground font-medium">Blogdrop</span>
+        <span className="text-foreground font-medium">BlogDrop</span>
       </Link>
 
       <div className="flex items-center gap-2">
@@ -32,7 +32,7 @@ function Navbar() {
         >
           Login <IconArrowUpRight stroke={2} />
         </Link>
-        <div className="hidden h-7 w-px bg-neutral-300 sm:block" />
+        <div className="bg-border hidden h-7 w-px sm:block" />
         <Link
           href={"/feed"}
           className={buttonVariants({
