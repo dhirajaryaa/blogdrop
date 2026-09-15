@@ -32,7 +32,7 @@ function SidebarLink({
                     "flex items-center gap-3 rounded-xl px-4 py-2",
                     collapsed && "justify-center px-0",
                     active
-                        ? "bg-primary text-background font-medium drop-shadow-sm"
+                        ? "bg-primary text-background dark:text-foreground font-medium drop-shadow-sm"
                         : "text-muted-foreground hover:bg-muted/50 hover:text-foreground",
                 )}
             >
@@ -53,13 +53,13 @@ function Sidebar({
     return (
         <aside
             className={cn(
-                "bg-background/80 sticky top-0 hidden h-screen shrink-0 flex-col border-r backdrop-blur transition-all duration-300 lg:flex",
+                "bg-background/80 sticky top-0 left-0 bg-red-7005 hidden h-screen shrink-0 flex-col border-r backdrop-blur transition-all duration-300 md:flex",
                 collapsed ? "w-16" : "w-60",
             )}
         >
             <div
                 className={cn(
-                    "flex h-16 items-center border-b",
+                    "flex h-14 items-center mt-px border-b",
                     collapsed ? "justify-center" : "px-5",
                 )}
             >
@@ -97,11 +97,11 @@ function Sidebar({
                 ))}
             </nav>
 
-            <div className="border-t px-3 py-3">
+            <div className="border-t px-3 py-3 ">
                 <button
                     onClick={onToggle}
                     className={cn(
-                        "text-muted-foreground hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-xl px-3 py-2 text-sm transition-colors",
+                        "text-muted-foreground hover:bg-muted hover:text-foreground flex w-full items-center gap-3 rounded-xl px-3 py-1 text-sm transition-colors",
                         collapsed && "justify-center px-0",
                     )}
                     aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}

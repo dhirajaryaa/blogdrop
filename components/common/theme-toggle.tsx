@@ -5,7 +5,7 @@ import { useTheme } from "next-themes";
 import { IconMoon, IconSun } from "@tabler/icons-react";
 import { cn } from "@/lib/utils";
 
-const emptySubscribe = () => () => {};
+const emptySubscribe = () => () => { };
 const serverValue = false;
 const clientValue = true;
 
@@ -22,10 +22,10 @@ export function ThemeToggle() {
       type="button"
       aria-label="Toggle theme"
       onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-      className="text-muted-foreground hover:text-foreground rounded-xl p-2 transition-colors"
+      className="text-muted-foreground hover:text-foreground rounded-xl p-2 transition-colors "
     >
       {!mounted ? (
-        <span className="block size-[19px]" />
+        <span className="block size-4.75" />
       ) : resolvedTheme === "dark" ? (
         <IconSun size={19} stroke={1.75} />
       ) : (
@@ -37,6 +37,7 @@ export function ThemeToggle() {
 
 export function ThemeSwitch({ className }: { className?: string }) {
   const { resolvedTheme, setTheme } = useTheme();
+
   const mounted = useSyncExternalStore(
     emptySubscribe,
     () => clientValue,

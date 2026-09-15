@@ -11,36 +11,46 @@ type TopbarUser = {
 };
 
 export function Topbar({ user }: { user?: TopbarUser }) {
+  
   const initials = (user?.name || user?.email || "?")
     .slice(0, 2)
     .toUpperCase();
 
   return (
     <header className="bg-background/80 sticky top-0 z-20 border-b backdrop-blur">
-      <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between gap-4 px-6 sm:px-10">
-        <Link href="/" className="flex items-center lg:hidden">
+      <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 px-6 sm:px-10">
+        <Link href="/" className="flex items-center md:hidden min-w-8 h-8">
           <Image
             src="/logo.png"
             alt="BlogDrop"
             width={26}
             height={26}
             loading="lazy"
-            className="rounded-lg"
+            className="rounded-lg size-8 object-contain"
           />
         </Link>
 
-        <button
-          type="button"
-          className="text-muted-foreground flex h-9 w-full max-w-sm items-center gap-2 rounded-xl border px-3 text-sm transition-colors hover:bg-muted/50"
-        >
-          <IconSearch size={16} stroke={1.75} />
-          <span className="text-muted-foreground/80">Search articles…</span>
-          <kbd className="font-mono text-muted-foreground/70 ml-auto hidden rounded-md bg-muted px-1.5 py-0.5 text-[10px] sm:block">
-            ⌘K
+        {/* search  */}
+        <div className="relative w-full max-w-sm">
+          <IconSearch
+            size={16}
+            stroke={1.75}
+            className="text-muted-foreground/70 pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+          />
+          <input
+            type="search"
+            aria-label="Search articles"
+            placeholder="Search articles…"
+            className="text-muted-foreground flex h-9 w-full max-w-sm items-center gap-2 rounded-xl border bg-transparent px-3 pl-9 text-sm transition-colors placeholder:text-muted-foreground/80 hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
+          />
+          <kbd className="font-mono text-muted-foreground/70 absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-md bg-muted px-1.5 py-0.5 text-[10px] sm:block">
+            ⌘ K
           </kbd>
-        </button>
+        </div>
 
         <div className="flex items-center gap-3">
+
+          {/* saved  */}
           <Link
             href="/saved"
             title="Saved"
@@ -50,10 +60,12 @@ export function Topbar({ user }: { user?: TopbarUser }) {
             <IconBookmark size={19} stroke={1.75} />
           </Link>
 
+          {/* theme  */}
           <ThemeToggle />
 
+          {/* profile  */}
           <Link href="/profile" title="Profile" aria-label="Profile">
-            <Avatar size="sm">
+            <Avatar >
               <AvatarImage src={user?.image ?? undefined} />
               <AvatarFallback>{initials}</AvatarFallback>
             </Avatar>
