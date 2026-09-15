@@ -1,11 +1,18 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IconArrowUpRight } from "@tabler/icons-react";
+import { IconArrowRight } from "@tabler/icons-react";
 import { formatDate } from "@/features/article/format-date";
+import { cn } from "@/lib/utils";
+
+const difficultyStyles: Record<string, string> = {
+  junior: "border-border text-muted-foreground",
+  mid: "border-primary/30 text-primary",
+  senior: "border-destructive/30 text-destructive",
+};
 
 export type FeedListItem = {
   id: string;
-  slug?: string;
+  slug: string;
   title: string;
   description: string;
   url: string;
@@ -13,17 +20,21 @@ export type FeedListItem = {
   readingTime: string;
   company: string;
   logo: string;
+  difficulty?: "junior" | "mid" | "senior";
+  hideNumber?: boolean;
 };
 
 function FeedRow({ item, index }: { item: FeedListItem; index: number }) {
   return (
     <div className="grid gap-2 sm:grid-cols-[3.5rem_1fr]">
-      <span className="font-mono text-muted-foreground/50 pt-1.5 text-xs">
-        {String(index + 1).padStart(2, "0")}
-      </span>
+      {!item.hideNumber && (
+        <span className="font-mono text-muted-foreground/50 pt-1.5 text-xs">
+          {String(index + 1).padStart(2, "0")}
+        </span>
+      )}
 
       <div>
-        <div className="flex items-center gap-2.5 text-xs text-muted-foreground">
+        <div className="flex flex-wrap items-center gap-2.5 text-xs text-muted-foreground">
           <Image
             src={item.logo}
             alt={item.company}
@@ -37,22 +48,33 @@ function FeedRow({ item, index }: { item: FeedListItem; index: number }) {
           <span>{formatDate(item.date)}</span>
           <span aria-hidden>·</span>
           <span>{item.readingTime} read</span>
+          {item.difficulty && (
+            <span
+              className={cn(
+                "rounded-full border px-2.5 py-0.5 text-[10px]",
+                difficultyStyles[item.difficulty],
+              )}
+            >
+              {item.difficulty.slice(0, 1).toUpperCase() +
+                item.difficulty.slice(1)}
+            </span>
+          )}
         </div>
 
         <h2 className="mt-5 max-w-2xl text-lg leading-snug font-medium tracking-tight text-balance sm:text-xl lg:text-2xl">
           {item.title}
         </h2>
 
-        <p className="text-muted-foreground mt-3 max-w-2xl text-sm leading-7 sm:text-[15px]">
+        <p className="text-muted-foreground mt-3 max-w-2xl text-sm leading-7 sm:text-[15px] sm:line-clamp-2">
           {item.description}
         </p>
 
         <span className="text-muted-foreground mt-6 flex items-center gap-1 text-sm opacity-60 transition-all duration-300 group-hover:opacity-100">
-          {item.slug ? "Open in reader" : "Read article"}
-          <IconArrowUpRight
+          AI summary
+          <IconArrowRight
             stroke={2}
             size={15}
-            className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+            className="transition-transform duration-300 group-hover:translate-x-0.5"
           />
         </span>
       </div>
@@ -80,20 +102,9 @@ function FeedList({ articles }: { articles: FeedListItem[] }) {
             key={article.id}
             className="py-10 first:pt-0 last:pb-0 sm:py-14"
           >
-            {article.slug ? (
-              <Link href={`/read/${article.slug}`} className="group block">
-                <FeedRow item={article} index={index} />
-              </Link>
-            ) : (
-              <a
-                href={article.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group block"
-              >
-                <FeedRow item={article} index={index} />
-              </a>
-            )}
+            <Link href={`/a/${article.slug}`} className="group block">
+              <FeedRow item={article} index={index} />
+            </Link>
           </li>
         ))}
       </ol>
