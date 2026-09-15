@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
+import { IconChevronRight } from "@tabler/icons-react";
 import PreferenceRow from "@/features/settings/components/preference-row";
+import { ThemeSwitch } from "@/components/common/theme-toggle";
 
 export const metadata: Metadata = constructMetadata({
   title: "Settings — BlogDrop",
@@ -28,11 +30,26 @@ export default function SettingsPage() {
       </div>
 
       <div className="mt-16">
+        <SectionLabel>Appearance</SectionLabel>
+        <div className="border-border/70 mt-2 border-y">
+          <div className="flex items-center justify-between gap-6 py-5">
+            <div>
+              <p className="text-sm font-medium">Theme</p>
+              <p className="text-muted-foreground mt-1 text-xs leading-5">
+                Choose between a light or dark reading experience.
+              </p>
+            </div>
+            <ThemeSwitch />
+          </div>
+        </div>
+      </div>
+
+      <div className="mt-12">
         <SectionLabel>Reading</SectionLabel>
-        <div className="divide-border/70 mt-2 divide-y">
+        <div className="divide-border/70 mt-2 divide-y border-y">
           <PreferenceRow
-            title="Open articles in reader"
-            description="Read inside BlogDrop's distraction-free view instead of the original site."
+            title="Open AI brief first"
+            description="Open the AI summary view in BlogDrop instead of jumping straight to the original site."
             defaultPressed
           />
           <PreferenceRow
@@ -50,7 +67,7 @@ export default function SettingsPage() {
 
       <div className="mt-12">
         <SectionLabel>Notifications</SectionLabel>
-        <div className="divide-border/70 mt-2 divide-y">
+        <div className="divide-border/70 mt-2 divide-y border-y">
           <PreferenceRow
             title="Daily digest email"
             description="A short summary of new articles, delivered each morning."
@@ -65,9 +82,31 @@ export default function SettingsPage() {
 
       <div className="mt-12">
         <SectionLabel>Account</SectionLabel>
-        <p className="text-muted-foreground mt-4 text-sm leading-6">
-          Manage your profile, interests and connected accounts. Sign out is
-          handled from your profile.
+        <div className="divide-border/70 mt-2 divide-y border-y">
+          <button
+            type="button"
+            className="group flex w-full items-center gap-3 py-5 text-left text-sm"
+          >
+            <span className="font-medium">Edit profile</span>
+            <IconChevronRight
+              size={16}
+              className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
+            />
+          </button>
+          <button
+            type="button"
+            className="group flex w-full items-center gap-3 py-5 text-left text-sm"
+          >
+            <span className="text-destructive font-medium">Delete account</span>
+            <IconChevronRight
+              size={16}
+              className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
+            />
+          </button>
+        </div>
+        <p className="text-muted-foreground mt-4 text-xs leading-5">
+          Deleting your account permanently removes your saved articles and
+          reading preferences.
         </p>
       </div>
     </div>

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { IconArrowRight } from "@tabler/icons-react";
+import { IconArrowRight, IconArrowUpRight } from "@tabler/icons-react";
 import { formatDate } from "@/features/article/format-date";
 import { cn } from "@/lib/utils";
 
@@ -102,9 +102,21 @@ function FeedList({ articles }: { articles: FeedListItem[] }) {
             key={article.id}
             className="py-10 first:pt-0 last:pb-0 sm:py-14"
           >
-            <Link href={`/a/${article.slug}`} className="group block">
-              <FeedRow item={article} index={index} />
-            </Link>
+            <div className="relative">
+              <Link href={`/a/${article.slug}`} className="group block">
+                <FeedRow item={article} index={index} />
+              </Link>
+
+              <a
+                href={article.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open the original article on ${article.company}`}
+                className="text-muted-foreground hover:text-foreground border-border/80 hover:border-foreground/30 absolute right-0 top-0 hidden h-8 w-8 items-center justify-center rounded-full border bg-background/60 backdrop-blur transition-colors sm:inline-flex"
+              >
+                <IconArrowUpRight size={14} stroke={2} />
+              </a>
+            </div>
           </li>
         ))}
       </ol>

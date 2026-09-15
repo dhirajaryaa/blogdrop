@@ -26,5 +26,11 @@ const demoInterests = [
 ];
 
 export default function ProfilePage() {
-  return <ProfileView user={demoUser} interests={demoInterests} />;
+  return (
+    <ProfileView
+      user={demoUser}
+      interests={demoInterests}
+      stats={{ saved: 4, interests: demoInterests.length, following: 12 }}
+    />
+  );
 }

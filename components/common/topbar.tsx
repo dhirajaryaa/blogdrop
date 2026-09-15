@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { IconBookmark, IconSearch } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { ThemeToggle } from "./theme-toggle";
 
 type TopbarUser = {
   name?: string | null;
@@ -48,6 +49,8 @@ export function Topbar({ user }: { user?: TopbarUser }) {
           >
             <IconBookmark size={19} stroke={1.75} />
           </Link>
+
+          <ThemeToggle />
 
           <Link href="/profile" title="Profile" aria-label="Profile">
             <Avatar size="sm">

@@ -15,12 +15,22 @@ type ProfileUser = {
   createdAt?: Date | string | null;
 };
 
+type ProfileStats = {
+  saved?: number;
+  interests?: number;
+  following?: number;
+};
+
+const experienceOptions = ["Junior", "Mid", "Senior"];
+
 function ProfileView({
   user,
   interests,
+  stats,
 }: {
   user?: ProfileUser;
   interests: { name: string; slug: string }[];
+  stats?: ProfileStats;
 }) {
   const { name, email, image, about, experienceLevel, createdAt } = user ?? {};
   const initials = (name || email || "?").slice(0, 2).toUpperCase();
@@ -28,6 +38,12 @@ function ProfileView({
   const experience = experienceLevel
     ? experienceLevel.charAt(0).toUpperCase() + experienceLevel.slice(1)
     : null;
+
+  const statItems = [
+    { label: "Saved", value: stats?.saved ?? 4 },
+    { label: "Interests", value: stats?.interests ?? interests.length },
+    { label: "Following", value: stats?.following ?? 12 },
+  ];
 
   return (
     <div className="mx-auto w-full max-w-2xl">
@@ -66,7 +82,92 @@ function ProfileView({
         </p>
       )}
 
-      <div className="mt-12">
+      <div className="divide-border/70 mt-10 grid grid-cols-3 divide-x border-y">
+        {statItems.map((stat) => (
+          <div key={stat.label} className="flex flex-col items-center gap-1 py-6">
+            <span className="text-xl font-medium tracking-tight">
+              {stat.value}
+            </span>
+            <span className="text-muted-foreground text-xs">{stat.label}</span>
+          </div>
+        ))}
+      </div>
+
+      <div className="mt-14">
+        <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
+          Edit profile
+        </p>
+        <div className="mt-4 space-y-5">
+          <div className="grid gap-5 sm:grid-cols-2">
+            <div>
+              <label className="text-muted-foreground mb-2 block text-xs">
+                Name
+              </label>
+              <input
+                defaultValue={name ?? ""}
+                className="border-border/70 focus:ring-ring/50 h-11 w-full rounded-xl border bg-transparent px-4 text-sm outline-none focus:ring-2"
+                placeholder="Your name"
+              />
+            </div>
+            <div>
+              <label className="text-muted-foreground mb-2 block text-xs">
+                Email
+              </label>
+              <input
+                defaultValue={email ?? ""}
+                type="email"
+                className="border-border/70 focus:ring-ring/50 h-11 w-full rounded-xl border bg-transparent px-4 text-sm outline-none focus:ring-2"
+                placeholder="you@example.com"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label className="text-muted-foreground mb-2 block text-xs">
+              About
+            </label>
+            <textarea
+              defaultValue={about ?? ""}
+              rows={3}
+              className="border-border/70 focus:ring-ring/50 w-full resize-none rounded-xl border bg-transparent px-4 py-3 text-sm leading-6 outline-none focus:ring-2"
+              placeholder="Tell readers about yourself…"
+            />
+          </div>
+
+          <div>
+            <label className="text-muted-foreground mb-2 block text-xs">
+              Experience level
+            </label>
+            <div className="flex flex-wrap items-center gap-2">
+              {experienceOptions.map((option) => {
+                const active = option === (experience ?? "Senior");
+                return (
+                  <button
+                    key={option}
+                    type="button"
+                    className={
+                      active
+                        ? "border-primary bg-primary text-primary-foreground rounded-full border px-4 py-1.5 text-xs"
+                        : "border-border/80 hover:bg-muted/40 rounded-full border px-4 py-1.5 text-xs text-muted-foreground transition-colors"
+                    }
+                  >
+                    {option}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+
+          <button
+            type="button"
+            className="bg-primary text-primary-foreground rounded-lg px-5 py-2.5 text-sm font-medium"
+          >
+            Save changes
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-14">
         <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
           Your interests
         </p>
