@@ -1,5 +1,5 @@
 import Parser from "rss-parser"
-import { convertInIsoDate } from "@/utils/format-date";
+import { convertInIsoDate } from "@/features/article/format-date";
 
 type FeedArticle = {
     title: string,

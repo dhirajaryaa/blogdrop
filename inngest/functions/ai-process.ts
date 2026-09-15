@@ -2,10 +2,10 @@ import { db } from "@/db";
 import { inngest, IngestResult } from "../client";
 import { article, articleMetaData, aiUsage, tag, category, articleTag, articleCategory } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
-import { calculateReadingTime } from "@/lib/harvester/reading-time";
-import { llmGeneration } from "@/lib/ai";
-import { categoriesMapping, tagsMapping } from "@/lib/harvester/tag-mapping";
-import { userInterests } from "@/config/tags";
+import { calculateReadingTime } from "@/features/harvester/reading-time";
+import { llmGeneration } from "@/features/ai/";
+import { categoriesMapping, tagsMapping } from "@/features/harvester/tag-mapping";
+import { userTags } from "@/config/tags";
 import { articleCategories } from "@/config/category";
 
 export const articleAIProcessing = inngest.createFunction({
@@ -123,7 +123,7 @@ export const articleAIProcessing = inngest.createFunction({
 
                     //* tag create-save */
 
-                    const selectedTags = userInterests.filter((interest) =>
+                    const selectedTags = userTags.filter((interest) =>
                         canonicalTags.includes(interest.value)
                     );
 

@@ -2,8 +2,8 @@ import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { article, source } from "@/db/schema";
 import { and, eq, isNotNull } from "drizzle-orm";
-import { fetchRSS } from "@/lib/harvester/feed-process";
-import { buildArticleSlug } from "@/utils/slug";
+import { fetchRSS } from "@/features/harvester/feed-process";
+import { buildArticleSlug } from "@/features/article/slugCreate";
 
 export const sourceScan = inngest.createFunction(
     {

@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { authClient } from "@/lib/auth/auth-client";
-import { authCallbackPath } from "@/config/constant";
+import { authClient } from "@/features/auth/lib/auth-client";
+import { authCallbackPath } from "@/features/auth/config";
 import { IconBrandGithub, IconBrandGoogleFilled } from "@tabler/icons-react";
 import { toast } from "sonner";
 

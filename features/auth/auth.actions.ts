@@ -1,6 +1,6 @@
 "use server";
 
-import { auth } from "./auth";
+import { auth } from "@/features/auth/lib/auth";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 
@@ -17,7 +17,7 @@ export async function ensureAuthUser() {
     const user = await getCurrentUser();
 
     if (!user) redirect("/auth/login");
-    
+
 
     if (!user.onboarded) {
         redirect("/onboarding");

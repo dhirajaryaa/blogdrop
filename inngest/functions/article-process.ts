@@ -2,8 +2,8 @@ import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { article } from "@/db/schema";
 import { eq } from "drizzle-orm";
-import { extractArticleContent } from "@/lib/harvester/extract-article";
-import { convertHtmlToMarkdown } from "@/lib/harvester/html-markdown";
+import { extractArticleContent } from "@/features/harvester/extract-article";
+import { convertHtmlToMarkdown } from "@/features/harvester/html-markdown";
 
 export const FETCH_TIMEOUT_MS = 15_000;
 
@@ -30,8 +30,10 @@ export const articleProcessing = inngest.createFunction({
         //? step 1: fetch article content
         const response = await step.fetch(articleUrl, {
             redirect: "follow",
-            headers: { "User-Agent": USER_AGENT,
-                "Accept": "text/html,application/xhtml+xml" },
+            headers: {
+                "User-Agent": USER_AGENT,
+                "Accept": "text/html,application/xhtml+xml"
+            },
             signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
         });
 

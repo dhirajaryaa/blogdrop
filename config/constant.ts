@@ -6,7 +6,6 @@ const githubIssues = "https://github.com/dhirajaryaa/blogdrop/issues"
 const twitterLink = "https://x.com/dhirajarya01"
 const linkedinLink = "https://linkedin.com/in/dhirajarya"
 const earlyAccessFormLink = "https://forms.gle/d4tk9RwVmGqHcjTk8"
-const authCallbackPath = "/auth/callback"
 const siteUrl = process.env.BETTER_AUTH_URL!
 
 
@@ -19,6 +18,5 @@ export {
   twitterLink,
   linkedinLink,
   earlyAccessFormLink,
-  authCallbackPath,
   siteUrl
 }

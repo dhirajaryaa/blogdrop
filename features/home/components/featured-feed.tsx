@@ -1,5 +1,5 @@
 import { IconArrowDown, IconArrowRight } from "@tabler/icons-react";
-import ArticleBanner from "@/components/common/article-banner";
+import ArticleBanner from "@/features/article/components/article-banner";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 

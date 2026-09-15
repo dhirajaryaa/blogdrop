@@ -1,7 +1,7 @@
 import Container from "@/components/common/container"
 import GoBackBtn from "@/components/common/go-back"
 import Logo from "@/components/common/logo"
-import InterestSelect from "@/components/onboarding/interest-select"
+import InterestSelect from "@/features/onboarding/components/interest-select"
 
 function OnboardingPage() {
     return (

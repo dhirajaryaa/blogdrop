@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import { ArticleMetaData, metadataJsonSchema, metadataSchema } from "./schema";
+import { ArticleMetaData, metadataJsonSchema, metadataSchema } from "./ai.schema";
 import { PROMPT } from "./prompt";
 
 
