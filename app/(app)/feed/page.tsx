@@ -20,7 +20,7 @@ export default function FeedPage() {
           <h1 className="mt-4 text-2xl sm:text-3xl leading-tight font-medium tracking-tight text-balance">
             Engineering stories, thoughtfully collected.
           </h1>
-          <p className="text-muted-foreground mt-2 text-sm leading-7 sm:text-base">
+          <p className="text-muted-foreground mt-2 text-sm leading-7 ">
             Hand-picked articles from the teams building the web — new posts
             from the engineering blogs you care about.
           </p>
