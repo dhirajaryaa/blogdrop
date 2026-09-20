@@ -8,9 +8,9 @@ import { formatDate } from "@/features/article/format-date";
 import { cn } from "@/lib/utils";
 
 const difficultyStyles: Record<string, string> = {
-  junior: "border-border text-muted-foreground bg-muted/30",
-  mid: "border-primary/30 text-primary bg-primary/30",
-  senior: "border-destructive/30 text-destructive bg-destructive/30",
+  junior: "border-border text-muted-foreground",
+  mid: "border-primary/30 text-primary ",
+  senior: "border-destructive/30 text-destructive ",
 };
 
 //? feed row
