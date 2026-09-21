@@ -5,7 +5,7 @@ export type FeedInputProps = {
 };
 
 //* feed type */
-export type FeedArticle = {
+export interface FeedArticle {
   id: string;
   slug: string;
   title: string;

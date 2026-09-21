@@ -22,7 +22,7 @@ const options: FeedFilterOption[] = [
 ];
 
 //! loading state
-function ArticleLoading() {
+export function ArticleLoading() {
   return (
     <div className="flex w-full items-center justify-center pt-14 sm:pt-24 md:pt-40">
       <IconLoader2 className="text-muted-foreground size-8 animate-spin" />

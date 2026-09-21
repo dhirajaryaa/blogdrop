@@ -25,7 +25,8 @@ export default function FeedPage() {
             from the engineering blogs you care about.
           </p>
         </div>
-      </section>
+          </section>
+          {/*list articles */}
       <FeedView />
     </Container>
   </>
