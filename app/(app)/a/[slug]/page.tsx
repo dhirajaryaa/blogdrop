@@ -4,6 +4,7 @@ import ArticleReader from "@/features/article-reader/reader";
 import { FeedError } from "@/features/feed/components/feed-list";
 import { ArticleLoading } from "@/features/feed/components/feed-view";
 import { Suspense } from "react";
+import Container from "@/components/common/container";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -23,14 +24,14 @@ async function ArticleReaderPage({ params }: Props) {
   // generate metadata
 
   return (
-    <div className="mx-auto max-w-3xl px-8">
+    <Container className="max-w-3xl px-8">
       <div className="mt-8 sm:mt-12">
         <GoBackBtn text />
       </div>
       <Suspense fallback={<ArticleLoading />}>
-        <ArticleReader article={data.success && data.data} />
+        <ArticleReader article={data.data} />
       </Suspense>
-    </div>
+    </Container>
   );
 }
 

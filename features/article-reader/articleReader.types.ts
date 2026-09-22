@@ -11,4 +11,5 @@ export interface ArticleDetails extends FeedArticle {
   keyTakeaways: string[] | null;
   whyRead: string | null;
   bannerImg: string | null;
+  isSaved: boolean;
 }

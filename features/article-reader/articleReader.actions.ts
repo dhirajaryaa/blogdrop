@@ -1,8 +1,9 @@
 import { AppResponse } from "@/lib/types";
 import { ArticleDetails } from "./articleReader.types";
-import { article, articleCategory, articleMetaData, articleTag, category, source, tag } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { article, articleCategory, articleMetaData, articleTag, bookmark, category, source, tag } from "@/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
+import { getCurrentUser } from "@/features/auth/auth.actions";
 
 export async function getArticleWithSlug(
   slug: string,
@@ -80,8 +81,31 @@ export async function getArticleWithSlug(
         eq(articleMetaData.articleId, article.id)
       )
       .where(eq(article.slug, slug));
-    
-      return { success: true, data };
+
+    if (!data) {
+      return {
+        success: false,
+        reason: "Article not found",
+      };
+    }
+
+    //* check if the current user saved this article
+    let isSaved = false;
+    const authUser = await getCurrentUser();
+
+    if (authUser) {
+      const [saved] = await db
+        .select({ id: bookmark.id })
+        .from(bookmark)
+        .where(
+          and(eq(bookmark.articleId, data.id), eq(bookmark.userId, authUser.id)),
+        )
+        .limit(1);
+
+      isSaved = Boolean(saved);
+    }
+
+    return { success: true, data: { ...data, isSaved } };
       
   } catch (error) {
     console.error("Error fetching public feed:", error);
