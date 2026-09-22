@@ -14,6 +14,7 @@ import {
 } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { cn } from "@/lib/utils";
+import { userTags } from "@/config/tags";
 import type { ProfileData, ProfileInterest } from "../profile.types";
 import {
   addTag,
@@ -156,6 +157,7 @@ function ProfileView({ data }: { data: ProfileData }) {
       router.refresh();
     });
   };
+
 
   return (
     <div>

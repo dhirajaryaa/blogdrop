@@ -48,7 +48,7 @@ function FeedRow({
           <span>{formatDate(item.publishDate)}</span>
           {!minimal && (
             <>
-              <span aria-hidden>·</span>
+              <span aria-hidden className="hidden sm:inline">·</span>
               <span className="hidden sm:inline">{item.readingTime} read</span>
             </>
           )}
@@ -96,6 +96,8 @@ function FeedRow({
     </div>
   );
 }
+
+export { FeedError } from "./feed-error";
 
 export function FeedList({
   articles,

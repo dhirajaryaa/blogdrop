@@ -5,10 +5,35 @@ import { FeedError } from "@/features/feed/components/feed-list";
 import { ReaderSkeleton } from "@/components/skeletons";
 import { Suspense } from "react";
 import Container from "@/components/common/container";
+import { constructMetadata } from "@/lib/utils";
+import type { Metadata } from "next";
 
 type Props = {
   params: Promise<{ slug: string }>;
 };
+
+//* per-article SEO: og + twitter image from article banner
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+
+  const data = await getArticleWithSlug(slug);
+
+  if (!data.success || !data.data) {
+    return constructMetadata({
+      title: "Article not found",
+      description: "This article could not be found on BlogDrop.",
+      noIndex: true,
+    });
+  }
+
+  const article = data.data;
+
+  return constructMetadata({
+    title: article.title,
+
+
+  });
+}
 
 async function ArticleReaderPage({ params }: Props) {
   //* get article form slug
@@ -19,9 +44,6 @@ async function ArticleReaderPage({ params }: Props) {
   if (!data.success) {
     return <FeedError />;
   }
-
-  // render on ui
-  // generate metadata
 
   return (
     <Container className="max-w-3xl px-8">

@@ -1,4 +1,4 @@
-import ErrorView from "./error-view";
+import ErrorView from "@/components/common/error-view";
 
 //? feed-load (backwards-compatible re-export so existing feed imports keep working)
 function FeedErrorView() {
@@ -7,4 +7,4 @@ function FeedErrorView() {
 
 export { FeedErrorView as FeedError };
 
-export { default } from "./error-view";
+export { default } from "@/components/common/error-view";
