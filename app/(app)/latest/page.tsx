@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
 import { FeedList, FeedError } from "@/features/feed/components/feed-list";
 import { getLatestFeed } from "@/features/feed/feed.actions";
+import { ArticleListSkeleton } from "@/components/skeletons";
 import Container from "@/components/common/container";
+import { Suspense } from "react";
 
 export const metadata: Metadata = constructMetadata({
   title: "Latest — BlogDrop",
@@ -10,13 +12,17 @@ export const metadata: Metadata = constructMetadata({
     "The newest engineering articles from across the web, sorted by publish date.",
 });
 
-export default async function LatestPage() {
+async function LatestFeed() {
   const result = await getLatestFeed({ limit: 30, offset: 0 });
 
   if (!result.success) {
     return <FeedError />;
   }
 
+  return <FeedList articles={result.data} />;
+}
+
+export default function LatestPage() {
   return (
     <Container className="max-w-3xl min-h-screen">
       <div className="mt-10 mb-6 flex flex-col gap-8">
@@ -34,7 +40,9 @@ export default async function LatestPage() {
         </div>
       </div>
 
-      <FeedList articles={result.data} />
+      <Suspense fallback={<ArticleListSkeleton />}>
+        <LatestFeed />
+      </Suspense>
     </Container>
   );
 }

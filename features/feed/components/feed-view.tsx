@@ -7,6 +7,7 @@ import FeedFilter from "./feed-filter";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FeedList, FeedError } from "./feed-list";
 import { getPublicFeed } from "../feed.actions";
+import { ArticleListSkeleton } from "@/components/skeletons";
 import { IconLoader2 } from "@tabler/icons-react";
 
 export type FeedFilterOption = {
@@ -27,15 +28,6 @@ const options: FeedFilterOption[] = [
 ];
 
 const PAGE_SIZE = 20;
-
-//! loading state
-export function ArticleLoading() {
-  return (
-    <div className="flex w-full items-center justify-center pt-14 sm:pt-24 md:pt-40">
-      <IconLoader2 className="text-muted-foreground size-8 animate-spin" />
-    </div>
-  );
-}
 
 function FeedView() {
   const router = useRouter();
@@ -119,7 +111,7 @@ function FeedView() {
       </ScrollArea>
 
       {isPending ? (
-        <ArticleLoading />
+        <ArticleListSkeleton />
       ) : (
         <>
           <FeedList articles={articles} />

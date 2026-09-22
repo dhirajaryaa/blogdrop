@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
 import FeedView from "@/features/feed/components/feed-view";
 import Container from "@/components/common/container";
+import { ArticleListSkeleton } from "@/components/skeletons";
 import { Suspense } from "react";
 
 export const metadata: Metadata = constructMetadata({
@@ -28,7 +29,7 @@ export default function FeedPage() {
         </div>
       </section>
       {/*list articles */}
-      <Suspense>
+      <Suspense fallback={<ArticleListSkeleton />}>
         <FeedView />
       </Suspense>
     </Container>
