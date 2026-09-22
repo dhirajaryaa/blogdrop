@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   IconBrandGithub,
   IconBrandLinkedin,
@@ -23,12 +24,12 @@ export function Footer() {
             About
           </a>
 
-          <a
+          <Link
             href="/sources"
             className="hover:text-foreground transition-colors"
           >
             Sources
-          </a>
+          </Link>
 
           <a
             href="https://github.com/dhirajaryaa/blogdrop"
