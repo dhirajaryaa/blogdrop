@@ -1,5 +1,6 @@
 const email = "dhirajarya.ptn@gmail.com"
 const contactEmail = "dhirajarya.ptn@gmail.com"
+const requestEmail = "request@blogdrop.in"
 const githubProfile = "https://github.com/dhirajaryaa"
 const githubRepo = "https://github.com/dhirajaryaa/blogdrop"
 const githubIssues = "https://github.com/dhirajaryaa/blogdrop/issues"
@@ -12,6 +13,7 @@ const siteUrl = process.env.BETTER_AUTH_URL!
 export {
   email,
   contactEmail,
+  requestEmail,
   githubProfile,
   githubRepo,
   githubIssues,

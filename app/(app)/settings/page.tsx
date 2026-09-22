@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
 import { IconChevronRight } from "@tabler/icons-react";
 import { ThemeSwitch } from "@/components/common/theme-toggle";
+import { githubIssues, requestEmail } from "@/config/constant";
 import Container from "@/components/common/container";
 
 export const metadata: Metadata = constructMetadata({
@@ -50,7 +51,7 @@ export default function SettingsPage() {
         <SectionLabel>Account</SectionLabel>
         <div className="divide-border/70 mt-2 divide-y border-y">
           <a
-            href="mailto:request@blogdrop.in"
+            href={`mailto:${requestEmail}`}
             className="group flex w-full items-center gap-3 py-5 text-left text-sm"
           >
             <span className="font-medium">Request a source</span>
@@ -60,7 +61,7 @@ export default function SettingsPage() {
             />
           </a>
           <a
-            href="https://github.com/dhirajaryaa/blogdrop/issues"
+            href={githubIssues}
             target="_blank"
             rel="noopener noreferrer"
             className="group flex w-full items-center gap-3 py-5 text-left text-sm"
