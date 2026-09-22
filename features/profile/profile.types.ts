@@ -21,6 +21,8 @@ export type ProfileUser = {
 export type ProfileData = {
   user: ProfileUser | null;
   interests: ProfileInterest[];
+  tags: string[];
+  allCategories: ProfileInterest[];
   stats: ProfileStats;
 };
 

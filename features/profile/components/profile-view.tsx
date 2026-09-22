@@ -1,18 +1,26 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
   IconBookmark,
   IconChevronRight,
   IconPencil,
+  IconPlus,
   IconSettings,
+  IconX,
 } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import type { ProfileData } from "../profile.types";
-import { updateProfile } from "../profile.actions";
+import { cn } from "@/lib/utils";
+import type { ProfileData, ProfileInterest } from "../profile.types";
+import {
+  addTag,
+  removeTag,
+  toggleCategory,
+  updateProfile,
+} from "../profile.actions";
 
 const experienceOptions: { value: string; label: string }[] = [
   { value: "junior", label: "Junior" },
@@ -22,7 +30,7 @@ const experienceOptions: { value: string; label: string }[] = [
 
 function ProfileView({ data }: { data: ProfileData }) {
   const router = useRouter();
-  const { user, interests, stats } = data;
+  const { user, interests: initialInterests, tags: initialTags, allCategories, stats } = data;
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -31,6 +39,12 @@ function ProfileView({ data }: { data: ProfileData }) {
   const [experienceLevel, setExperienceLevel] = useState(
     user?.experienceLevel ?? "mid",
   );
+
+  const [editingInterests, setEditingInterests] = useState(false);
+  const [interests, setInterests] = useState<ProfileInterest[]>(initialInterests);
+  const [tags, setTags] = useState<string[]>(initialTags);
+  const [tagInput, setTagInput] = useState("");
+  const [isToggling, startToggling] = useTransition();
 
   const initials = (user?.name || user?.email || "?").slice(0, 2).toUpperCase();
   const memberSince = user?.createdAt
@@ -84,6 +98,63 @@ function ProfileView({ data }: { data: ProfileData }) {
     } finally {
       setSaving(false);
     }
+  };
+
+  const handleToggleInterest = (slug: string) => {
+    startToggling(async () => {
+      const selected = interests.some((i) => i.slug === slug);
+
+      setInterests((prev) =>
+        selected
+          ? prev.filter((i) => i.slug !== slug)
+          : [...prev, { slug, name: slug }],
+      );
+
+      const res = await toggleCategory(slug);
+
+      if (res.success) {
+        router.refresh();
+      } else {
+        toast.error(res.reason || "Failed to update interests");
+        router.refresh();
+      }
+    });
+  };
+
+  const handleAddTag = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const value = tagInput.trim();
+
+    if (!value) return;
+    if (tags.includes(value)) {
+      setTagInput("");
+      return;
+    }
+
+    setTagInput("");
+    setTags((prev) => [...prev, value]);
+
+    startToggling(async () => {
+      const res = await addTag(value);
+
+      if (!res.success) {
+        toast.error(res.reason || "Failed to add tag");
+      }
+      router.refresh();
+    });
+  };
+
+  const handleRemoveTag = (value: string) => {
+    setTags((prev) => prev.filter((tag) => tag !== value));
+
+    startToggling(async () => {
+      const res = await removeTag(value);
+
+      if (!res.success) {
+        toast.error(res.reason || "Failed to remove tag");
+      }
+      router.refresh();
+    });
   };
 
   return (
@@ -243,20 +314,60 @@ function ProfileView({ data }: { data: ProfileData }) {
       )}
 
       <div className="mt-14">
-        <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
-          Your interests
-        </p>
-        <div className="mt-4 flex flex-wrap gap-2">
-          {interests.length === 0 ? (
-            <p className="text-muted-foreground text-sm">
-              No interests yet —{" "}
-              <Link href="/explore" className="text-foreground underline">
-                pick a topic
-              </Link>
-              .
-            </p>
-          ) : (
-            interests.map((interest) => (
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
+            Your interests
+          </p>
+          <button
+            type="button"
+            onClick={() => setEditingInterests((prev) => !prev)}
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
+          >
+            <IconPencil size={13} stroke={1.75} />
+            {editingInterests ? "Done" : "Edit"}
+          </button>
+        </div>
+
+        {editingInterests ? (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {allCategories.map((interest) => {
+              const active = interests.some(
+                (item) => item.slug === interest.slug,
+              );
+
+              return (
+                <button
+                  key={interest.slug}
+                  type="button"
+                  onClick={() => handleToggleInterest(interest.slug)}
+                  disabled={isToggling}
+                  className={cn(
+                    "rounded-full border px-4 py-1.5 text-xs transition-colors",
+                    active
+                      ? "border-primary bg-primary text-primary-foreground"
+                      : "border-border/80 hover:bg-muted/40 text-muted-foreground",
+                  )}
+                >
+                  {interest.name}
+                </button>
+              );
+            })}
+          </div>
+        ) : interests.length === 0 ? (
+          <p className="text-muted-foreground mt-4 text-sm">
+            No interests yet —{" "}
+            <button
+              type="button"
+              onClick={() => setEditingInterests(true)}
+              className="text-foreground underline"
+            >
+              pick a topic
+            </button>
+            .
+          </p>
+        ) : (
+          <div className="mt-4 flex flex-wrap gap-2">
+            {interests.map((interest) => (
               <Link
                 key={interest.slug}
                 href={`/feed?topic=${interest.slug}`}
@@ -264,9 +375,62 @@ function ProfileView({ data }: { data: ProfileData }) {
               >
                 {interest.name}
               </Link>
-            ))
-          )}
+            ))}
+          </div>
+        )}
+      </div>
+
+      <div className="mt-14">
+        <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
+          Your tags
+        </p>
+
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          {tags.map((tag) => (
+            <span
+              key={tag}
+              className="border-border/80 bg-muted/30 flex items-center gap-1.5 rounded-full border py-1.5 pr-2 pl-4 text-xs"
+            >
+              {tag}
+              <button
+                type="button"
+                onClick={() => handleRemoveTag(tag)}
+                disabled={isToggling}
+                aria-label={`Remove tag ${tag}`}
+                className="text-muted-foreground hover:text-foreground rounded-full p-0.5 transition-colors"
+              >
+                <IconX size={12} stroke={2} />
+              </button>
+            </span>
+          ))}
+
+          <form
+            onSubmit={handleAddTag}
+            className="flex items-center gap-1.5 rounded-full border border-dashed py-1.5 pr-2 pl-4"
+          >
+            <input
+              value={tagInput}
+              onChange={(e) => setTagInput(e.target.value)}
+              placeholder="Add a tag…"
+              aria-label="Tag name"
+              className="text-xs outline-none placeholder:text-muted-foreground/60"
+            />
+            <button
+              type="submit"
+              disabled={isToggling || !tagInput.trim()}
+              className="text-muted-foreground hover:text-foreground disabled:opacity-40 rounded-full p-0.5 transition-colors"
+              aria-label="Add tag"
+            >
+              <IconPlus size={12} stroke={2} />
+            </button>
+          </form>
         </div>
+
+        <p className="text-muted-foreground mt-3 text-xs">
+          {tags.length === 0
+            ? "Add your own tags to mark the topics you care about."
+            : `You've saved ${tags.length} tag${tags.length === 1 ? "" : "s"}.`}
+        </p>
       </div>
 
       <div className="mt-16 border-t">
