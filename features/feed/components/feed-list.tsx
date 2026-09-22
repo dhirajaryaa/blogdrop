@@ -17,9 +17,11 @@ const difficultyStyles: Record<string, string> = {
 function FeedRow({
   item,
   index,
+  minimal = false,
 }: {
   item: FeedArticle & { hideNumber?: boolean };
   index: number;
+  minimal?: boolean;
 }) {
   const logoUrl = `https://www.google.com/s2/favicons?domain=${new URL(item.originalUrl).hostname}&sz=128`;
 
@@ -60,15 +62,25 @@ function FeedRow({
         </div>
 
         <h2
-          className="mt-5 line-clamp-1 max-w-2xl text-lg leading-snug font-medium tracking-tight text-balance sm:line-clamp-2 sm:text-xl lg:text-2xl"
+          className={cn(
+            "line-clamp-1 max-w-2xl text-lg leading-snug font-medium tracking-tight text-balance sm:line-clamp-2 sm:text-xl lg:text-2xl",
+            minimal ? "mt-3" : "mt-5",
+          )}
           dangerouslySetInnerHTML={{ __html: item.title }}
         />
 
-        <p className="text-muted-foreground mt-3 line-clamp-2 max-w-2xl text-sm leading-7 sm:text-[15px]">
-          {item.summary}
-        </p>
+        {!minimal && (
+          <p className="text-muted-foreground mt-3 line-clamp-2 max-w-2xl text-sm leading-7 sm:text-[15px]">
+            {item.summary}
+          </p>
+        )}
 
-        <span className="text-muted-foreground mt-6 flex items-center justify-start gap-1 text-sm opacity-60 transition-all duration-300 group-hover:opacity-100">
+        <span
+          className={cn(
+            "text-muted-foreground mt-6 flex items-center justify-start gap-1 text-sm opacity-60 transition-all duration-300 group-hover:opacity-100",
+            minimal && "mt-3 text-xs",
+          )}
+        >
           AI summary
           <IconArrowRight
             stroke={2}
@@ -96,7 +108,13 @@ export function FeedError() {
   );
 }
 
-export function FeedList({ articles }: { articles: FeedArticle[] }) {
+export function FeedList({
+  articles,
+  minimal = false,
+}: {
+  articles: FeedArticle[];
+  minimal?: boolean;
+}) {
   if (articles.length === 0) {
     return (
       <div className="border-border/70 flex flex-col items-start gap-3 border-y py-24">
@@ -112,10 +130,16 @@ export function FeedList({ articles }: { articles: FeedArticle[] }) {
     <div className="mt-6 sm:mt-10">
       <ol className="divide-border/70 divide-y">
         {articles.map((article, index) => (
-          <li key={article.id} className="py-10 first:pt-0 last:pb-0 sm:py-14">
+          <li
+            key={article.id}
+            className={cn(
+              "first:pt-0 last:pb-0",
+              minimal ? "py-8" : "py-10 sm:py-14",
+            )}
+          >
             <div className="relative">
               <Link href={`/a/${article.slug}`} className="group block">
-                <FeedRow item={article} index={index} />
+                <FeedRow item={article} index={index} minimal={minimal} />
               </Link>
               {/*source link */}
               <a

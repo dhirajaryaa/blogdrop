@@ -32,7 +32,7 @@ function SavedList({ articles }: { articles: FeedArticle[] }) {
           </Button>
         </div>
       ) : (
-        <FeedList articles={articles} />
+        <FeedList articles={articles} minimal />
       )}
     </>
   );
