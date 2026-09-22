@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
 import { IconChevronRight } from "@tabler/icons-react";
-import PreferenceRow from "@/features/settings/components/preference-row";
 import { ThemeSwitch } from "@/components/common/theme-toggle";
 import Container from "@/components/common/container";
 
@@ -44,42 +43,6 @@ export default function SettingsPage() {
             </div>
             <ThemeSwitch />
           </div>
-        </div>
-      </div>
-
-      <div className="mt-12">
-        <SectionLabel>Reading</SectionLabel>
-        <div className="divide-border/70 mt-2 divide-y border-y">
-          <PreferenceRow
-            title="Open AI brief first"
-            description="Open the AI summary view in BlogDrop instead of jumping straight to the original site."
-            defaultPressed
-          />
-          <PreferenceRow
-            title="Show reading time"
-            description="Display an estimated reading time on every article."
-            defaultPressed
-          />
-          <PreferenceRow
-            title="Show difficulty"
-            description="Mark articles as junior, mid or senior level."
-            defaultPressed
-          />
-        </div>
-      </div>
-
-      <div className="mt-12">
-        <SectionLabel>Notifications</SectionLabel>
-        <div className="divide-border/70 mt-2 divide-y border-y">
-          <PreferenceRow
-            title="Daily digest email"
-            description="A short summary of new articles, delivered each morning."
-            defaultPressed
-          />
-          <PreferenceRow
-            title="New source alerts"
-            description="Let me know when new engineering blogs are added."
-          />
         </div>
       </div>
 
