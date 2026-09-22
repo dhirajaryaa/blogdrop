@@ -3,6 +3,7 @@ import { account, session } from "./auth-schema";
 import { relations } from "drizzle-orm";
 import { bookmark } from "./article-schema";
 import { userCategory } from "./category-schema";
+import { userTag } from "./tag-schema";
 
 export const user = pgTable("user", {
     id: text("id").primaryKey(),
@@ -24,5 +25,6 @@ export const userRelations = relations(user, ({ many }) => ({
   sessions: many(session),
   accounts: many(account),
   bookmarks : many(bookmark),
-  categories: many(userCategory)
+  categories: many(userCategory),
+  tags: many(userTag)
 }));
