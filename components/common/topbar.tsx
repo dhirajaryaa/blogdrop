@@ -2,6 +2,8 @@ import Link from "next/link";
 import Image from "next/image";
 import { IconBookmark, IconSearch } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
 
 type TopbarUser = {
@@ -63,13 +65,27 @@ export function Topbar({ user }: { user?: TopbarUser }) {
           {/* theme  */}
           <ThemeToggle />
 
-          {/* profile  */}
-          <Link href="/profile" title="Profile" aria-label="Profile">
-            <Avatar >
-              <AvatarImage src={user?.image ?? undefined} />
-              <AvatarFallback>{initials}</AvatarFallback>
-            </Avatar>
-          </Link>
+          {/* profile / login */}
+          {user ? (
+            <Link href="/profile" title="Profile" aria-label="Profile">
+              <Avatar>
+                <AvatarImage src={user.image ?? undefined} />
+                <AvatarFallback>{initials}</AvatarFallback>
+              </Avatar>
+            </Link>
+          ) : (
+            <Link
+              href="/auth/login"
+              className={cn(
+                buttonVariants({
+                  size: "default",
+                  className: "rounded-xl px-4 text-sm font-normal",
+                }),
+              )}
+            >
+              Login
+            </Link>
+          )}
         </div>
       </div>
     </header>
