@@ -5,7 +5,7 @@ import { useInfiniteQuery } from "@tanstack/react-query";
 import { useRouter, useSearchParams } from "next/navigation";
 import FeedFilter from "./feed-filter";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { FeedList, FeedError } from "./feed-list";
+import { FeedList } from "./feed-list";
 import { getPublicFeed } from "../feed.actions";
 import { ArticleListSkeleton } from "@/components/skeletons";
 import { IconLoader2 } from "@tabler/icons-react";
