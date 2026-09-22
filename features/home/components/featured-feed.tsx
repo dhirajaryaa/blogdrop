@@ -1,80 +1,16 @@
 import { IconArrowDown, IconArrowRight } from "@tabler/icons-react";
 import ArticleBanner from "@/features/article/components/article-banner";
+import { formatDate } from "@/features/article/format-date";
+import { getPublicFeed } from "@/features/feed/feed.actions";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
-function FeaturedFeed() {
-  const featuredArticles = [
-    {
-      title: "How Stripe’s Document Databases Support 99.999% Uptime",
-      description:
-        "How Stripe designed its database infrastructure and data movement systems for zero-downtime migrations at scale.",
-      author: "Stripe Engineering",
-      date: "Jun 6, 2024",
-      readingTime: "12 min",
-      company: "Stripe",
-      logo: "https://www.google.com/s2/favicons?domain=stripe.com&sz=128",
-      url: "https://stripe.dev/blog/how-stripes-document-databases-supported-99.999-uptime-with-zero-downtime-data-migrations",
-    },
-    {
-      title: "Recommending Items to More Than a Billion People",
-      description:
-        "How Facebook scaled collaborative filtering across more than a billion users and 100 billion ratings.",
-      author: "Meta Engineering",
-      date: "Jun 2, 2015",
-      readingTime: "8 min",
-      company: "Meta",
-      logo: "https://www.google.com/s2/favicons?domain=engineering.fb.com&sz=128",
-      url: "https://engineering.fb.com/2015/06/02/core-infra/recommending-items-to-more-than-a-billion-people/",
-    },
-    {
-      title:
-        "How We Built Pingora, the Proxy That Connects Cloudflare to the Internet",
-      description:
-        "Inside Cloudflare’s Rust-based proxy architecture, built to handle Internet traffic with better performance and efficiency.",
-      author: "Cloudflare Engineering",
-      date: "Sep 14, 2022",
-      readingTime: "12 min",
-      company: "Cloudflare",
-      logo: "https://www.google.com/s2/favicons?domain=cloudflare.com&sz=128",
-      url: "https://blog.cloudflare.com/how-we-built-pingora-the-proxy-that-connects-cloudflare-to-the-internet/",
-    },
-    {
-      title: "Discord: Why Discord is Switching from Go to Rust",
-      description:
-        "How Discord eliminated latency spikes and GC pauses in their Read States service by rewriting it from Go to Rust.",
-      author: "Discord Engineering",
-      date: "Feb 4, 2020",
-      readingTime: "9 min",
-      company: "Discord",
-      logo: "https://www.google.com/s2/favicons?domain=discord.com&sz=128",
-      url: "https://discord.com/blog/why-discord-is-switching-from-go-to-rust",
-    },
-    {
-      title:
-        "Netflix Information Overload: Machine Learning and Recommendation at Scale",
-      description:
-        "A deep dive into Netflix's multi-layered recommendation system architecture, covering offline model training and real-time inference.",
-      author: "Netflix Technology Blog",
-      date: "Apr 6, 2012",
-      readingTime: "10 min",
-      company: "Netflix",
-      logo: "https://faviconapi.com/cdn/favicons/netflix.com.png",
-      url: "https://netflixtechblog.com/netflix-recommendations-beyond-the-5-stars-part-1-55838468f429",
-    },
-    {
-      title:
-        "How Uber Serves Over 40 Million Reads Per Second Using Integrated Cache",
-      description:
-        "How Uber designed CacheFront, an integrated caching tier built atop Schemaless and Docstore to serve tens of millions of QPS.",
-      author: "Uber Engineering",
-      date: "Oct 27, 2021",
-      readingTime: "9 min",
-      company: "Uber",
-      logo: "https://www.google.com/s2/favicons?domain=uber.com&sz=128",
-      url: "https://www.uber.com/blog/how-uber-serves-over-40-million-reads-per-second-using-integrated-cache/",
-    },
-  ];
+async function FeaturedFeed() {
+  const feed = await getPublicFeed({ limit: 6, offset: 0 });
+
+  if (!feed.success || feed.data.length === 0) {
+    return null;
+  }
 
   return (
     <section className="my-10 space-y-8">
@@ -87,47 +23,49 @@ function FeaturedFeed() {
       </div>
 
       <div className="grid gap-16 sm:grid-cols-2 lg:grid-cols-3">
-        {featuredArticles.slice(0, 6).map((article, index) => (
-          <a
-            key={article.title}
-            href={article.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="group lg:after:bg-border relative cursor-pointer nth-[3n]:after:hidden lg:after:absolute lg:after:inset-y-0 lg:after:-right-8 lg:after:w-px"
-          >
-            <article key={article.title} className="flex h-full flex-col gap-6">
-              {/* Image / Brand Banner */}
-              <ArticleBanner url={article.logo} title={article.company} />
-              {/* Content */}
-              <div className="space-y-2">
-                <h3 className="line-clamp-2 text-lg leading-relaxed font-medium tracking-normal">
-                  {article.title}
-                </h3>
-                <p className="text-muted-foreground line-clamp-3 text-sm leading-6 tracking-normal">
-                  {article.description}
-                </p>
-              </div>
-              {/* { company && date } */}
-              <div className="text-muted-foreground mt-auto flex items-center gap-2 text-xs">
-                <span>{article.author}</span>
-                <span>·</span>
-                <span>{article.date}</span>
-                <IconArrowRight
-                  stroke={2}
-                  className="size-4 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100"
-                />
-              </div>
-            </article>
-          </a>
-        ))}
+        {feed.data.slice(0, 6).map((article) => {
+          const logoUrl = `https://www.google.com/s2/favicons?domain=${new URL(article.originalUrl).hostname}&sz=128`;
+
+          return (
+            <Link
+              key={article.id}
+              href={`/a/${article.slug}`}
+              className="group lg:after:bg-border relative cursor-pointer nth-[3n]:after:hidden lg:after:absolute lg:after:inset-y-0 lg:after:-right-8 lg:after:w-px"
+            >
+              <article className="flex h-full flex-col gap-6">
+                {/* Image / Brand Banner */}
+                <ArticleBanner url={logoUrl} title={article.sourceName} />
+                {/* Content */}
+                <div className="space-y-2">
+                  <h3 className="line-clamp-2 text-lg leading-relaxed font-medium tracking-normal">
+                    {article.title}
+                  </h3>
+                  <p className="text-muted-foreground line-clamp-3 text-sm leading-6 tracking-normal">
+                    {article.summary}
+                  </p>
+                </div>
+                {/* { company && date } */}
+                <div className="text-muted-foreground mt-auto flex items-center gap-2 text-xs">
+                  <span>{article.author}</span>
+                  <span>·</span>
+                  <span>{formatDate(article.publishDate)}</span>
+                  <IconArrowRight
+                    stroke={2}
+                    className="size-4 opacity-100 transition-opacity duration-300 sm:opacity-0 sm:group-hover:opacity-100"
+                  />
+                </div>
+              </article>
+            </Link>
+          );
+        })}
       </div>
       <div className="mt-16 flex items-center justify-center">
-        <a
+        <Link
           href="/feed"
           className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors duration-200 ease-linear"
         >
           Load more <IconArrowDown stroke={2} size={16} />
-        </a>
+        </Link>
       </div>
     </section>
   );
