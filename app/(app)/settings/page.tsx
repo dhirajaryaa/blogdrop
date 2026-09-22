@@ -49,16 +49,28 @@ export default function SettingsPage() {
       <div className="mt-12">
         <SectionLabel>Account</SectionLabel>
         <div className="divide-border/70 mt-2 divide-y border-y">
-          <button
-            type="button"
+          <a
+            href="mailto:request@blogdrop.in"
             className="group flex w-full items-center gap-3 py-5 text-left text-sm"
           >
-            <span className="font-medium">Edit profile</span>
+            <span className="font-medium">Request a source</span>
             <IconChevronRight
               size={16}
               className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
             />
-          </button>
+          </a>
+          <a
+            href="https://github.com/dhirajaryaa/blogdrop/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="group flex w-full items-center gap-3 py-5 text-left text-sm"
+          >
+            <span className="font-medium">Report a bug</span>
+            <IconChevronRight
+              size={16}
+              className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
+            />
+          </a>
           <button
             type="button"
             className="group flex w-full items-center gap-3 py-5 text-left text-sm"
