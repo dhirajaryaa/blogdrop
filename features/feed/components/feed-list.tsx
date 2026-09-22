@@ -46,8 +46,12 @@ function FeedRow({
           <span className="text-foreground font-medium">{item.sourceName}</span>
           <span aria-hidden>·</span>
           <span>{formatDate(item.publishDate)}</span>
-          <span aria-hidden>·</span>
-          <span className="hidden sm:inline">{item.readingTime} read</span>
+          {!minimal && (
+            <>
+              <span aria-hidden>·</span>
+              <span className="hidden sm:inline">{item.readingTime} read</span>
+            </>
+          )}
           <span aria-hidden>·</span>
           {item.difficulty && (
             <span
@@ -89,21 +93,6 @@ function FeedRow({
           />
         </span>
       </div>
-    </div>
-  );
-}
-
-//? error reload
-export function FeedError() {
-  return (
-    <div className="flex w-full flex-col items-center justify-center gap-4 pt-14 sm:pt-24 md:pt-40">
-      <p className="text-muted-foreground text-sm">Failed to load articles.</p>
-      <button
-        onClick={() => window.location.reload()}
-        className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
-      >
-        Reload
-      </button>
     </div>
   );
 }
