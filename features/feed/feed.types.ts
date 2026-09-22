@@ -2,6 +2,7 @@
 export type FeedInputProps = {
   limit: number;
   offset: number;
+  category?: string | null;
 };
 
 //* feed type */

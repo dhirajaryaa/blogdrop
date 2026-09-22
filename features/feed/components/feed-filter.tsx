@@ -17,9 +17,9 @@ function FeedFilter({
       type="single"
       variant="outline"
       value={active}
-      // onValueChange={(value) => {
-      //   if (value) onChange(value);
-      // }}
+      onValueChange={(value) => {
+        if (value && onChange) onChange(value);
+      }}
       spacing={2}
     >
       {options.map(({ value, label }) => (

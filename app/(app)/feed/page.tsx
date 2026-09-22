@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
 import FeedView from "@/features/feed/components/feed-view";
 import Container from "@/components/common/container";
+import { Suspense } from "react";
 
 export const metadata: Metadata = constructMetadata({
   title: "Feed — BlogDrop",
@@ -25,9 +26,11 @@ export default function FeedPage() {
             from the engineering blogs you care about.
           </p>
         </div>
-          </section>
-          {/*list articles */}
-      <FeedView />
+      </section>
+      {/*list articles */}
+      <Suspense>
+        <FeedView />
+      </Suspense>
     </Container>
   </>
 }
