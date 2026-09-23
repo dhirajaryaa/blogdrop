@@ -56,6 +56,7 @@ export const searchArticles = async (
 
     const searchQuery = sql`plainto_tsquery('english', ${trimmed})`;
     const searchVector = sql`to_tsvector('english', ${article.title} || ' ' || COALESCE(${articleMetaData.summary}, '') || ' ' || ${article.author} || ' ' || ${source.title})`;
+    
     const rank = sql`ts_rank(${searchVector}, ${searchQuery})`;
 
     const data = await db

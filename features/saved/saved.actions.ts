@@ -65,27 +65,37 @@ export const toggleSaveArticle = async (
 
     if (!authUser) {
       return { success: false, reason: "Login required to save articles" };
-    }
+    };
 
-    const [existing] = await db
-      .select({ id: bookmark.id })
-      .from(bookmark)
-      .where(
-        and(eq(bookmark.articleId, articleId), eq(bookmark.userId, authUser.id)),
-      )
-      .limit(1);
 
-    if (existing) {
-      await db.delete(bookmark).where(eq(bookmark.id, existing.id));
-      return { success: true, data: false };
-    }
+    const saved = await db.transaction(async (tx) => {
 
-    await db
-      .insert(bookmark)
-      .values({ articleId, userId: authUser.id })
-      .onConflictDoNothing();
 
-    return { success: true, data: true };
+      const [existing] = await tx
+        .select({ id: bookmark.id })
+        .from(bookmark)
+        .where(
+          and(eq(bookmark.articleId, articleId), eq(bookmark.userId, authUser.id)),
+        )
+        .for("update")
+        .limit(1);
+
+      if (existing) {
+        await tx.delete(bookmark).where(eq(bookmark.id, existing.id));
+        return false;
+      };
+
+      await tx
+        .insert(bookmark)
+        .values({ articleId, userId: authUser.id })
+        .onConflictDoNothing({
+          target: [bookmark.articleId, bookmark.userId]
+        });
+
+      return true;
+    })
+
+    return { success: true, data: saved };
 
   } catch (error) {
     console.error("Error toggling saved article:", error);

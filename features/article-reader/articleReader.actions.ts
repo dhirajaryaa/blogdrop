@@ -17,6 +17,8 @@ export async function getArticleWithSlug(
       };
     }
 
+    const authUser = await getCurrentUser();
+
     // fetch article info
 
     const [data] = await db
@@ -28,16 +30,15 @@ export async function getArticleWithSlug(
         bannerImg: article.imageUrl,
         originalUrl: article.originalUrl,
         publishDate: article.publicAt,
-    
         sourceName: source.title,
         sourceUrl: source.siteUrl,
-    
         summary: articleMetaData.summary,
         difficulty: articleMetaData.difficulty,
         whyRead: articleMetaData.whyRead,
         keyTakeaways: articleMetaData.keyTakeaways,
         readingTime: articleMetaData.readingTime ?? 0,
-    
+        isSaved: sql<boolean>`CASE WHEN ${bookmark.id} IS NOT NULL THEN true ELSE false END`,
+
         categories: sql<{ name: string; slug: string }[]>`
           COALESCE(
             (
@@ -55,7 +56,7 @@ export async function getArticleWithSlug(
             '[]'::json
           )
         `,
-    
+
         tags: sql<{ name: string; slug: string }[]>`
           COALESCE(
             (
@@ -80,6 +81,12 @@ export async function getArticleWithSlug(
         articleMetaData,
         eq(articleMetaData.articleId, article.id)
       )
+      .leftJoin(
+        bookmark,
+        authUser
+          ? and(eq(bookmark.articleId, article.id), eq(bookmark.userId, authUser.id))
+          : sql`false`
+      )
       .where(eq(article.slug, slug));
 
     if (!data) {
@@ -89,24 +96,8 @@ export async function getArticleWithSlug(
       };
     }
 
-    //* check if the current user saved this article
-    let isSaved = false;
-    const authUser = await getCurrentUser();
+    return { success: true, data };
 
-    if (authUser) {
-      const [saved] = await db
-        .select({ id: bookmark.id })
-        .from(bookmark)
-        .where(
-          and(eq(bookmark.articleId, data.id), eq(bookmark.userId, authUser.id)),
-        )
-        .limit(1);
-
-      isSaved = Boolean(saved);
-    }
-
-    return { success: true, data: { ...data, isSaved } };
-      
   } catch (error) {
     console.error("Error fetching public feed:", error);
     return {
