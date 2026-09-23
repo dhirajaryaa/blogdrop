@@ -12,6 +12,7 @@ import {
   IconX,
 } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import LogoutButton from "@/features/auth/logout-button";
 import { cn } from "@/lib/utils";
 import { userTags } from "@/config/tags";
 import type { ProfileData, ProfileInterest } from "../profile.types";
@@ -488,6 +489,9 @@ function ProfileView({ data }: { data: ProfileData }) {
               className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
             />
           </Link>
+          <div className="border-t py-0">
+            <LogoutButton className="!py-5" />
+          </div>
         </div>
       </div>
     </div>

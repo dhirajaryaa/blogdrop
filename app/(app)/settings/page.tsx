@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
 import { IconChevronRight } from "@tabler/icons-react";
 import { ThemeSwitch } from "@/components/common/theme-toggle";
+import LogoutButton from "@/features/auth/logout-button";
 import { githubIssues, requestEmail } from "@/config/constant";
 import Container from "@/components/common/container";
 
@@ -82,6 +83,7 @@ export default function SettingsPage() {
               className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
             />
           </button>
+          <LogoutButton />
         </div>
         <p className="text-muted-foreground mt-4 text-xs leading-5">
           Deleting your account permanently removes your saved articles and
