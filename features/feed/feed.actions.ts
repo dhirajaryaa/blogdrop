@@ -197,71 +197,98 @@ export const getPublicFeed = async ({
   offset = 0,
   category: categorySlug,
 }: FeedInputProps): Promise<AppResponse<FeedArticle[]>> => {
-  try {
-    const parsedLimit = Number(limit);
-    const parsedOffset = Number(offset);
+  const parsedLimit = Number(limit);
+  const parsedOffset = Number(offset);
 
-    if (
-      !Number.isInteger(parsedLimit) ||
-      !Number.isInteger(parsedOffset) ||
-      parsedLimit <= 0 ||
-      parsedOffset < 0
-    ) {
-      return {
-        success: false,
-        reason: "Invalid input: limit must be positive and offset non-negative",
-      };
-    }
+  if (
+    !Number.isInteger(parsedLimit) ||
+    !Number.isInteger(parsedOffset) ||
+    parsedLimit <= 0 ||
+    parsedOffset < 0
+  ) {
+    return {
+      success: false,
+      reason: "Invalid input: limit must be positive and offset non-negative",
+    };
+  }
 
-    const base = db
-      .select({
-        id: article.id,
-        slug: article.slug,
-        title: article.title,
-        author: article.author,
-        originalUrl: article.originalUrl,
-        publishDate: article.publicAt,
-        sourceName: source.title,
-        sourceUrl: source.siteUrl,
-        summary: articleMetaData.summary,
-        difficulty: articleMetaData.difficulty,
-        readingTime: sql<number>`COALESCE(${articleMetaData.readingTime}, 0)`,
-      })
-      .from(article)
-      .innerJoin(source, eq(article.sourceId, source.id))
-      .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id));
+  const base = db
+    .select({
+      id: article.id,
+      slug: article.slug,
+      title: article.title,
+      author: article.author,
+      originalUrl: article.originalUrl,
+      publishDate: article.publicAt,
+      sourceName: source.title,
+      sourceUrl: source.siteUrl,
+      summary: articleMetaData.summary,
+      difficulty: articleMetaData.difficulty,
+      readingTime: sql<number>`COALESCE(${articleMetaData.readingTime}, 0)`,
+    })
+    .from(article)
+    .innerJoin(source, eq(article.sourceId, source.id))
+    .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id));
 
-    //? membership check only, so EXISTS instead of a join (no article dupes)
+  //? deterministic daily shuffle happens in TS: the score is applied as a
+  //? stable-sort tie-breaker over articles sharing a publish timestamp, so
+  //? pagination is stable across pages on the same day without the
+  //? md5(concat(id, '-', day)) SQL trick (a parameterized concat that
+  //? PostgreSQL can't infer a type for)
+  const daySeed = new Date().toISOString().slice(0, 10);
+
+  //? membership check only, so EXISTS instead of a join (no article dupes)
+  const categoryCondition = (slug: string) => sql`EXISTS (
+      SELECT 1
+      FROM ${articleCategory}
+      INNER JOIN ${category} ON ${category.id} = ${articleCategory.categoryId}
+      WHERE ${articleCategory.articleId} = ${article.id}
+        AND ${category.slug} = ${slug}
+    )`;
+
+  const run = async (filterByCategory: boolean) => {
     const conditions = [eq(article.status, "done")];
-    if (categorySlug) {
-      conditions.push(sql`EXISTS (
-          SELECT 1
-          FROM ${articleCategory}
-          INNER JOIN ${category} ON ${category.id} = ${articleCategory.categoryId}
-          WHERE ${articleCategory.articleId} = ${article.id}
-            AND ${category.slug} = ${categorySlug}
-        )`);
+    if (filterByCategory && categorySlug) {
+      conditions.push(categoryCondition(categorySlug));
     }
 
-    //? deterministic daily shuffle: md5(id + daySeed) is a cheap tie-breaker that
-    //? reorders only articles sharing a publish timestamp. it lives in SQL
-    //? because the public feed paginates directly with OFFSET/LIMIT and the order
-    //? must be stable across pages on the same day.
-    const daySeed = new Date().toISOString().slice(0, 10);
-
-    const data = await base
+    const rows = await base
       .where(and(...conditions))
-      .orderBy(
-        sql`${article.publicAt} desc`,
-        sql`${article.createdAt} desc`,
-        sql`md5(concat(${article.id}, '-', ${daySeed})) desc`,
-      )
+      .orderBy(sql`${article.publicAt} desc`, sql`${article.createdAt} desc`)
       .offset(parsedOffset)
       .limit(parsedLimit);
 
+    //? stable sort keeps the SQL order for everything else and only reorders
+    //? same-day articles by the deterministic daily jitter
+    return [...rows].sort((a, b) =>
+      a.publishDate === b.publishDate
+        ? dayJitter(`${b.id}-${daySeed}`) - dayJitter(`${a.id}-${daySeed}`)
+        : 0,
+    );
+  };
+
+  try {
+    const data = await run(Boolean(categorySlug));
     return { success: true, data };
   } catch (error) {
     console.error("Error fetching public feed:", error);
+
+    //? category filtering is an optional enhancement - fall back to the
+    //? unfiltered public feed instead of failing the whole feed
+    if (categorySlug) {
+      try {
+        const data = await run(false);
+        return { success: true, data };
+      } catch (fallbackError) {
+        console.error("Error fetching public feed (without category):", fallbackError);
+        return {
+          success: false,
+          reason:
+            fallbackError instanceof Error ? fallbackError.message : "Failed to fetch feed",
+        };
+      }
+    }
+
     return {
       success: false,
       reason: error instanceof Error ? error.message : "Failed to fetch feed",
@@ -330,50 +357,57 @@ const getPersonalizedFeed = async ({
   category: categorySlug,
   userId,
 }: FeedInputProps & { userId: string }): Promise<AppResponse<FeedArticle[]>> => {
-  //* reader's interests
-  const [catRows, tagRows] = await Promise.all([
-    db
-      .select({ slug: category.slug })
-      .from(userCategory)
-      .innerJoin(category, eq(userCategory.categoryId, category.id))
-      .where(eq(userCategory.userId, userId)),
-    db
-      .select({ name: userTag.name })
-      .from(userTag)
-      .where(eq(userTag.userId, userId)),
-  ]);
+  try {
+    //* reader's interests
+    const [catRows, tagRows] = await Promise.all([
+      db
+        .select({ slug: category.slug })
+        .from(userCategory)
+        .innerJoin(category, eq(userCategory.categoryId, category.id))
+        .where(eq(userCategory.userId, userId)),
+      db
+        .select({ name: userTag.name })
+        .from(userTag)
+        .where(eq(userTag.userId, userId)),
+    ]);
 
-  const userCategorySlugs = new Set(catRows.map((r) => r.slug));
-  const userTagNames = new Set(tagRows.map((r) => r.name.toLowerCase()));
+    const userCategorySlugs = new Set(catRows.map((r) => r.slug));
+    const userTagNames = new Set(tagRows.map((r) => r.name.toLowerCase()));
 
-  //* no interests configured -> nothing to personalize, serve the public feed
-  if (userCategorySlugs.size === 0 && userTagNames.size === 0) {
+    //* no interests configured -> nothing to personalize, serve the public feed
+    if (userCategorySlugs.size === 0 && userTagNames.size === 0) {
+      return getPublicFeed({ limit, offset, category: categorySlug });
+    }
+
+    //* ranked pool is cached for RANK_CACHE_REVALIDATE, so page 2, 3, ... reuse
+    //* the same ranking instead of re-fetching and re-sorting all 500 rows
+    const daySeed = new Date().toISOString().slice(0, 10);
+    const rankedPool = await getRankedPool(userId, categorySlug ?? null, daySeed);
+
+    //* paginate after ranking
+    const data = rankedPool
+      .slice(offset, offset + limit)
+      .map((item) => ({
+        id: item.id,
+        slug: item.slug,
+        title: item.title,
+        author: item.author,
+        originalUrl: item.originalUrl,
+        publishDate: item.publishDate,
+        sourceName: item.sourceName,
+        sourceUrl: item.sourceUrl,
+        summary: item.summary,
+        difficulty: item.difficulty,
+        readingTime: item.readingTime,
+      }));
+
+    return { success: true, data };
+  } catch (error) {
+    //? personalization is an optional enhancement - log the real error, then
+    //? serve the normal public feed instead of failing the whole feed
+    console.error("Error fetching personalized feed:", error);
     return getPublicFeed({ limit, offset, category: categorySlug });
   }
-
-  //* ranked pool is cached for RANK_CACHE_REVALIDATE, so page 2, 3, ... reuse
-  //* the same ranking instead of re-fetching and re-sorting all 500 rows
-  const daySeed = new Date().toISOString().slice(0, 10);
-  const rankedPool = await getRankedPool(userId, categorySlug ?? null, daySeed);
-
-  //* paginate after ranking
-  const data = rankedPool
-    .slice(offset, offset + limit)
-    .map((item) => ({
-      id: item.id,
-      slug: item.slug,
-      title: item.title,
-      author: item.author,
-      originalUrl: item.originalUrl,
-      publishDate: item.publishDate,
-      sourceName: item.sourceName,
-      sourceUrl: item.sourceUrl,
-      summary: item.summary,
-      difficulty: item.difficulty,
-      readingTime: item.readingTime,
-    }));
-
-  return { success: true, data };
 };
 
 //? entry point used by the feed UI: two modes only - logged out gets the public
@@ -412,7 +446,7 @@ export const getUserFeed = async ({
       userId: authUser.id,
     });
   } catch (error) {
-    console.error("Error fetching personalized feed:", error);
+    console.error("Error fetching user feed:", error);
     return {
       success: false,
       reason: error instanceof Error ? error.message : "Failed to fetch feed",
