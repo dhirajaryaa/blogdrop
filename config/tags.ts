@@ -108,7 +108,6 @@ export const userTags = [
     { value: "interview", label: "Interview" },
 ] as const;
 
-export const userInterests = userTags;
 
 
 // tag mapping with alias
