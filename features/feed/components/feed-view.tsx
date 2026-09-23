@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import FeedFilter from "./feed-filter";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { FeedList, FeedError } from "./feed-list";
-import { getPublicFeed } from "../feed.actions";
+import { getUserFeed } from "../feed.actions";
 import { ArticleListSkeleton } from "@/components/skeletons";
 import { IconLoader2 } from "@tabler/icons-react";
 
@@ -46,7 +46,7 @@ function FeedView() {
   } = useInfiniteQuery({
     queryKey: ["public-feed", category ?? "all"],
     queryFn: async ({ pageParam }) =>
-      getPublicFeed({ limit: PAGE_SIZE, offset: pageParam, category }),
+      getUserFeed({ limit: PAGE_SIZE, offset: pageParam, category }),
     initialPageParam: 0,
     getNextPageParam: (lastPage, allPages) => {
       if (!lastPage.success || lastPage.data.length < PAGE_SIZE) return undefined;
