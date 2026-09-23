@@ -73,6 +73,7 @@ export default function SettingsPage() {
               className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
             />
           </a>
+          <LogoutButton />
           <button
             type="button"
             className="group flex w-full items-center gap-3 py-5 text-left text-sm"
@@ -83,7 +84,6 @@ export default function SettingsPage() {
               className="text-muted-foreground ml-auto transition-transform group-hover:translate-x-0.5"
             />
           </button>
-          <LogoutButton />
         </div>
         <p className="text-muted-foreground mt-4 text-xs leading-5">
           Deleting your account permanently removes your saved articles and

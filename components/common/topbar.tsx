@@ -20,7 +20,7 @@ export function Topbar({ user }: { user?: TopbarUser }) {
     .toUpperCase();
 
   return (
-    <header className="bg-background/80 sticky top-0 z-20 border-b backdrop-blur">
+    <header className="bg-background/80 sticky top-0 z-20 border-b backdrop-blur-md">
       <div className="mx-auto flex h-14 w-full max-w-5xl items-center justify-between gap-4 px-6 sm:px-10">
         <Link href="/" className="flex items-center md:hidden min-w-8 h-8">
           <Image
