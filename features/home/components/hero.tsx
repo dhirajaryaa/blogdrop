@@ -3,36 +3,12 @@ import { Button } from "@/components/ui/button";
 import {
   IconArrowRight,
   IconCompass,
-  IconSearch,
   IconSparkles,
 } from "@tabler/icons-react";
 
 function Hero() {
   return (
     <section className="relative flex w-full flex-col items-center overflow-hidden py-16 sm:py-24">
-      {/* soft radial glow */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-20"
-        style={{
-          background:
-            "radial-gradient(60% 45% at 50% -5%, color-mix(in oklch, var(--primary) 18%, transparent), transparent 70%)",
-        }}
-      />
-      {/* masked grid */}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute inset-0 -z-10"
-        style={{
-          backgroundImage:
-            "linear-gradient(to right, color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px)",
-          backgroundSize: "48px 48px",
-          WebkitMaskImage:
-            "radial-gradient(ellipse 70% 60% at 50% 20%, #000 20%, transparent 78%)",
-          maskImage:
-            "radial-gradient(ellipse 70% 60% at 50% 20%, #000 20%, transparent 78%)",
-        }}
-      />
       <div className="flex flex-col items-center gap-5 text-center">
         <span className="text-muted-foreground border-border/70 bg-muted/40 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
           <IconSparkles size={13} stroke={1.75} />
@@ -72,7 +48,7 @@ function Hero() {
         </div>
       </div>
 
-      <div className="mt-14 flex w-full flex-col items-center gap-6">
+      {/* <div className="mt-14 flex w-full flex-col items-center gap-6">
         <div className="search-demo text-muted-foreground border-border/70 bg-muted/30 flex w-full max-w-md items-center gap-3 rounded-xl border px-4 py-3 text-sm">
           <IconSearch size={16} stroke={1.75} />
           <span className="truncate">Try searching for “storage”, “LLMs”…</span>
@@ -80,7 +56,7 @@ function Hero() {
             ⌘ K
           </kbd>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 }
