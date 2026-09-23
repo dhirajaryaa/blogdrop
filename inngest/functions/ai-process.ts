@@ -16,12 +16,29 @@ export const articleAIProcessing = inngest.createFunction({
     triggers: { event: "article/ai-processing" }
 },
     async ({ step, event }): Promise<IngestResult> => {
-
+        try {
         //* helper: terminal-status guard so the row never lingers as "processing"
         const markFailed = (reason: string) =>
             step.run("mark-ai-failed", async () => {
                 await db.update(article).set({ status: "failed" }).where(eq(article.id, event.data.articleId));
             }).then(() => ({ status: "error" as const, reason }));
+
+        //* one Gemini call = one credit, whether the article is saved or removed
+        //* as promotional - bill it right after the call completes. upsert so the
+        //* ai_usage row always exists to increment (e.g. at a UTC day boundary)
+        const consumeAiCredit = () =>
+            step.run("consume-ai-credit", async () => {
+                const today = new Date().toISOString().slice(0, 10);
+                return db
+                    .insert(aiUsage)
+                    .values({ day: today, used: 1, apiId: 1 })
+                    .onConflictDoUpdate({
+                        target: aiUsage.day,
+                        set: {
+                            used: sql`${aiUsage.used} + 1`,
+                        },
+                    });
+            });
 
         //? step 1: select article from db
         const [sourceArticle] = await db
@@ -58,6 +75,9 @@ export const articleAIProcessing = inngest.createFunction({
         if (!llmOutput.success) {
             return await markFailed(llmOutput.error ?? "AI metadata generation failed");
         }
+        //* a Gemini call completed - bill it now so promotional-removed articles
+        //* still count against the daily AI usage
+        await consumeAiCredit();
         //* promotional article remove
         if (llmOutput.data.isPromotional) {
             await step.run("remove-promotion", async () => {
@@ -90,17 +110,10 @@ export const articleAIProcessing = inngest.createFunction({
         //* reading time calculate (computed once, reused in transaction)
         const readingTime = calculateReadingTime(sourceArticle.content ?? "");
 
-        //? step 4: metadata save on db, ai credit, tags-categories and status=done in one transition
-        const today = new Date().toISOString().slice(0, 10);
-
+        //? step 4: metadata save on db, tags-categories and status=done in one transition
         await step.run("save-metadata-and-tags-update",
             async () => {
                 return await db.transaction(async (tx) => {
-                    //* always increment credit — AI call already happened in step 2, tokens already used
-                    await tx.update(aiUsage)
-                        .set({ used: sql`${aiUsage.used} + 1` })
-                        .where(eq(aiUsage.day, today));
-
                     //* save metadata */
                     await tx.insert(articleMetaData).values({
                         articleId: sourceArticle.id,
@@ -197,11 +210,14 @@ export const articleAIProcessing = inngest.createFunction({
             }
         );
 
-        //? step 5: next batch trigger it
-        await step.sendEvent("article-batch-dispatcher", {
-            name: "app/ArticleBatchDispatcher",
-            data: {}
-        });
-
         return { status: "success", data: llmOutput }
+        } finally {
+            //? keep the queue self-driving: re-trigger the batch dispatcher on
+            //? every terminal path (success, promotional removal, or failure) so
+            //? one bad article can't stall the rest of the pending queue
+            await step.sendEvent("article-batch-dispatcher", {
+                name: "app/ArticleBatchDispatcher",
+                data: {}
+            });
+        }
     })

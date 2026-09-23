@@ -24,7 +24,15 @@ export const articleProcessing = inngest.createFunction({
     const markFailed = (reason: string) =>
         step.run("mark-failed", async () => {
             await db.update(article).set({ status: "failed" }).where(eq(article.id, articleId));
-        }).then(() => ({ status: "error" as const, reason }));
+        }).then(async () => {
+            //* keep the queue moving on failure - re-trigger the batch dispatcher
+            //* so remaining pending articles don't wait for the next cron
+            await step.sendEvent("article-batch-dispatcher", {
+                name: "app/ArticleBatchDispatcher",
+                data: {}
+            });
+            return { status: "error" as const, reason };
+        });
 
     try {
         //? step 1: fetch article content
