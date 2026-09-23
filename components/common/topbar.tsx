@@ -1,10 +1,11 @@
 import Link from "next/link";
 import Image from "next/image";
-import { IconBookmark, IconSearch } from "@tabler/icons-react";
+import { IconBookmark } from "@tabler/icons-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./theme-toggle";
+import SiteSearch from "./site-search";
 
 type TopbarUser = {
   name?: string | null;
@@ -32,23 +33,8 @@ export function Topbar({ user }: { user?: TopbarUser }) {
           />
         </Link>
 
-        {/* search  */}
-        <div className="relative w-full max-w-sm">
-          <IconSearch
-            size={16}
-            stroke={1.75}
-            className="text-muted-foreground/70 pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
-          />
-          <input
-            type="search"
-            aria-label="Search articles"
-            placeholder="Search articles…"
-            className="text-muted-foreground flex h-9 w-full max-w-sm items-center gap-2 rounded-xl border bg-transparent px-3 pl-9 text-sm transition-colors placeholder:text-muted-foreground/80 hover:bg-muted/50 focus:outline-none focus:ring-2 focus:ring-ring/50"
-          />
-          <kbd className="font-mono text-muted-foreground/70 absolute right-2.5 top-1/2 hidden -translate-y-1/2 rounded-md bg-muted px-1.5 py-0.5 text-[10px] sm:block">
-            ⌘ K
-          </kbd>
-        </div>
+        {/* site search (fuse.js) */}
+        <SiteSearch />
 
         <div className="flex items-center gap-3">
 
