@@ -8,7 +8,7 @@ import { redirect } from "next/navigation"
 async function OnboardingPage() {
     const user = await getCurrentUser()
     if(!user){
-        redirect("/login");
+        redirect("/auth/login");
     };
     if(user.onboarded){
         redirect("/feed")

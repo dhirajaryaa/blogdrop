@@ -9,14 +9,28 @@ import {
 
 function Hero() {
   return (
-    <section className="flex w-full flex-col items-center py-16 sm:py-24">
+    <section className="relative flex w-full flex-col items-center overflow-hidden py-16 sm:py-24">
+      {/* masked grid */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 -z-10"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--border) 60%, transparent) 1px, transparent 1px)",
+          backgroundSize: "56px 56px",
+          WebkitMaskImage:
+            "radial-gradient(ellipse 85% 70% at 50% 0%, #000 35%, transparent 100%)",
+          maskImage:
+            "radial-gradient(ellipse 85% 70% at 50% 0%, #000 35%, transparent 100%)",
+        }}
+      />
       <div className="flex flex-col items-center gap-5 text-center">
         <span className="text-muted-foreground border-border/70 bg-muted/40 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
           <IconSparkles size={13} stroke={1.75} />
           Curated engineering stories, hand-picked daily
         </span>
 
-        <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl">
+        <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl ">
           Discover better
           <br />
           <span className="text-transparent [background:linear-gradient(120deg,var(--foreground),var(--muted-foreground))_text]">
