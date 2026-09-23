@@ -6,6 +6,7 @@ import { ReaderSkeleton } from "@/components/skeletons";
 import { Suspense } from "react";
 import Container from "@/components/common/container";
 import { constructMetadata } from "@/lib/utils";
+import { decodeHtmlEntities } from "@/lib/html";
 import type { Metadata } from "next";
 
 type Props = {
@@ -29,10 +30,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const article = data.data;
 
   return constructMetadata({
-    title: article.title,
-    description:
+    title: decodeHtmlEntities(article.title),
+    description: decodeHtmlEntities(
       article.summary ??
-      `${article.sourceName} — an engineering article curated on BlogDrop.`,
+        `${article.sourceName} — an engineering article curated on BlogDrop.`,
+    ),
     path: `/a/${slug}`,
     image: `/og/article/${slug}`,
   });

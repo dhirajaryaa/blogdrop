@@ -1,4 +1,6 @@
 //* branded article og card — BlogDrop brand first, article banner is NOT used
+import { decodeHtmlEntities } from "@/lib/html";
+
 export type OgArticleImageData = {
   title: string;
   sourceName: string | null;
@@ -28,11 +30,13 @@ const INK_FAINT = "rgba(15,23,42,0.45)";
 const BORDER = "rgba(15,23,42,0.1)";
 
 function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
-  const title = truncateTitle(data.title);
+  const title = truncateTitle(decodeHtmlEntities(data.title));
   const isLongTitle = title.length > 96;
   const titleSize = isLongTitle ? 46 : 56;
   const titleLineHeight = isLongTitle ? 1.16 : 1.14;
-  const category = data.category || "Engineering Blog";
+  const category = data.category
+    ? decodeHtmlEntities(data.category)
+    : "Engineering Blog";
   const readingTime = data.readingTime;
 
   return (
@@ -266,7 +270,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                   whiteSpace: "nowrap",
                 }}
               >
-                {data.sourceName}
+                {decodeHtmlEntities(data.sourceName)}
               </span>
             )}
             {data.author && (
@@ -281,7 +285,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  By {data.author}
+                  By {decodeHtmlEntities(data.author)}
                 </span>
               </>
             )}

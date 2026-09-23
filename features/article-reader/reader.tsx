@@ -5,6 +5,7 @@ import { formatDate } from "../article/format-date";
 import { Button } from "@/components/ui/button";
 import { IconArrowUpRight } from "@tabler/icons-react";
 import SaveArticleButton from "./save-article";
+import { decodeHtmlEntities } from "@/lib/html";
 
 function ArticleReader({ article }: { article: ArticleDetails }) {
   const logoUrl = `https://www.google.com/s2/favicons?domain=${new URL(article.originalUrl).hostname
@@ -29,7 +30,7 @@ function ArticleReader({ article }: { article: ArticleDetails }) {
       {/* Title */}
       <div className="mt-4 flex items-start justify-between gap-4">
         <h1 className="text-3xl leading-tight font-medium tracking-tight text-balance sm:text-4xl">
-          {article.title}
+          {decodeHtmlEntities(article.title)}
         </h1>
 
         <SaveArticleButton
