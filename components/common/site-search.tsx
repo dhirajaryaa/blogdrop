@@ -173,7 +173,7 @@ function SiteSearch() {
       </kbd>
 
       {open && (
-        <div className="bg-background/95 shadow-muted shadow-xl absolute top-11 right-0 left-0 z-30 overflow-hidden rounded-xl border backdrop-blur">
+        <div className="bg-background shadow-muted shadow-xl absolute top-11 right-0 left-0 z-30 overflow-hidden rounded-xl">
           {trimmed.length === 0 ? (
             <p className="text-muted-foreground px-4 py-3 text-sm">
               Type to search pages and articles…
@@ -200,7 +200,7 @@ function SiteSearch() {
                       {item.Icon ? (
                         <item.Icon size={15} stroke={1.75} />
                       ) : (
-                        <IconFileText size={15} stroke={1.75} />
+                        <IconArrowUpRight size={15} />
                       )}
                     </span>
                     <span className="flex min-w-0 flex-1 flex-col">

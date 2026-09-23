@@ -55,7 +55,7 @@ function ExploreView({ categories }: { categories: ExploreCategory[] }) {
           </p>
         </div>
 
-        <div className="relative max-w-xl">
+        <div className="relative w-full">
           <IconSearch
             size={18}
             stroke={1.75}
