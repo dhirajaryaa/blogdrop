@@ -19,8 +19,13 @@ function truncateTitle(title: string, max = 140) {
     : trimmed;
 }
 
-const BRAND = "#8AB4FF";
-const PRIMARY = "#5B8CFF";
+//* light theme tokens — matches the site's near-white / brand-blue look
+const PRIMARY = "#3B6BF2";
+const BRAND_STRONG = "#2658D8";
+const INK = "#111827";
+const INK_MUTED = "rgba(15,23,42,0.62)";
+const INK_FAINT = "rgba(15,23,42,0.45)";
+const BORDER = "rgba(15,23,42,0.1)";
 
 function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
   const title = truncateTitle(data.title);
@@ -38,7 +43,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
         display: "flex",
         position: "relative",
         overflow: "hidden",
-        background: "#0A0F1E",
+        background: "#FFFFFF",
       }}
     >
       {/* background layers */}
@@ -47,7 +52,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
           position: "absolute",
           inset: 0,
           background:
-            "linear-gradient(135deg, #0A0F1E 0%, #0E1830 52%, #132541 100%)",
+            "linear-gradient(135deg, #FFFFFF 0%, #F2F6FF 55%, #E7EFFF 100%)",
         }}
       />
       <div
@@ -59,7 +64,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
           top: -240,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(91,140,255,0.32), transparent 70%)",
+            "radial-gradient(circle, rgba(59,107,242,0.16), transparent 70%)",
         }}
       />
       <div
@@ -71,7 +76,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
           bottom: -280,
           borderRadius: "50%",
           background:
-            "radial-gradient(circle, rgba(56,189,248,0.16), transparent 70%)",
+            "radial-gradient(circle, rgba(37,99,235,0.1), transparent 70%)",
         }}
       />
 
@@ -131,7 +136,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                 style={{
                   fontSize: 27,
                   fontWeight: 700,
-                  color: "#FFFFFF",
+                  color: INK,
                   letterSpacing: "-0.02em",
                   lineHeight: 1,
                 }}
@@ -141,7 +146,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
               <span
                 style={{
                   fontSize: 12,
-                  color: "rgba(255,255,255,0.5)",
+                  color: INK_FAINT,
                   fontWeight: 500,
                   letterSpacing: "0.08em",
                 }}
@@ -157,10 +162,11 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
               display: "flex",
               alignItems: "center",
               gap: 10,
-              border: "1px solid rgba(255,255,255,0.14)",
+              border: `1px solid ${BORDER}`,
               borderRadius: 999,
               padding: "9px 18px",
-              background: "rgba(255,255,255,0.06)",
+              background: "#FFFFFF",
+              boxShadow: "0 1px 2px rgba(15,23,42,0.05)",
             }}
           >
             <span
@@ -174,15 +180,13 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
             <span
               style={{
                 fontSize: 16,
-                color: "rgba(255,255,255,0.7)",
+                color: INK_MUTED,
                 fontWeight: 500,
               }}
             >
               Curated by
             </span>
-            <span
-              style={{ fontSize: 17, color: BRAND, fontWeight: 700 }}
-            >
+            <span style={{ fontSize: 17, color: BRAND_STRONG, fontWeight: 700 }}>
               Dhiraj Arya
             </span>
           </div>
@@ -195,11 +199,11 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
               style={{
                 fontSize: 15,
                 fontWeight: 500,
-                color: BRAND,
-                border: `1px solid rgba(91,140,255,0.45)`,
+                color: BRAND_STRONG,
+                border: "1px solid rgba(59,107,242,0.4)",
                 borderRadius: 999,
                 padding: "6px 14px",
-                background: "rgba(91,140,255,0.12)",
+                background: "rgba(59,107,242,0.08)",
               }}
             >
               {category}
@@ -210,11 +214,11 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                   fontFamily: "JetBrains Mono",
                   fontSize: 13,
                   fontWeight: 500,
-                  color: "rgba(255,255,255,0.72)",
-                  border: "1px solid rgba(255,255,255,0.14)",
+                  color: INK_MUTED,
+                  border: `1px solid ${BORDER}`,
                   borderRadius: 999,
                   padding: "6px 14px",
-                  background: "rgba(255,255,255,0.05)",
+                  background: "rgba(255,255,255,0.7)",
                 }}
               >
                 {readingTime} MIN READ
@@ -229,7 +233,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
               maxWidth: 1030,
               fontSize: titleSize,
               fontWeight: 700,
-              color: "#FFFFFF",
+              color: INK,
               lineHeight: titleLineHeight,
               letterSpacing: "-0.03em",
             }}
@@ -246,7 +250,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
             justifyContent: "space-between",
             gap: 28,
             width: "100%",
-            borderTop: "1px solid rgba(255,255,255,0.1)",
+            borderTop: `1px solid ${BORDER}`,
             paddingTop: 20,
           }}
         >
@@ -263,20 +267,20 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                 style={{
                   fontSize: 17,
                   fontWeight: 600,
-                  color: BRAND,
+                  color: BRAND_STRONG,
                   whiteSpace: "nowrap",
                 }}
               >
                 {data.sourceName}
               </span>
             )}
-            <span style={{ color: "rgba(255,255,255,0.3)", fontSize: 15 }}>
+            <span style={{ color: "rgba(15,23,42,0.3)", fontSize: 15 }}>
               •
             </span>
             <span
               style={{
                 fontSize: 15,
-                color: "rgba(255,255,255,0.7)",
+                color: INK_MUTED,
                 whiteSpace: "nowrap",
               }}
             >
@@ -296,7 +300,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                 fontFamily: "JetBrains Mono",
                 fontSize: 15,
                 fontWeight: 500,
-                color: "rgba(255,255,255,0.92)",
+                color: INK,
               }}
             >
               blogdrop.in
@@ -306,7 +310,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                 fontFamily: "JetBrains Mono",
                 fontSize: 14,
                 fontWeight: 500,
-                color: "rgba(255,255,255,0.55)",
+                color: INK_FAINT,
               }}
             >
               @dhirajarya01
