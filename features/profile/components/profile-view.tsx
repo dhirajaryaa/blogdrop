@@ -8,7 +8,6 @@ import {
   IconBookmark,
   IconChevronRight,
   IconPencil,
-  IconPlus,
   IconSettings,
   IconX,
 } from "@tabler/icons-react";
@@ -43,8 +42,8 @@ function ProfileView({ data }: { data: ProfileData }) {
 
   const [editingInterests, setEditingInterests] = useState(false);
   const [interests, setInterests] = useState<ProfileInterest[]>(initialInterests);
+  const [editingTags, setEditingTags] = useState(false);
   const [tags, setTags] = useState<string[]>(initialTags);
-  const [tagInput, setTagInput] = useState("");
   const [isToggling, startToggling] = useTransition();
 
   const initials = (user?.name || user?.email || "?").slice(0, 2).toUpperCase();
@@ -122,24 +121,20 @@ function ProfileView({ data }: { data: ProfileData }) {
     });
   };
 
-  const handleAddTag = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    const value = tagInput.trim();
+  const handleToggleTag = (label: string) => {
+    const selected = tags.includes(label);
 
-    if (!value) return;
-    if (tags.includes(value)) {
-      setTagInput("");
-      return;
-    }
-
-    setTagInput("");
-    setTags((prev) => [...prev, value]);
+    setTags((prev) =>
+      selected
+        ? prev.filter((tag) => tag !== label)
+        : [...prev, label],
+    );
 
     startToggling(async () => {
-      const res = await addTag(value);
+      const res = selected ? await removeTag(label) : await addTag(label);
 
       if (!res.success) {
-        toast.error(res.reason || "Failed to add tag");
+        toast.error(res.reason || "Failed to update tag");
       }
       router.refresh();
     });
@@ -383,56 +378,82 @@ function ProfileView({ data }: { data: ProfileData }) {
       </div>
 
       <div className="mt-14">
-        <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
-          Your tags
-        </p>
-
-        <div className="mt-4 flex flex-wrap items-center gap-2">
-          {tags.map((tag) => (
-            <span
-              key={tag}
-              className="border-border/80 bg-muted/30 flex items-center gap-1.5 rounded-full border py-1.5 pr-2 pl-4 text-xs"
-            >
-              {tag}
-              <button
-                type="button"
-                onClick={() => handleRemoveTag(tag)}
-                disabled={isToggling}
-                aria-label={`Remove tag ${tag}`}
-                className="text-muted-foreground hover:text-foreground rounded-full p-0.5 transition-colors"
-              >
-                <IconX size={12} stroke={2} />
-              </button>
-            </span>
-          ))}
-
-          <form
-            onSubmit={handleAddTag}
-            className="flex items-center gap-1.5 rounded-full border border-dashed py-1.5 pr-2 pl-4"
+        <div className="flex items-center justify-between">
+          <p className="text-muted-foreground text-xs font-medium tracking-[0.2em] uppercase">
+            Your tags
+          </p>
+          <button
+            type="button"
+            onClick={() => setEditingTags((prev) => !prev)}
+            disabled={isToggling}
+            className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
           >
-            <input
-              value={tagInput}
-              onChange={(e) => setTagInput(e.target.value)}
-              placeholder="Add a tag…"
-              aria-label="Tag name"
-              className="text-xs outline-none placeholder:text-muted-foreground/60"
-            />
-            <button
-              type="submit"
-              disabled={isToggling || !tagInput.trim()}
-              className="text-muted-foreground hover:text-foreground disabled:opacity-40 rounded-full p-0.5 transition-colors"
-              aria-label="Add tag"
-            >
-              <IconPlus size={12} stroke={2} />
-            </button>
-          </form>
+            <IconPencil size={13} stroke={1.75} />
+            {editingTags ? "Done" : "Edit"}
+          </button>
         </div>
 
-        <p className="text-muted-foreground mt-3 text-xs">
-          {tags.length === 0
-            ? "Add your own tags to mark the topics you care about."
-            : `You've saved ${tags.length} tag${tags.length === 1 ? "" : "s"}.`}
-        </p>
+        {editingTags ? (
+          <>
+            <div className="mt-4 flex max-h-72 flex-wrap gap-2 overflow-y-auto pr-1">
+              {userTags.map(({ value, label }) => {
+                const active = tags.includes(label);
+
+                return (
+                  <button
+                    key={value}
+                    type="button"
+                    onClick={() => handleToggleTag(label)}
+                    disabled={isToggling}
+                    className={cn(
+                      "rounded-full border px-4 py-1.5 text-xs transition-colors",
+                      active
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : "border-border/80 hover:bg-muted/40 text-muted-foreground",
+                    )}
+                  >
+                    {label}
+                  </button>
+                );
+              })}
+            </div>
+            <p className="text-muted-foreground mt-3 text-xs">
+              Choose from the predefined tags only.
+            </p>
+          </>
+        ) : tags.length === 0 ? (
+          <p className="text-muted-foreground mt-4 text-sm">
+            No tags yet —{" "}
+            <button
+              type="button"
+              onClick={() => setEditingTags(true)}
+              className="text-foreground underline"
+            >
+              pick a tag
+            </button>
+            .
+          </p>
+        ) : (
+          <div className="mt-4 flex flex-wrap items-center gap-2">
+            {tags.map((tag) => (
+              <span
+                key={tag}
+                className="border-border/80 bg-muted/30 flex items-center gap-1.5 rounded-full border py-1.5 pr-2 pl-4 text-xs"
+              >
+                {tag}
+                <button
+                  type="button"
+                  onClick={() => handleRemoveTag(tag)}
+                  disabled={isToggling}
+                  aria-label={`Remove tag ${tag}`}
+                  className="text-muted-foreground hover:text-foreground rounded-full p-0.5 transition-colors"
+                >
+                  <IconX size={12} stroke={2} />
+                </button>
+              </span>
+            ))}
+          </div>
+        )}
       </div>
 
       <div className="mt-16 border-t">

@@ -7,7 +7,11 @@ import { db } from "@/db";
 import { bookmark, category, source, user, userCategory, userTag } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
+import { userTags } from "@/config/tags";
 import type { ProfileData, ProfileInput } from "./profile.types";
+
+//? only predefined tags from config/tags.ts are allowed as profile tags
+const predefinedTagNames = new Set<string>(userTags.map((tag) => tag.label));
 
 export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
   try {
@@ -190,7 +194,7 @@ export const toggleCategory = async (
   }
 };
 
-//* add a free-form tag for the current user
+//* add a tag (only predefined tags from config/tags.ts are allowed)
 export const addTag = async (name: string): Promise<AppResponse<void>> => {
   try {
     const trimmed = name.trim();
@@ -199,8 +203,11 @@ export const addTag = async (name: string): Promise<AppResponse<void>> => {
       return { success: false, reason: "Tag name is required" };
     }
 
-    if (trimmed.length > 32) {
-      return { success: false, reason: "Tags must be 32 characters or fewer" };
+    if (!predefinedTagNames.has(trimmed)) {
+      return {
+        success: false,
+        reason: "Choose a tag from the predefined list only",
+      };
     }
 
     const authUser = await getCurrentUser();
