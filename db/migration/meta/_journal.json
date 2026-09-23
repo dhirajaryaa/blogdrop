@@ -99,6 +99,13 @@
       "when": 1790089019165,
       "tag": "0013_add-user-tag",
       "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790136557521,
+      "tag": "0014_add-read-history",
+      "breakpoints": true
     }
   ]
 }

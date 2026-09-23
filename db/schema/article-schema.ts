@@ -77,6 +77,40 @@ export const bookmark = pgTable("bookmark", {
     unique("bookmark_article_unique").on(table.articleId, table.userId),
 ]));
 
+//! read history: articles the user has already read
+//! (distinct from bookmarks - saved means "want to read later")
+export const readHistory = pgTable(
+    "read_history",
+    {
+        id: uuid("id").primaryKey().defaultRandom(),
+        articleId: uuid("article_id")
+            .notNull()
+            .references(() => article.id, { onDelete: "cascade" }),
+        userId: text("user_id")
+            .notNull()
+            .references(() => user.id, { onDelete: "cascade" }),
+        createdAt: timestamp("created_at").defaultNow().notNull(),
+        updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
+    },
+    (table) => [
+        unique("read_history_article_user_unique").on(table.articleId, table.userId),
+        index("read_history_user_idx").on(table.userId),
+    ]
+);
+
+//? read history relations
+export const readHistoryRelations = relations(readHistory, ({ one }) => ({
+    article: one(article, {
+        fields: [readHistory.articleId],
+        references: [article.id],
+    }),
+
+    user: one(user, {
+        fields: [readHistory.userId],
+        references: [user.id],
+    }),
+}));
+
 //? bookmarks relations
 export const bookmarkRelations = relations(bookmark, ({ one }) => ({
     article: one(article, {
@@ -101,6 +135,7 @@ export const articleRelations = relations(article, ({ one, many }) => ({
         references: [source.id]
     }),
     bookmark: many(bookmark),
+    readHistory: many(readHistory),
     tags: many(articleTag),
     categories: many(articleCategory)
 }))
