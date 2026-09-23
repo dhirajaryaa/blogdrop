@@ -13,16 +13,21 @@ export function constructMetadata({
   image = "/main-og.png",
   icons = "/favicon.ico",
   noIndex = false,
+  path = "",
+  twitterHandle = "@dhirajarya01",
 }: {
   title?: string
   description?: string
   image?: string | null
   icons?: string
   noIndex?: boolean
+  path?: string
+  twitterHandle?: string
 } = {}): Metadata {
   const imageUrl = image
     ? new URL(image, siteUrl).toString()
     : undefined
+  const pageUrl = path ? new URL(path, siteUrl).toString() : siteUrl
 
   return {
     title,
@@ -34,9 +39,9 @@ export function constructMetadata({
       openGraph: {
         title,
         description,
-        url: siteUrl,
+        url: pageUrl,
         siteName: "BlogDrop",
-        type: "website",
+        type: "article",
         images: [
           {
             url: imageUrl,
@@ -52,7 +57,7 @@ export function constructMetadata({
         title,
         description,
         images: [imageUrl],
-        creator: "@blogdrop",
+        creator: twitterHandle,
       },
     }),
 
