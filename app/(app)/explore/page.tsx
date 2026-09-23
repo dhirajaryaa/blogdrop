@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { constructMetadata } from "@/lib/utils";
-import ExploreGrid from "@/features/explore/components/explore-grid";
+import ExploreView from "@/features/explore/components/explore-view";
 import { getExploreCategories } from "@/features/explore/explore.actions";
 import { FeedError } from "@/features/feed/components/feed-list";
 import { ExploreGridSkeleton } from "@/components/skeletons";
@@ -10,7 +10,7 @@ import { Suspense } from "react";
 export const metadata: Metadata = constructMetadata({
   title: "Explore — BlogDrop",
   description:
-    "Browse engineering topics and discover high-quality stories from the teams building what's next.",
+    "Search and browse engineering topics, and discover high-quality stories from the teams building what's next.",
 });
 
 async function ExploreTopics() {
@@ -20,7 +20,7 @@ async function ExploreTopics() {
     return <FeedError />;
   }
 
-  return <ExploreGrid categories={result.data} />;
+  return <ExploreView categories={result.data} />;
 }
 
 export default function ExplorePage() {
