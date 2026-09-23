@@ -25,7 +25,7 @@ function Hero() {
         className="pointer-events-none absolute inset-0 -z-10"
         style={{
           backgroundImage:
-            "linear-gradient(to right, color-mix(in srgb, var(--border) 85%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--border) 85%, transparent) 1px, transparent 1px)",
+            "linear-gradient(to right, color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px), linear-gradient(to bottom, color-mix(in srgb, var(--foreground) 10%, transparent) 1px, transparent 1px)",
           backgroundSize: "48px 48px",
           WebkitMaskImage:
             "radial-gradient(ellipse 70% 60% at 50% 20%, #000 20%, transparent 78%)",
