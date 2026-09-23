@@ -32,8 +32,8 @@ function ArticleReader({ article }: { article: ArticleDetails }) {
       )}
 
       {/* Title */}
-      <div className="mt-4 flex items-start justify-between gap-4">
-        <h1 className="text-3xl leading-tight font-medium tracking-tight text-balance sm:text-4xl">
+      <div className="mt-4 flex flex-1 items-start justify-between gap-4">
+        <h1 className="text-2xl leading-tight font-medium tracking-tight text-balance sm:text-4xl">
           {decodeHtmlEntities(article.title)}
         </h1>
 

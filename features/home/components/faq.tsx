@@ -4,29 +4,38 @@ import { IconChevronDown } from "@tabler/icons-react";
 const faqs = [
   {
     q: "What is BlogDrop?",
-    a: "BlogDrop is a curated feed of engineering articles from real product and infrastructure teams — think Netflix, Cloudflare, and Jane Street. We surface the writing that explains how the web is actually built.",
+    a: "BlogDrop is a curated feed of engineering articles from real product and infrastructure teams — from companies like Netflix, Cloudflare, and Jane Street. We make it easier to discover the engineering work behind the products you use.",
+  },
+  {
+    q: "What makes BlogDrop different from a regular RSS reader?",
+    a: "Instead of managing dozens of feeds yourself, BlogDrop brings engineering blogs from trusted companies into one place, organizes them by topics and tags, and helps you discover articles worth reading.",
   },
   {
     q: "How does the personalized feed work?",
-    a: "Pick topics and tags on your profile and we rank your feed against them — matching articles float to the top, weighted by category and tag overlaps, recency, and a little daily randomness so it never feels stale.",
+    a: "Choose the topics and tags you're interested in, and BlogDrop uses them to prioritize relevant articles in your feed. Your interests, article freshness, and topic or tag matches all contribute to the ranking.",
+  },
+  {
+    q: "Do I need an account to use BlogDrop?",
+    a: "No. You can browse and read articles without an account. Creating an account unlocks a personalized feed, saved articles, and your reading profile.",
   },
   {
     q: "Is BlogDrop free?",
-    a: "Yes — reading, saving, and your personalized feed are completely free. There are no plans, pricing, or paywalls. We'll let you know if that ever changes.",
+    a: "Yes. Reading, saving, and using the personalized feed are currently completely free. There are no plans, pricing tiers, or paywalls.",
   },
   {
-    q: "Can I request an engineering source?",
-    a: "Absolutely. If there's an engineering blog you'd like to see, head to Settings and let us know. We review every request and add the best sources regularly.",
+    q: "Where do the articles come from?",
+    a: "BlogDrop collects articles from engineering blogs and technical publications published by real engineering teams and organizations. We focus on sources that share practical insights about building, scaling, and operating software.",
   },
   {
-    q: "How do I save articles for later?",
-    a: "Log in, open any article, and hit the bookmark. Your saved articles live in one place, ready when you are.",
+    q: "Can I save articles to read later?",
+    a: "Yes. Log in and bookmark any article you want to keep. Your saved articles are available from your profile whenever you're ready to read them.",
   },
   {
-    q: "Do I need an account to read articles?",
-    a: "No. Anyone can browse and read from the feed, latest, and explore pages. An account unlocks a personalized feed, saved articles, and your reading profile.",
+    q: "Can I request an engineering blog to be added?",
+    a: "Absolutely. If you know a great engineering blog that isn't on BlogDrop yet, send us a request from Settings. We review source suggestions and regularly add new ones.",
   },
 ];
+
 
 function Faq() {
   return (
@@ -43,7 +52,7 @@ function Faq() {
         </p>
       </div>
 
-      <div className="border-border/70 mx-auto mt-10 max-w-2xl divide-y rounded-2xl border">
+      <div className="border-border/70 mx-auto mt-10 max-w-3xl divide-y rounded-2xl border">
         {faqs.map(({ q, a }) => (
           <details
             key={q}
