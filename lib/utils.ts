@@ -14,7 +14,7 @@ export function constructMetadata({
   icons = "/favicon.ico",
   noIndex = false,
   path = "",
-  twitterHandle = "@dhirajarya01",
+  twitterHandle = "@blogdrop",
 }: {
   title?: string
   description?: string

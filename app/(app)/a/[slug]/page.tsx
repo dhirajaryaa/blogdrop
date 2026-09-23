@@ -12,7 +12,7 @@ type Props = {
   params: Promise<{ slug: string }>;
 };
 
-//* per-article SEO: branded og + twitter image (personal branding, not article banner)
+//* per-article SEO: branded og + twitter image (BlogDrop brand, not article banner)
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
 
@@ -35,7 +35,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       `${article.sourceName} — an engineering article curated on BlogDrop.`,
     path: `/a/${slug}`,
     image: `/og/article/${slug}`,
-    twitterHandle: "@dhirajarya01",
   });
 }
 

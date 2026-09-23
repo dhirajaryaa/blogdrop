@@ -11,7 +11,7 @@ import ArticleOgImage, { type OgArticleImageData } from "@/features/og/article-o
 export const dynamic = "force-dynamic";
 
 const FONTS_URL =
-  "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=JetBrains+Mono:wght@500;600&display=swap";
+  "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&display=swap";
 
 type FontWeight = 100 | 200 | 300 | 400 | 500 | 600 | 700 | 800 | 900;
 
@@ -132,7 +132,7 @@ export async function GET(
     ({
       title: "Discover better engineering articles, all in one feed.",
       sourceName: "BlogDrop",
-      author: "Dhiraj Arya",
+      author: "",
       readingTime: null,
       category: "Engineering Blog",
     } satisfies OgArticleImageData);

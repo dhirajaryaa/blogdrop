@@ -1,4 +1,4 @@
-//* branded article og card — personal branding first, article banner is NOT used
+//* branded article og card — BlogDrop brand first, article banner is NOT used
 export type OgArticleImageData = {
   title: string;
   sourceName: string | null;
@@ -156,7 +156,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
             </div>
           </div>
 
-          {/* personal branding */}
+          {/* brand tagline */}
           <div
             style={{
               display: "flex",
@@ -165,8 +165,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
               border: `1px solid ${BORDER}`,
               borderRadius: 999,
               padding: "9px 18px",
-              background: "#FFFFFF",
-              boxShadow: "0 1px 2px rgba(15,23,42,0.05)",
+              background: "rgba(255,255,255,0.7)",
             }}
           >
             <span
@@ -184,10 +183,7 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                 fontWeight: 500,
               }}
             >
-              Curated by
-            </span>
-            <span style={{ fontSize: 17, color: BRAND_STRONG, fontWeight: 700 }}>
-              Dhiraj Arya
+              Every engineering blog, one feed.
             </span>
           </div>
         </div>
@@ -211,7 +207,6 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
             {readingTime !== null && (
               <span
                 style={{
-                  fontFamily: "JetBrains Mono",
                   fontSize: 13,
                   fontWeight: 500,
                   color: INK_MUTED,
@@ -274,18 +269,22 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
                 {data.sourceName}
               </span>
             )}
-            <span style={{ color: "rgba(15,23,42,0.3)", fontSize: 15 }}>
-              •
-            </span>
-            <span
-              style={{
-                fontSize: 15,
-                color: INK_MUTED,
-                whiteSpace: "nowrap",
-              }}
-            >
-              By {data.author}
-            </span>
+            {data.author && (
+              <>
+                <span style={{ color: "rgba(15,23,42,0.3)", fontSize: 15 }}>
+                  •
+                </span>
+                <span
+                  style={{
+                    fontSize: 15,
+                    color: INK_MUTED,
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  By {data.author}
+                </span>
+              </>
+            )}
           </div>
           <div
             style={{
@@ -297,23 +296,12 @@ function ArticleOgImage({ data, logoDataUri }: ArticleOgImageProps) {
           >
             <span
               style={{
-                fontFamily: "JetBrains Mono",
-                fontSize: 15,
-                fontWeight: 500,
+                fontSize: 16,
+                fontWeight: 600,
                 color: INK,
               }}
             >
               blogdrop.in
-            </span>
-            <span
-              style={{
-                fontFamily: "JetBrains Mono",
-                fontSize: 14,
-                fontWeight: 500,
-                color: INK_FAINT,
-              }}
-            >
-              @dhirajarya01
             </span>
           </div>
         </div>
