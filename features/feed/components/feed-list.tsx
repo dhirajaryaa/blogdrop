@@ -23,7 +23,7 @@ function FeedRow({
   index: number;
   minimal?: boolean;
 }) {
-  const logoUrl = `https://www.google.com/s2/favicons?domain=${new URL(item.originalUrl).hostname}&sz=128`;
+  const logoUrl = `https://faviconapi.com/google/64/png/${new URL(item.originalUrl).host}` || `https://www.google.com/s2/favicons?domain=${new URL(item.originalUrl).host}&sz=128`;;
 
   return (
     <div className="grid gap-2 sm:grid-cols-[3.5rem_1fr]">

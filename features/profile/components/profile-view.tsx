@@ -157,7 +157,7 @@ function ProfileView({ data }: { data: ProfileData }) {
   return (
     <div>
       <div className="mt-10 flex flex-col sm:flex-row sm:items-center sm:gap-6">
-        <Avatar size="lg">
+        <Avatar className="size-14 sm:size-20">
           <AvatarImage src={user?.image ?? undefined} />
           <AvatarFallback className="text-lg">{initials}</AvatarFallback>
         </Avatar>
