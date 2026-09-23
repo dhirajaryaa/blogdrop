@@ -1,35 +1,64 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IconArrowRight } from "@tabler/icons-react";
+import {
+  IconArrowRight,
+  IconCompass,
+  IconSearch,
+  IconSparkles,
+} from "@tabler/icons-react";
 
 function Hero() {
   return (
-    <div className="flex w-full flex-col gap-4">
-      <div className="mt-20 flex flex-col gap-2">
-        <div className="flex w-full flex-col gap-4">
-          <div className="max-w-lg space-y-2">
-            <h1 className="text-3xl font-semibold tracking-wide sm:text-4xl">
-              Discover better, engineering articles.
-            </h1>
+    <section className="flex w-full flex-col items-center py-16 sm:py-24">
+      <div className="flex flex-col items-center gap-5 text-center">
+        <span className="text-muted-foreground border-border/70 bg-muted/40 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
+          <IconSparkles size={13} stroke={1.75} />
+          Curated engineering stories, hand-picked daily
+        </span>
 
-            <p className="text-muted-foreground max-w-xl text-sm leading-6 sm:text-base">
-              Curated technical stories from the teams building what’s next.
-            </p>
-          </div>
-          <div className="flex items-center">
-            <Button
-              variant={"link"}
-              className="px-0 text-sm hover:text-blue-600 hover:no-underline"
-              asChild
-            >
-              <Link href="/feed">
-                Start reading <IconArrowRight stroke={2} />{" "}
-              </Link>
-            </Button>
-          </div>
+        <h1 className="text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl md:text-7xl">
+          Discover better
+          <br />
+          <span className="text-transparent [background:linear-gradient(120deg,var(--foreground),var(--muted-foreground))_text]">
+            engineering articles.
+          </span>
+        </h1>
+
+        <p className="text-muted-foreground max-w-xl text-sm leading-7 sm:text-base">
+          BlogDrop collects the best technical writing from the teams building
+          the web — and feeds them to you in one personalized stream.
+        </p>
+
+        <div className="mt-4 flex flex-col items-center gap-3 sm:flex-row">
+          <Button size="lg" className="h-10 gap-2 rounded-xl text-sm" asChild>
+            <Link href="/feed">
+              Start reading <IconArrowRight stroke={2} size={16} />
+            </Link>
+          </Button>
+
+          <Button
+            size="lg"
+            variant="outline"
+            className="h-10 gap-2 rounded-xl text-sm"
+            asChild
+          >
+            <Link href="/explore">
+              <IconCompass stroke={1.75} size={16} /> Explore articles
+            </Link>
+          </Button>
         </div>
       </div>
-    </div>
+
+      <div className="mt-14 flex w-full flex-col items-center gap-6">
+        <div className="search-demo text-muted-foreground border-border/70 bg-muted/30 flex w-full max-w-md items-center gap-3 rounded-xl border px-4 py-3 text-sm">
+          <IconSearch size={16} stroke={1.75} />
+          <span className="truncate">Try searching for “storage”, “LLMs”…</span>
+          <kbd className="font-mono ml-auto rounded-md border px-1.5 py-0.5 text-[10px]">
+            ⌘ K
+          </kbd>
+        </div>
+      </div>
+    </section>
   );
 }
 

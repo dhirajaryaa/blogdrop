@@ -15,7 +15,14 @@ async function FeaturedFeed() {
   return (
     <section className="my-10 space-y-8">
       <div className="flex items-end justify-between">
-        <h2 className="text-xl font-semibold tracking-wide">Featured</h2>
+        <div className="max-w-md">
+          <p className="text-muted-foreground text-xs font-medium tracking-[0.18em] uppercase">
+            Featured
+          </p>
+          <h2 className="text-foreground mt-3 text-2xl font-semibold tracking-tight sm:text-3xl">
+            Fresh off the feed.
+          </h2>
+        </div>
 
         <Button asChild variant={"link"} className="text-xs">
           <Link href="/feed">View all →</Link>
