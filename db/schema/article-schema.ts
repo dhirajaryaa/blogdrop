@@ -1,4 +1,4 @@
-import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
+import { pgTable, uuid, text, timestamp, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
 import { relations } from "drizzle-orm";
 import { user } from "./user-schema";
@@ -27,12 +27,14 @@ export const article = pgTable("article", {
     imageUrl: text("image_url").default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     status: articleStatusEnum().default("pending"),
+    processingBatchId: text("processing_batch_id"),
     slug: text("slug").notNull().unique(),
     updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
 },
     (table) => [
         index("article_source_idx").on(table.sourceId),
         index("article_published_idx").on(table.publicAt),
+        index("article_status_batch_idx").on(table.status, table.processingBatchId),
         uniqueIndex("article_url_idx").on(table.originalUrl),
     ]);
 

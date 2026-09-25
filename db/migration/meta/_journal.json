@@ -106,6 +106,20 @@
       "when": 1790136557521,
       "tag": "0014_add-read-history",
       "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1790321557913,
+      "tag": "0015_add-user-category-primary-key",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790322149217,
+      "tag": "0016_add-article-processing-batch",
+      "breakpoints": true
     }
   ]
 }

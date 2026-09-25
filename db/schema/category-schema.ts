@@ -42,7 +42,12 @@ export const userCategory = pgTable("user_category", {
     userId: text("user_id")
         .notNull()
         .references(() => user.id, { onDelete: "cascade" }),
-})
+}, (table) => [
+    primaryKey({
+        name: "user_category_user_id_category_id_pk",
+        columns: [table.userId, table.categoryId],
+    }),
+]);
 
 //? article category relation
 export const articleCategoryRelations = relations(articleCategory, ({ one }) => ({
