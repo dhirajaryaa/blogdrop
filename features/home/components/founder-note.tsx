@@ -18,7 +18,7 @@ function FounderNote() {
           <h2 className="text-foreground text-3xl leading-tight font-semibold tracking-[-0.03em] sm:text-4xl">
             I built BlogDrop because <br />
             <span className="text-foreground/60">
-              great engineering writing shouldn't be so hard to find.
+              great engineering writing shouldn&apos;t be so hard to find.
             </span>
           </h2>
 
@@ -36,7 +36,7 @@ function FounderNote() {
             </p>
 
             <p>
-              So I started building BlogDrop for myself. Now I'm making it
+              So I started building BlogDrop for myself. Now I&apos;m making it
               useful for anyone who enjoys learning from people who actually
               build.
             </p>

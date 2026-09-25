@@ -1,5 +1,4 @@
-import { Inngest, eventType } from "inngest";
-import { z } from "zod";
+import { Inngest } from "inngest";
 
 // export const refreshSourceEvent = eventType("cron/refresh-Source");
 

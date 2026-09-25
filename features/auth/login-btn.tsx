@@ -23,7 +23,7 @@ function LoginBtn({ type }: LoginBtnProps) {
           callbackURL: authCallbackPath,
         },
         {
-          onRequest: (ctx) => {
+          onRequest: () => {
             setIsLoading(true);
           },
           onError: (ctx) => {
@@ -34,7 +34,7 @@ function LoginBtn({ type }: LoginBtnProps) {
           },
         },
       );
-    } catch (error: any) {
+    } catch (error: unknown) {
       setIsLoading(false);
       toast.error("Unable to sign in. Please try again.");
       console.error(error);

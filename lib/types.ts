@@ -4,5 +4,5 @@ export type AppResponse<T= void> = {
 } | {
     success: false;
     reason: string;
-    error?: any;
+    error?: unknown;
 };

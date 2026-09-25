@@ -20,12 +20,13 @@ export default function ArticleBanner({
       )}
     >
       {/* Blurred logo background */}
-      <img
+      <Image
         src={url}
         alt={title || "Article logo"}
         aria-hidden="true"
-        className="absolute inset-0 h-full w-full scale-[2] object-contain opacity-80 blur-sm select-none"
-        draggable={false}
+        fill
+        sizes="100vw"
+        className="scale-[2] object-contain opacity-80 blur-sm select-none"
       />
 
       {/* Brightness / readability layer */}

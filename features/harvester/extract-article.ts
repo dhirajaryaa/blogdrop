@@ -44,7 +44,7 @@ export function extractArticleContent({
     unwantedElements.forEach((element) => element.remove());
 
     // Readability options only
-    const reader = new Readability(document as any, {
+    const reader = new Readability(document as unknown as Document, {
         debug: false,
     });
 

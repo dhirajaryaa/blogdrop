@@ -32,7 +32,7 @@ function LoginPage() {
           </div>
 
           <p className="text-muted-foreground mt-6 text-center text-xs leading-5">
-            By continuing, you agree to BlogDrop's{" "}
+            By continuing, you agree to BlogDrop&apos;s{" "}
             <Link
               href="/terms"
               className="text-foreground underline underline-offset-4"
