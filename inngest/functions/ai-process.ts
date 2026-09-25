@@ -12,8 +12,30 @@ export const articleAIProcessing = inngest.createFunction({
     id: "ai-article-processing",
     concurrency: 5,
     retries: 3,
+    idempotency: "event.data.articleId",
     throttle: { limit: 5, period: "1m" },
-    triggers: { event: "article/ai-processing" }
+    triggers: { event: "article/ai-processing" },
+    onFailure: async ({ event, error, step }) => {
+        const sourceEvent = event.data.event;
+        console.error(`AI processing failed for ${sourceEvent.data.articleId}:`, error);
+
+        await step.run("mark-ai-processing-failed", async () => {
+            await db
+                .update(article)
+                .set({ status: "failed" })
+                .where(
+                    and(
+                        eq(article.id, sourceEvent.data.articleId),
+                        eq(article.status, "processing"),
+                    ),
+                );
+        });
+
+        await step.sendEvent("article-batch-dispatcher-after-ai-failure", {
+            name: "app/ArticleBatchDispatcher",
+            data: {},
+        });
+    },
 },
     async ({ step, event }): Promise<IngestResult> => {
         try {

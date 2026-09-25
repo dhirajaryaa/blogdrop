@@ -8,12 +8,14 @@ type FeedArticle = {
     pubDate: string
 }
 
+export const RSS_FETCH_TIMEOUT_MS = 15_000;
+
+const parser = new Parser({ timeout: RSS_FETCH_TIMEOUT_MS });
+
 export const fetchRSS = async (rssUrl: string|null): Promise<FeedArticle[]> => {
     if(!rssUrl) return [];
 
-    const parser = new Parser();
-
-    const feed = await parser.parseURL(rssUrl);   
+    const feed = await parser.parseURL(rssUrl);
 
     return feed.items.map((item) => ({
         title: item.title ?? "",

@@ -1,7 +1,7 @@
 import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { article } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import { extractArticleContent } from "@/features/harvester/extract-article";
 import { convertHtmlToMarkdown } from "@/features/harvester/html-markdown";
 
@@ -14,11 +14,47 @@ export const articleProcessing = inngest.createFunction({
     id: "article-processing",
     concurrency: 5,
     retries: 3,
-    triggers: { event: "app/ArticleProcessing" }
+    idempotency: "event.data.articleId",
+    triggers: { event: "app/ArticleProcessing" },
+    onFailure: async ({ event, error, step }) => {
+        const sourceEvent = event.data.event;
+        console.error(`Article processing failed for ${sourceEvent.data.articleId}:`, error);
+
+        await step.run("mark-article-processing-failed", async () => {
+            await db
+                .update(article)
+                .set({ status: "failed" })
+                .where(
+                    and(
+                        eq(article.id, sourceEvent.data.articleId),
+                        eq(article.status, "processing"),
+                    ),
+                );
+        });
+    },
 }, async ({ step, event }): Promise<IngestResult> => {
 
     const { articleId, articleUrl } = event.data;
     if (!(articleId && articleUrl)) return { status: "error", reason: "article id and article url required to proceed" };
+
+    const claimedArticle = await step.run("claim-article-processing", async () => {
+        const [claimed] = await db
+            .update(article)
+            .set({ processingBatchId: null })
+            .where(
+                and(
+                    eq(article.id, articleId),
+                    eq(article.status, "processing"),
+                ),
+            )
+            .returning({ id: article.id });
+
+        return claimed;
+    });
+
+    if (!claimedArticle) {
+        return { status: "error", reason: "article not found or not in processing state" };
+    }
 
     //* helper: guarantee a terminal status so rows never stay "processing"
     const markFailed = (reason: string) =>
