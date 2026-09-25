@@ -4,12 +4,23 @@
 
 import { AppResponse } from "@/lib/types";
 import { db } from "@/db";
-import { bookmark, category, source, user, userCategory, userTag } from "@/db/schema";
-import { and, eq, sql } from "drizzle-orm";
+import {
+  bookmark,
+  category,
+  source,
+  user,
+  userCategory,
+  userTag,
+} from "@/db/schema";
+import { eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
-import type { ProfileData, ProfileInput } from "./profile.types";
+import type {
+  ProfileData,
+  ProfileInput,
+  ProfileSelectionsInput,
+} from "./profile.types";
 
 const configuredCategories = articleCategories.map(({ value, label }) => ({
   slug: value,
@@ -84,12 +95,12 @@ export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
         },
       },
     };
-
   } catch (error) {
     console.error("Error fetching profile:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to fetch profile",
+      reason:
+        error instanceof Error ? error.message : "Failed to fetch profile",
     };
   }
 };
@@ -123,143 +134,109 @@ export const updateProfile = async (
       .where(eq(user.id, authUser.id));
 
     return { success: true, data: null };
-
   } catch (error) {
     console.error("Error updating profile:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to update profile",
+      reason:
+        error instanceof Error ? error.message : "Failed to update profile",
     };
   }
 };
 
-//* toggle an interest (category) for the current user
-export const toggleCategory = async (
-  slug: string,
-): Promise<AppResponse<void>> => {
+export const saveProfileSelections = async (
+  input: ProfileSelectionsInput,
+): Promise<AppResponse<null>> => {
   try {
+    if (!Array.isArray(input.interests) || !Array.isArray(input.tags)) {
+      return { success: false, reason: "Invalid profile selections" };
+    }
+
     const authUser = await getCurrentUser();
 
     if (!authUser) {
-      return { success: false, reason: "Login required to update interests" };
+      return { success: false, reason: "Login required to update selections" };
     }
 
-    const selectedCategory = articleCategories.find(
-      (item) => item.value === slug,
-    );
+    const interestSlugs = [
+      ...new Set(input.interests.map((interest) => interest.trim())),
+    ];
+    const selectedCategories = interestSlugs.flatMap((slug) => {
+      const selectedCategory = articleCategories.find(
+        (item) => item.value === slug,
+      );
 
-    if (!selectedCategory) {
-      return { success: false, reason: "Category not found" };
+      return selectedCategory ? [selectedCategory] : [];
+    });
+
+    if (selectedCategories.length !== interestSlugs.length) {
+      return { success: false, reason: "Choose configured categories only" };
     }
 
-    const [target] = await db
-      .insert(category)
-      .values({
-        name: selectedCategory.label,
-        slug: selectedCategory.value,
-      })
-      .onConflictDoUpdate({
-        target: category.slug,
-        set: { name: selectedCategory.label },
-      })
-      .returning({ id: category.id });
+    const selectedTags = [
+      ...new Set(input.tags.map((tag) => tag.trim()).filter(Boolean)),
+    ];
 
-    const [existing] = await db
-      .select({ userId: userCategory.userId })
-      .from(userCategory)
-      .where(
-        and(
-          eq(userCategory.categoryId, target.id),
-          eq(userCategory.userId, authUser.id),
-        ),
-      )
-      .limit(1);
-
-    if (existing) {
-      await db
-        .delete(userCategory)
-        .where(
-          and(
-            eq(userCategory.categoryId, target.id),
-            eq(userCategory.userId, authUser.id),
-          ),
-        );
-    } else {
-      await db
-        .insert(userCategory)
-        .values({ categoryId: target.id, userId: authUser.id })
-        .onConflictDoNothing();
-    }
-
-    return { success: true, data: undefined };
-
-  } catch (error) {
-    console.error("Error toggling category:", error);
-    return {
-      success: false,
-      reason: error instanceof Error ? error.message : "Failed to update interests",
-    };
-  }
-};
-
-//* add a tag (only predefined tags from config/tags.ts are allowed)
-export const addTag = async (name: string): Promise<AppResponse<void>> => {
-  try {
-    const trimmed = name.trim();
-
-    if (!trimmed) {
-      return { success: false, reason: "Tag name is required" };
-    }
-
-    if (!predefinedTagNames.has(trimmed)) {
+    if (!selectedTags.every((tag) => predefinedTagNames.has(tag))) {
       return {
         success: false,
-        reason: "Choose a tag from the predefined list only",
+        reason: "Choose predefined tags only",
       };
     }
 
-    const authUser = await getCurrentUser();
+    await db.transaction(async (tx) => {
+      let categoryIds: number[] = [];
 
-    if (!authUser) {
-      return { success: false, reason: "Login required to add tags" };
-    }
+      if (selectedCategories.length > 0) {
+        const savedCategories = await tx
+          .insert(category)
+          .values(
+            selectedCategories.map((item) => ({
+              name: item.label,
+              slug: item.value,
+            })),
+          )
+          .onConflictDoUpdate({
+            target: category.slug,
+            set: { name: sql`excluded.name` },
+          })
+          .returning({ id: category.id });
 
-    await db
-      .insert(userTag)
-      .values({ userId: authUser.id, name: trimmed })
-      .onConflictDoNothing();
+        categoryIds = savedCategories.map(({ id }) => id);
+      }
 
-    return { success: true, data: undefined };
+      await tx.delete(userCategory).where(eq(userCategory.userId, authUser.id));
 
+      if (categoryIds.length > 0) {
+        await tx.insert(userCategory).values(
+          categoryIds.map((categoryId) => ({
+            categoryId,
+            userId: authUser.id,
+          })),
+        );
+      }
+
+      await tx.delete(userTag).where(eq(userTag.userId, authUser.id));
+
+      if (selectedTags.length > 0) {
+        await tx.insert(userTag).values(
+          selectedTags.map((name) => ({
+            name,
+            userId: authUser.id,
+          })),
+        );
+      }
+    });
+
+    return { success: true, data: null };
   } catch (error) {
-    console.error("Error adding tag:", error);
+    console.error("Error saving profile selections:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to add tag",
-    };
-  }
-};
-
-//* remove a tag for the current user
-export const removeTag = async (name: string): Promise<AppResponse<void>> => {
-  try {
-    const authUser = await getCurrentUser();
-
-    if (!authUser) {
-      return { success: false, reason: "Login required to remove tags" };
-    }
-
-    await db
-      .delete(userTag)
-      .where(and(eq(userTag.userId, authUser.id), eq(userTag.name, name)));
-
-    return { success: true, data: undefined };
-
-  } catch (error) {
-    console.error("Error removing tag:", error);
-    return {
-      success: false,
-      reason: error instanceof Error ? error.message : "Failed to remove tag",
+      reason:
+        error instanceof Error
+          ? error.message
+          : "Failed to save profile selections",
     };
   }
 };

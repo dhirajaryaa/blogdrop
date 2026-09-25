@@ -31,3 +31,8 @@ export type ProfileInput = {
   about: string;
   experienceLevel: "junior" | "mid" | "senior";
 };
+
+export type ProfileSelectionsInput = {
+  interests: string[];
+  tags: string[];
+};

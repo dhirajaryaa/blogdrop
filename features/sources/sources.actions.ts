@@ -5,8 +5,10 @@
 import { AppResponse } from "@/lib/types";
 import { db } from "@/db";
 import { article, articleMetaData, source } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import type { SourceDetail, SourceItem } from "./sources.types";
+
+const doneArticleCount = sql<number>`count(${article.id}) filter (where ${article.status} = 'done')`;
 
 export const getSources = async (): Promise<AppResponse<SourceItem[]>> => {
   try {
@@ -16,20 +18,21 @@ export const getSources = async (): Promise<AppResponse<SourceItem[]>> => {
         title: source.title,
         siteUrl: source.siteUrl,
         isActive: source.isActive,
-        articleCount: sql<number>`count(${article.id})`,
+        articleCount: doneArticleCount,
       })
       .from(source)
       .leftJoin(article, eq(article.sourceId, source.id))
+      .where(eq(source.isActive, true))
       .groupBy(source.id, source.title, source.siteUrl, source.isActive)
-      .orderBy(sql`count(${article.id}) desc`);
+      .orderBy(desc(doneArticleCount));
 
     return { success: true, data: rows };
-
   } catch (error) {
     console.error("Error fetching sources:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to fetch sources",
+      reason:
+        error instanceof Error ? error.message : "Failed to fetch sources",
     };
   }
 };
@@ -48,11 +51,11 @@ export const getSourceArticles = async (
         title: source.title,
         siteUrl: source.siteUrl,
         isActive: source.isActive,
-        articleCount: sql<number>`count(${article.id})`,
+        articleCount: doneArticleCount,
       })
       .from(source)
       .leftJoin(article, eq(article.sourceId, source.id))
-      .where(eq(source.id, sourceId))
+      .where(and(eq(source.id, sourceId), eq(source.isActive, true)))
       .groupBy(source.id, source.title, source.siteUrl, source.isActive)
       .limit(1);
 
@@ -77,16 +80,24 @@ export const getSourceArticles = async (
       .from(article)
       .innerJoin(source, eq(article.sourceId, source.id))
       .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
-      .where(eq(article.sourceId, sourceId))
+      .where(
+        and(
+          eq(article.sourceId, sourceId),
+          eq(source.isActive, true),
+          eq(article.status, "done"),
+        ),
+      )
       .orderBy(sql`${article.publicAt} desc`);
 
     return { success: true, data: { source: sourceInfo, articles } };
-
   } catch (error) {
     console.error("Error fetching source articles:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to fetch source articles",
+      reason:
+        error instanceof Error
+          ? error.message
+          : "Failed to fetch source articles",
     };
   }
 };

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, useTransition } from "react";
+import { useRef, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import {
@@ -16,12 +16,7 @@ import LogoutButton from "@/features/auth/logout-button";
 import { cn } from "@/lib/utils";
 import { userTags } from "@/config/tags";
 import type { ProfileData, ProfileInterest } from "../profile.types";
-import {
-  addTag,
-  removeTag,
-  toggleCategory,
-  updateProfile,
-} from "../profile.actions";
+import { saveProfileSelections, updateProfile } from "../profile.actions";
 
 const experienceOptions: { value: string; label: string }[] = [
   { value: "junior", label: "Junior" },
@@ -31,7 +26,13 @@ const experienceOptions: { value: string; label: string }[] = [
 
 function ProfileView({ data }: { data: ProfileData }) {
   const router = useRouter();
-  const { user, interests: initialInterests, tags: initialTags, allCategories, stats } = data;
+  const {
+    user,
+    interests: initialInterests,
+    tags: initialTags,
+    allCategories,
+    stats,
+  } = data;
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -42,10 +43,14 @@ function ProfileView({ data }: { data: ProfileData }) {
   );
 
   const [editingInterests, setEditingInterests] = useState(false);
-  const [interests, setInterests] = useState<ProfileInterest[]>(initialInterests);
+  const [interests, setInterests] =
+    useState<ProfileInterest[]>(initialInterests);
   const [editingTags, setEditingTags] = useState(false);
   const [tags, setTags] = useState<string[]>(initialTags);
-  const [isToggling, startToggling] = useTransition();
+  const [interestCount, setInterestCount] = useState(stats.interests);
+  const persistedInterests = useRef(initialInterests);
+  const persistedTags = useRef(initialTags);
+  const [isSavingSelections, startSavingSelections] = useTransition();
 
   const initials = (user?.name || user?.email || "?").slice(0, 2).toUpperCase();
   const memberSince = user?.createdAt
@@ -57,7 +62,7 @@ function ProfileView({ data }: { data: ProfileData }) {
 
   const statItems = [
     { label: "Saved", value: stats.saved },
-    { label: "Interests", value: stats.interests },
+    { label: "Interests", value: interestCount },
     { label: "Following", value: stats.following },
   ];
 
@@ -102,88 +107,62 @@ function ProfileView({ data }: { data: ProfileData }) {
   };
 
   const handleToggleInterest = (interest: ProfileInterest) => {
-    const previousInterests = interests;
-    const selected = interests.some(
-      (item) => item.slug === interest.slug,
+    setInterests((current) =>
+      current.some((item) => item.slug === interest.slug)
+        ? current.filter((item) => item.slug !== interest.slug)
+        : [...current, interest],
     );
-
-    startToggling(async () => {
-      setInterests((prev) =>
-        selected
-          ? prev.filter((item) => item.slug !== interest.slug)
-          : [...prev, interest],
-      );
-
-      try {
-        const res = await toggleCategory(interest.slug);
-
-        if (res.success) {
-          router.refresh();
-        } else {
-          setInterests(previousInterests);
-          toast.error(res.reason || "Failed to update interests");
-        }
-      } catch (error) {
-        setInterests(previousInterests);
-        toast.error(
-          error instanceof Error
-            ? error.message
-            : "Failed to update interests",
-        );
-      }
-    });
   };
 
   const handleToggleTag = (label: string) => {
-    const previousTags = tags;
-    const selected = tags.includes(label);
-
-    setTags((prev) =>
-      selected
-        ? prev.filter((tag) => tag !== label)
-        : [...prev, label],
+    setTags((current) =>
+      current.includes(label)
+        ? current.filter((tag) => tag !== label)
+        : [...current, label],
     );
-
-    startToggling(async () => {
-      try {
-        const res = selected ? await removeTag(label) : await addTag(label);
-
-        if (!res.success) {
-          setTags(previousTags);
-          toast.error(res.reason || "Failed to update tag");
-        }
-        router.refresh();
-      } catch (error) {
-        setTags(previousTags);
-        toast.error(
-          error instanceof Error ? error.message : "Failed to update tag",
-        );
-      }
-    });
   };
 
   const handleRemoveTag = (value: string) => {
-    const previousTags = tags;
-    setTags((prev) => prev.filter((tag) => tag !== value));
+    setTags((current) => current.filter((tag) => tag !== value));
+    setEditingTags(true);
+  };
 
-    startToggling(async () => {
+  const handleDone = (section: "interests" | "tags") => {
+    startSavingSelections(async () => {
+      const nextInterests = interests;
+      const nextTags = tags;
+
       try {
-        const res = await removeTag(value);
+        const response = await saveProfileSelections({
+          interests: nextInterests.map(({ slug }) => slug),
+          tags: nextTags,
+        });
 
-        if (!res.success) {
-          setTags(previousTags);
-          toast.error(res.reason || "Failed to remove tag");
+        if (!response.success) {
+          setInterests(persistedInterests.current);
+          setTags(persistedTags.current);
+          toast.error(response.reason || "Failed to save selections");
+          return;
         }
+
+        persistedInterests.current = nextInterests;
+        persistedTags.current = nextTags;
+        setInterestCount(nextInterests.length);
+        setEditingInterests(section === "interests" ? false : editingInterests);
+        setEditingTags(section === "tags" ? false : editingTags);
+        toast.success(
+          section === "interests" ? "Interests updated" : "Tags updated",
+        );
         router.refresh();
       } catch (error) {
-        setTags(previousTags);
+        setInterests(persistedInterests.current);
+        setTags(persistedTags.current);
         toast.error(
-          error instanceof Error ? error.message : "Failed to remove tag",
+          error instanceof Error ? error.message : "Failed to save selections",
         );
       }
     });
   };
-
 
   return (
     <div>
@@ -283,7 +262,7 @@ function ProfileView({ data }: { data: ProfileData }) {
                   type="email"
                   readOnly
                   disabled
-                  className="border-border/70 h-11 w-full cursor-not-allowed rounded-xl border bg-muted/40 px-4 text-sm outline-none"
+                  className="border-border/70 bg-muted/40 h-11 w-full cursor-not-allowed rounded-xl border px-4 text-sm outline-none"
                 />
               </div>
             </div>
@@ -316,7 +295,7 @@ function ProfileView({ data }: { data: ProfileData }) {
                       className={
                         active
                           ? "border-primary bg-primary text-primary-foreground rounded-full border px-4 py-1.5 text-xs"
-                          : "border-border/80 hover:bg-muted/40 rounded-full border px-4 py-1.5 text-xs text-muted-foreground transition-colors"
+                          : "border-border/80 hover:bg-muted/40 text-muted-foreground rounded-full border px-4 py-1.5 text-xs transition-colors"
                       }
                     >
                       {option.label}
@@ -330,7 +309,7 @@ function ProfileView({ data }: { data: ProfileData }) {
               type="button"
               onClick={handleSave}
               disabled={saving}
-              className="bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50 flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 flex items-center gap-2 rounded-lg px-5 py-2.5 text-sm font-medium transition-colors disabled:opacity-50"
             >
               {saving && (
                 <span className="size-3.5 animate-spin rounded-full border-2 border-current border-t-transparent" />
@@ -348,7 +327,14 @@ function ProfileView({ data }: { data: ProfileData }) {
           </p>
           <button
             type="button"
-            onClick={() => setEditingInterests((prev) => !prev)}
+            onClick={() => {
+              if (editingInterests) {
+                handleDone("interests");
+              } else {
+                setEditingInterests(true);
+              }
+            }}
+            disabled={isSavingSelections}
             className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
           >
             <IconPencil size={13} stroke={1.75} />
@@ -368,7 +354,7 @@ function ProfileView({ data }: { data: ProfileData }) {
                   key={interest.slug}
                   type="button"
                   onClick={() => handleToggleInterest(interest)}
-                  disabled={isToggling}
+                  disabled={isSavingSelections}
                   className={cn(
                     "rounded-full border px-4 py-1.5 text-xs transition-colors",
                     active
@@ -415,8 +401,14 @@ function ProfileView({ data }: { data: ProfileData }) {
           </p>
           <button
             type="button"
-            onClick={() => setEditingTags((prev) => !prev)}
-            disabled={isToggling}
+            onClick={() => {
+              if (editingTags) {
+                handleDone("tags");
+              } else {
+                setEditingTags(true);
+              }
+            }}
+            disabled={isSavingSelections}
             className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-xs transition-colors"
           >
             <IconPencil size={13} stroke={1.75} />
@@ -435,7 +427,7 @@ function ProfileView({ data }: { data: ProfileData }) {
                     key={value}
                     type="button"
                     onClick={() => handleToggleTag(label)}
-                    disabled={isToggling}
+                    disabled={isSavingSelections}
                     className={cn(
                       "rounded-full border px-4 py-1.5 text-xs transition-colors",
                       active
@@ -475,7 +467,7 @@ function ProfileView({ data }: { data: ProfileData }) {
                 <button
                   type="button"
                   onClick={() => handleRemoveTag(tag)}
-                  disabled={isToggling}
+                  disabled={isSavingSelections}
                   aria-label={`Remove tag ${tag}`}
                   className="text-muted-foreground hover:text-foreground rounded-full p-0.5 transition-colors"
                 >
