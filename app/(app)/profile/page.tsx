@@ -12,6 +12,8 @@ import { Suspense } from "react";
 export const metadata: Metadata = constructMetadata({
   title: "Profile — BlogDrop",
   description: "Your profile and reading interests on BlogDrop.",
+  noIndex: true,
+  path: "/profile",
 });
 
 function LoginPrompt() {

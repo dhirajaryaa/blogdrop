@@ -7,8 +7,14 @@ import { db } from "@/db";
 import { bookmark, category, source, user, userCategory, userTag } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
+import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
 import type { ProfileData, ProfileInput } from "./profile.types";
+
+const configuredCategories = articleCategories.map(({ value, label }) => ({
+  slug: value,
+  name: label,
+}));
 
 //? only predefined tags from config/tags.ts are allowed as profile tags
 const predefinedTagNames = new Set<string>(userTags.map((tag) => tag.label));
@@ -30,7 +36,7 @@ export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
       };
     }
 
-    const [interests, tags, allCategories, saved, following] = await Promise.all([
+    const [interests, tags, saved, following] = await Promise.all([
       db
         .select({
           name: category.name,
@@ -45,14 +51,6 @@ export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
         .from(userTag)
         .where(eq(userTag.userId, authUser.id))
         .orderBy(userTag.createdAt),
-
-      db
-        .select({
-          name: category.name,
-          slug: category.slug,
-        })
-        .from(category)
-        .orderBy(category.name),
 
       db
         .select({ count: sql<number>`count(*)` })
@@ -78,7 +76,7 @@ export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
         },
         interests,
         tags: tags.map((tag) => tag.name),
-        allCategories,
+        allCategories: configuredCategories,
         stats: {
           saved: saved[0]?.count ?? 0,
           interests: interests.length,
@@ -146,15 +144,25 @@ export const toggleCategory = async (
       return { success: false, reason: "Login required to update interests" };
     }
 
-    const [target] = await db
-      .select({ id: category.id })
-      .from(category)
-      .where(eq(category.slug, slug))
-      .limit(1);
+    const selectedCategory = articleCategories.find(
+      (item) => item.value === slug,
+    );
 
-    if (!target) {
+    if (!selectedCategory) {
       return { success: false, reason: "Category not found" };
     }
+
+    const [target] = await db
+      .insert(category)
+      .values({
+        name: selectedCategory.label,
+        slug: selectedCategory.value,
+      })
+      .onConflictDoUpdate({
+        target: category.slug,
+        set: { name: selectedCategory.label },
+      })
+      .returning({ id: category.id });
 
     const [existing] = await db
       .select({ userId: userCategory.userId })

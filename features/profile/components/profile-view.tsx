@@ -101,28 +101,41 @@ function ProfileView({ data }: { data: ProfileData }) {
     }
   };
 
-  const handleToggleInterest = (slug: string) => {
-    startToggling(async () => {
-      const selected = interests.some((i) => i.slug === slug);
+  const handleToggleInterest = (interest: ProfileInterest) => {
+    const previousInterests = interests;
+    const selected = interests.some(
+      (item) => item.slug === interest.slug,
+    );
 
+    startToggling(async () => {
       setInterests((prev) =>
         selected
-          ? prev.filter((i) => i.slug !== slug)
-          : [...prev, { slug, name: slug }],
+          ? prev.filter((item) => item.slug !== interest.slug)
+          : [...prev, interest],
       );
 
-      const res = await toggleCategory(slug);
+      try {
+        const res = await toggleCategory(interest.slug);
 
-      if (res.success) {
-        router.refresh();
-      } else {
-        toast.error(res.reason || "Failed to update interests");
-        router.refresh();
+        if (res.success) {
+          router.refresh();
+        } else {
+          setInterests(previousInterests);
+          toast.error(res.reason || "Failed to update interests");
+        }
+      } catch (error) {
+        setInterests(previousInterests);
+        toast.error(
+          error instanceof Error
+            ? error.message
+            : "Failed to update interests",
+        );
       }
     });
   };
 
   const handleToggleTag = (label: string) => {
+    const previousTags = tags;
     const selected = tags.includes(label);
 
     setTags((prev) =>
@@ -132,25 +145,42 @@ function ProfileView({ data }: { data: ProfileData }) {
     );
 
     startToggling(async () => {
-      const res = selected ? await removeTag(label) : await addTag(label);
+      try {
+        const res = selected ? await removeTag(label) : await addTag(label);
 
-      if (!res.success) {
-        toast.error(res.reason || "Failed to update tag");
+        if (!res.success) {
+          setTags(previousTags);
+          toast.error(res.reason || "Failed to update tag");
+        }
+        router.refresh();
+      } catch (error) {
+        setTags(previousTags);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to update tag",
+        );
       }
-      router.refresh();
     });
   };
 
   const handleRemoveTag = (value: string) => {
+    const previousTags = tags;
     setTags((prev) => prev.filter((tag) => tag !== value));
 
     startToggling(async () => {
-      const res = await removeTag(value);
+      try {
+        const res = await removeTag(value);
 
-      if (!res.success) {
-        toast.error(res.reason || "Failed to remove tag");
+        if (!res.success) {
+          setTags(previousTags);
+          toast.error(res.reason || "Failed to remove tag");
+        }
+        router.refresh();
+      } catch (error) {
+        setTags(previousTags);
+        toast.error(
+          error instanceof Error ? error.message : "Failed to remove tag",
+        );
       }
-      router.refresh();
     });
   };
 
@@ -337,7 +367,7 @@ function ProfileView({ data }: { data: ProfileData }) {
                 <button
                   key={interest.slug}
                   type="button"
-                  onClick={() => handleToggleInterest(interest.slug)}
+                  onClick={() => handleToggleInterest(interest)}
                   disabled={isToggling}
                   className={cn(
                     "rounded-full border px-4 py-1.5 text-xs transition-colors",
