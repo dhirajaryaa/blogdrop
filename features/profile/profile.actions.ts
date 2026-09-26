@@ -242,7 +242,7 @@ export const saveProfileSelections = async (
       }
     });
 
-    revalidateTag("personalized-feed-rank", "max");
+    revalidateTag("personalized-feed-rank");
 
     return { success: true, data: null };
   } catch (error) {

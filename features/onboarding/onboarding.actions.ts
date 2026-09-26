@@ -12,13 +12,11 @@ import { eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
 import { redirect } from "next/navigation";
 
-type InterestInput = Set<string>;
-
 export const saveInterest = async (
-    interests: InterestInput,
+    interests: string[],
 ): Promise<AppResponse<null>> => {
     // Validate input
-    if (!interests?.size) {
+    if (!interests?.length) {
         return {
             success: false,
             reason: "Interests are required.",
@@ -33,7 +31,8 @@ export const saveInterest = async (
     }
 
     // Validate interests against allowed categories
-    const data = [...interests].flatMap((interest) => {
+    const uniqueInterests = [...new Set(interests)];
+    const data = uniqueInterests.flatMap((interest) => {
         const matchedCategory = articleCategories.find(
             (cat) => cat.value === interest,
         );

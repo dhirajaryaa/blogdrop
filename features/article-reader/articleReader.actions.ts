@@ -1,3 +1,5 @@
+"use server";
+
 import { AppResponse } from "@/lib/types";
 import { ArticleDetails } from "./articleReader.types";
 import {

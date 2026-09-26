@@ -182,7 +182,7 @@ function InterestSelect() {
     setError(null);
 
     try {
-      const res = await saveInterest(topic);
+      const res = await saveInterest([...topic]);
 
       if (!res.success) {
         const message = res.reason || "Something went wrong while saving your interests.";

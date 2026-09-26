@@ -45,6 +45,12 @@ export const getSourceArticles = async (
       return { success: false, reason: "Invalid source" };
     }
 
+    // validate UUID format to prevent Postgres errors
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(sourceId)) {
+      return { success: false, reason: "Source not found" };
+    }
+
     const [sourceInfo] = await db
       .select({
         id: source.id,

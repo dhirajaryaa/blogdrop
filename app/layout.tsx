@@ -41,7 +41,9 @@ export default function RootLayout({
         <Toaster position="top-right" />
 
         {/* google analytics */}
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID!} />
+        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID} />
+        )}
       </body>
     </html>
   );

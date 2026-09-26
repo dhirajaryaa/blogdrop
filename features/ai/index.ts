@@ -38,7 +38,7 @@ export const llmGeneration = async (articleMarkdown: string): Promise<Response> 
 
         const result = metadataSchema.safeParse(parsed);
 
-        console.log("promotional content filter out",result.data?.isPromotional);
+        // promotional content filtered: result.data?.isPromotional
         
 
         if (!result.success) {
