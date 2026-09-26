@@ -13,7 +13,18 @@
 import { AppResponse } from "@/lib/types";
 import { FeedArticle, FeedInputProps } from "./feed.types";
 import { db } from "@/db";
-import { article, articleMetaData, articleCategory, articleTag, category, readHistory, source, tag, userCategory, userTag } from "@/db/schema";
+import {
+  article,
+  articleMetaData,
+  articleCategory,
+  articleTag,
+  category,
+  readHistory,
+  source,
+  tag,
+  userCategory,
+  userTag,
+} from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
 import { unstable_cache } from "next/cache";
@@ -81,15 +92,19 @@ const getRankedPool = unstable_cache(
 
     //? parameterized IN (...) value list
     const inList = (values: string[]) =>
-      sql`(${sql.join(values.map((v) => sql`${v}`), sql`, `)})`;
+      sql`(${sql.join(
+        values.map((v) => sql`${v}`),
+        sql`, `,
+      )})`;
 
     const categorySlugs = [...userCategorySlugs];
     const tagNames = [...userTagNames];
 
     //? count the reader's interest matches in SQL instead of shipping every
     //? article's categories/tags up and filtering them in JS
-    const categoryCountSql = categorySlugs.length > 0
-      ? sql<number>`
+    const categoryCountSql =
+      categorySlugs.length > 0
+        ? sql<number>`
           (
             SELECT COUNT(*)
             FROM ${articleCategory}
@@ -98,10 +113,11 @@ const getRankedPool = unstable_cache(
               AND ${category.slug} IN ${inList(categorySlugs)}
           )
         `
-      : sql<number>`0`;
+        : sql<number>`0`;
 
-    const tagCountSql = tagNames.length > 0
-      ? sql<number>`
+    const tagCountSql =
+      tagNames.length > 0
+        ? sql<number>`
           (
             SELECT COUNT(*)
             FROM ${articleTag}
@@ -110,7 +126,7 @@ const getRankedPool = unstable_cache(
               AND LOWER(${tag.name}) IN ${inList(tagNames)}
           )
         `
-      : sql<number>`0`;
+        : sql<number>`0`;
 
     //? articles the reader already opened never come back in the personalized
     //? feed. a NOT EXISTS filter is cheaper than loading the read ids into JS
@@ -174,7 +190,9 @@ const getRankedPool = unstable_cache(
           (item.tagCount ?? 0) * TAG_WEIGHT;
 
         const ts = Date.parse(item.publishDate);
-        const daysAgo = Number.isNaN(ts) ? 9999 : Math.max(0, (now - ts) / 86_400_000);
+        const daysAgo = Number.isNaN(ts)
+          ? 9999
+          : Math.max(0, (now - ts) / 86_400_000);
         const recency = 1 / (1 + daysAgo);
 
         const score =
@@ -188,7 +206,10 @@ const getRankedPool = unstable_cache(
       .map(({ item }) => item);
   },
   ["personalized-feed-rank"],
-  { revalidate: RANK_CACHE_REVALIDATE },
+  {
+    revalidate: RANK_CACHE_REVALIDATE,
+    tags: ["personalized-feed-rank"],
+  },
 );
 
 //? public feed (logged-out mode)
@@ -280,11 +301,16 @@ export const getPublicFeed = async ({
         const data = await run(false);
         return { success: true, data };
       } catch (fallbackError) {
-        console.error("Error fetching public feed (without category):", fallbackError);
+        console.error(
+          "Error fetching public feed (without category):",
+          fallbackError,
+        );
         return {
           success: false,
           reason:
-            fallbackError instanceof Error ? fallbackError.message : "Failed to fetch feed",
+            fallbackError instanceof Error
+              ? fallbackError.message
+              : "Failed to fetch feed",
         };
       }
     }
@@ -340,12 +366,12 @@ export const getLatestFeed = async ({
       .limit(parsedLimit);
 
     return { success: true, data };
-
   } catch (error) {
     console.error("Error fetching latest feed:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to fetch latest feed",
+      reason:
+        error instanceof Error ? error.message : "Failed to fetch latest feed",
     };
   }
 };
@@ -356,7 +382,9 @@ const getPersonalizedFeed = async ({
   offset,
   category: categorySlug,
   userId,
-}: FeedInputProps & { userId: string }): Promise<AppResponse<FeedArticle[]>> => {
+}: FeedInputProps & { userId: string }): Promise<
+  AppResponse<FeedArticle[]>
+> => {
   try {
     //* reader's interests
     const [catRows, tagRows] = await Promise.all([
@@ -382,24 +410,26 @@ const getPersonalizedFeed = async ({
     //* ranked pool is cached for RANK_CACHE_REVALIDATE, so page 2, 3, ... reuse
     //* the same ranking instead of re-fetching and re-sorting all 500 rows
     const daySeed = new Date().toISOString().slice(0, 10);
-    const rankedPool = await getRankedPool(userId, categorySlug ?? null, daySeed);
+    const rankedPool = await getRankedPool(
+      userId,
+      categorySlug ?? null,
+      daySeed,
+    );
 
     //* paginate after ranking
-    const data = rankedPool
-      .slice(offset, offset + limit)
-      .map((item) => ({
-        id: item.id,
-        slug: item.slug,
-        title: item.title,
-        author: item.author,
-        originalUrl: item.originalUrl,
-        publishDate: item.publishDate,
-        sourceName: item.sourceName,
-        sourceUrl: item.sourceUrl,
-        summary: item.summary,
-        difficulty: item.difficulty,
-        readingTime: item.readingTime,
-      }));
+    const data = rankedPool.slice(offset, offset + limit).map((item) => ({
+      id: item.id,
+      slug: item.slug,
+      title: item.title,
+      author: item.author,
+      originalUrl: item.originalUrl,
+      publishDate: item.publishDate,
+      sourceName: item.sourceName,
+      sourceUrl: item.sourceUrl,
+      summary: item.summary,
+      difficulty: item.difficulty,
+      readingTime: item.readingTime,
+    }));
 
     return { success: true, data };
   } catch (error) {
@@ -436,7 +466,11 @@ export const getUserFeed = async ({
     const authUser = await getCurrentUser();
 
     if (!authUser) {
-      return getPublicFeed({ limit: parsedLimit, offset: parsedOffset, category: categorySlug });
+      return getPublicFeed({
+        limit: parsedLimit,
+        offset: parsedOffset,
+        category: categorySlug,
+      });
     }
 
     return getPersonalizedFeed({

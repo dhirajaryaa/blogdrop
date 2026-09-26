@@ -7,11 +7,7 @@ import { IconArrowUpRight } from "@tabler/icons-react";
 import SaveArticleButton from "./save-article";
 import { decodeHtmlEntities } from "@/lib/html";
 
-function ArticleReader({ article }: { article: ArticleDetails }) {
-
-  console.log(new URL(article.sourceUrl!).host);
-  console.log(new URL(article.originalUrl).host);
-  
+function ArticleReader({ article }: { article: ArticleDetails }) {  
   
   const logoUrl = `https://faviconapi.com/google/64/png/${new URL(article.originalUrl).host}` || `https://www.google.com/s2/favicons?domain=${new URL(article.originalUrl).host}&sz=128` ;
 

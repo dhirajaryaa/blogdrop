@@ -6,24 +6,39 @@ import { articleCategories } from "@/config/category";
 import { AppResponse } from "@/lib/types";
 import { FeedArticle } from "@/features/feed/feed.types";
 import { db } from "@/db";
-import { article, articleCategory, articleMetaData, category, source } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import {
+  article,
+  articleCategory,
+  articleMetaData,
+  category,
+  source,
+} from "@/db/schema";
+import { and, eq, sql } from "drizzle-orm";
 import type { ExploreCategory } from "./explore.types";
 
 const categoryLabelMap: Record<string, string> = Object.fromEntries(
   articleCategories.map((item) => [item.value, item.label]),
 );
 
-export const getExploreCategories = async (): Promise<AppResponse<ExploreCategory[]>> => {
+export const getExploreCategories = async (): Promise<
+  AppResponse<ExploreCategory[]>
+> => {
   try {
     const rows = await db
       .select({
         slug: category.slug,
         name: category.name,
-        count: sql<number>`count(${articleCategory.articleId})`,
+        count: sql<number>`count(${article.id})`,
       })
       .from(category)
       .leftJoin(articleCategory, eq(articleCategory.categoryId, category.id))
+      .leftJoin(
+        article,
+        and(
+          eq(article.id, articleCategory.articleId),
+          eq(article.status, "done"),
+        ),
+      )
       .groupBy(category.id, category.slug, category.name)
       .orderBy(category.name);
 
@@ -33,12 +48,12 @@ export const getExploreCategories = async (): Promise<AppResponse<ExploreCategor
     }));
 
     return { success: true, data };
-
   } catch (error) {
     console.error("Error fetching explore categories:", error);
     return {
       success: false,
-      reason: error instanceof Error ? error.message : "Failed to fetch categories",
+      reason:
+        error instanceof Error ? error.message : "Failed to fetch categories",
     };
   }
 };
@@ -56,7 +71,7 @@ export const searchArticles = async (
 
     const searchQuery = sql`plainto_tsquery('english', ${trimmed})`;
     const searchVector = sql`to_tsvector('english', ${article.title} || ' ' || COALESCE(${articleMetaData.summary}, '') || ' ' || ${article.author} || ' ' || ${source.title})`;
-    
+
     const rank = sql`ts_rank(${searchVector}, ${searchQuery})`;
 
     const data = await db
@@ -76,12 +91,13 @@ export const searchArticles = async (
       .from(article)
       .innerJoin(source, eq(article.sourceId, source.id))
       .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
-      .where(sql`${searchVector} @@ ${searchQuery}`)
+      .where(
+        and(sql`${searchVector} @@ ${searchQuery}`, eq(article.status, "done")),
+      )
       .orderBy(sql`${rank} desc`, sql`${article.publicAt} desc`)
       .limit(30);
 
     return { success: true, data };
-
   } catch (error) {
     console.error("Error searching articles:", error);
     return {

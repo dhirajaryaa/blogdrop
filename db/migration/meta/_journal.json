@@ -120,6 +120,13 @@
       "when": 1790322149217,
       "tag": "0016_add-article-processing-batch",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790328781823,
+      "tag": "0017_add-processing-lease",
+      "breakpoints": true
     }
   ]
 }

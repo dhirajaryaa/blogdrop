@@ -1,6 +1,15 @@
 import { AppResponse } from "@/lib/types";
 import { ArticleDetails } from "./articleReader.types";
-import { article, articleCategory, articleMetaData, articleTag, bookmark, category, source, tag } from "@/db/schema";
+import {
+  article,
+  articleCategory,
+  articleMetaData,
+  articleTag,
+  bookmark,
+  category,
+  source,
+  tag,
+} from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { getCurrentUser } from "@/features/auth/auth.actions";
@@ -77,17 +86,17 @@ export async function getArticleWithSlug(
       })
       .from(article)
       .innerJoin(source, eq(article.sourceId, source.id))
-      .innerJoin(
-        articleMetaData,
-        eq(articleMetaData.articleId, article.id)
-      )
+      .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
       .leftJoin(
         bookmark,
         authUser
-          ? and(eq(bookmark.articleId, article.id), eq(bookmark.userId, authUser.id))
-          : sql`false`
+          ? and(
+              eq(bookmark.articleId, article.id),
+              eq(bookmark.userId, authUser.id),
+            )
+          : sql`false`,
       )
-      .where(eq(article.slug, slug));
+      .where(and(eq(article.slug, slug), eq(article.status, "done")));
 
     if (!data) {
       return {
@@ -97,7 +106,6 @@ export async function getArticleWithSlug(
     }
 
     return { success: true, data };
-
   } catch (error) {
     console.error("Error fetching public feed:", error);
     return {
@@ -105,4 +113,4 @@ export async function getArticleWithSlug(
       reason: error instanceof Error ? error.message : "Failed to fetch feed",
     };
   }
-};
+}

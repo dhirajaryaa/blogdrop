@@ -1,187 +1,250 @@
 import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { aiUsage, article } from "@/db/schema";
-import { and, eq, inArray, or, sql } from "drizzle-orm";
+import { and, eq, inArray, isNull, lt, or, sql } from "drizzle-orm";
 
 const BATCH_SIZE = 100;
 const AI_API_LIMIT = 450;
+const PROCESSING_LEASE_MS = 15 * 60 * 1000;
 
-export const articleBatchDispatcher = inngest.createFunction({
+const leaseExpiry = () => new Date(Date.now() + PROCESSING_LEASE_MS);
+
+export const articleBatchDispatcher = inngest.createFunction(
+  {
     id: "article-batch-dispatcher",
-    concurrency: 1, //* prevent two dispatchers from racing for the same articles
+    concurrency: 1,
     retries: 2,
     triggers: [
-        { event: "app/ArticleBatchDispatcher" },
-        { cron: "*/5 * * * *" },
+      { event: "app/ArticleBatchDispatcher" },
+      { cron: "*/5 * * * *" },
     ],
     onFailure: async ({ event, error, step }) => {
-        const sourceEvent = event.data.event;
-        const batchId = sourceEvent.id;
-        console.error(`Article batch dispatcher failed for ${batchId}:`, error);
+      const sourceEvent = event.data.event;
+      const batchId = sourceEvent?.id;
+      console.error(`Article batch dispatcher failed for ${batchId}:`, error);
 
-        if (!batchId) return;
+      if (!batchId) return;
 
-        await step.run("requeue-unclaimed-articles", async () => {
-            await db
-                .update(article)
-                .set({ status: "pending", processingBatchId: null })
-                .where(
-                    and(
-                        eq(article.status, "processing"),
-                        eq(article.processingBatchId, batchId),
-                    ),
-                );
-        });
+      await step.run("requeue-unclaimed-articles", async () => {
+        await db
+          .update(article)
+          .set({
+            status: "pending",
+            processingBatchId: null,
+            processingLeaseExpiresAt: null,
+          })
+          .where(
+            and(
+              eq(article.status, "processing"),
+              eq(article.processingBatchId, batchId),
+            ),
+          );
+      });
 
-        await step.sendEvent("article-batch-dispatcher-after-failure", {
-            name: "app/ArticleBatchDispatcher",
-            data: {},
-        });
+      await step.sendEvent("article-batch-dispatcher-after-failure", {
+        name: "app/ArticleBatchDispatcher",
+        data: {},
+      });
     },
-},
-    async ({ step, event }): Promise<IngestResult> => {
+  },
+  async ({ step, event }): Promise<IngestResult> => {
+    const batchId = event.id;
 
-        //? step 1: check ai credit [if remaining then proceed]
-        const aiCredit = await step.run("ai-credit-check", async () => {
-            const today = new Date().toISOString().slice(0, 10);
+    await step.run("recover-stale-articles", async () => {
+      const now = new Date();
+      await db
+        .update(article)
+        .set({
+          status: "pending",
+          processingBatchId: null,
+          processingLeaseExpiresAt: null,
+        })
+        .where(
+          and(
+            eq(article.status, "processing"),
+            or(
+              isNull(article.processingLeaseExpiresAt),
+              lt(article.processingLeaseExpiresAt, now),
+            ),
+          ),
+        );
+    });
 
-            const [aiCredit] = await db
-                .insert(aiUsage)
-                .values({
-                    day: today,
-                    used: 0,
-                    apiId: 1
+    const claimed = await step.run("claim-and-reserve-articles", async () =>
+      db.transaction(async (tx) => {
+        const today = new Date().toISOString().slice(0, 10);
+        await tx
+          .insert(aiUsage)
+          .values({ day: today, used: 0, apiId: 1 })
+          .onConflictDoNothing({ target: aiUsage.day });
+
+        const [credit] = await tx
+          .select({ used: aiUsage.used })
+          .from(aiUsage)
+          .where(eq(aiUsage.day, today))
+          .for("update");
+        const remaining = Math.max(0, AI_API_LIMIT - (credit?.used ?? 0));
+
+        const current = await tx
+          .select({
+            id: article.id,
+            originalUrl: article.originalUrl,
+            status: article.status,
+          })
+          .from(article)
+          .where(
+            and(
+              eq(article.status, "processing"),
+              eq(article.processingBatchId, batchId),
+            ),
+          )
+          .orderBy(sql`${article.createdAt} asc`)
+          .limit(BATCH_SIZE)
+          .for("update", { skipLocked: true });
+
+        const pendingLimit = Math.min(
+          remaining,
+          Math.max(0, BATCH_SIZE - current.length),
+        );
+        const pending =
+          pendingLimit > 0
+            ? await tx
+                .select({
+                  id: article.id,
+                  originalUrl: article.originalUrl,
+                  status: article.status,
                 })
-                .onConflictDoUpdate({
-                    target: aiUsage.day,
-                    set: {
-                        used: sql`${aiUsage.used}`
-                    }
-                })
-                .returning({
-                    used: aiUsage.used,
-                    apiId: aiUsage.apiId
-                });
+                .from(article)
+                .where(eq(article.status, "pending"))
+                .orderBy(sql`${article.createdAt} asc`)
+                .limit(pendingLimit)
+                .for("update", { skipLocked: true })
+            : [];
 
+        const articles = [...current, ...pending];
+        if (articles.length === 0) {
+          return {
+            articles: [],
+            reservedCredits: 0,
+            reservedArticleIds: [],
+            remaining,
+          };
+        }
 
-            const used = aiCredit?.used ?? 0;
-            const remaining = AI_API_LIMIT - used;
+        if (pending.length > 0) {
+          await tx
+            .update(aiUsage)
+            .set({ used: sql`${aiUsage.used} + ${pending.length}` })
+            .where(eq(aiUsage.day, today));
+        }
 
-            if (remaining <= 0) {
-                return { allow: false, remaining: 0 }
-            };
+        const claimedArticles = await tx
+          .update(article)
+          .set({
+            status: "processing",
+            processingBatchId: batchId,
+            processingLeaseExpiresAt: leaseExpiry(),
+          })
+          .where(
+            and(
+              inArray(
+                article.id,
+                articles.map(({ id }) => id),
+              ),
+              or(
+                eq(article.status, "pending"),
+                and(
+                  eq(article.status, "processing"),
+                  eq(article.processingBatchId, batchId),
+                ),
+              ),
+            ),
+          )
+          .returning({ id: article.id, originalUrl: article.originalUrl });
 
-            return { allow: true, remaining }
-        });
-
-        if (!aiCredit.allow) return {
-            status: "error",
-            reason: "no ai credit remaining",
-            error: aiCredit
+        return {
+          articles: claimedArticles,
+          reservedCredits: pending.length,
+          reservedArticleIds: pending.map(({ id }) => id),
+          remaining: Math.max(0, remaining - pending.length),
         };
+      }),
+    );
 
-        //? step 2: select pending article [limit remaining or batch size -100] and upsert status "processing"
-        const processingArticles = await step.run("select-pending-article", async () => {
+    if (claimed.articles.length === 0) {
+      return { status: "success", data: "no pending articles" };
+    }
 
-            const batchSize = Math.min(aiCredit.remaining, BATCH_SIZE);
+    const dispatchResults = await Promise.allSettled(
+      claimed.articles.map((processingArticle) =>
+        step.sendEvent(`article-processing-${processingArticle.id}`, {
+          name: "app/ArticleProcessing",
+          data: {
+            articleId: processingArticle.id,
+            articleUrl: processingArticle.originalUrl,
+            batchId,
+          },
+        }),
+      ),
+    );
+    const failedDispatches = dispatchResults.flatMap((result, index) =>
+      result.status === "rejected"
+        ? [
+            {
+              articleId: claimed.articles[index].id,
+              reason: result.reason,
+            },
+          ]
+        : [],
+    );
 
-            return await db.transaction(async (tx) => {
-                // 1 - select pending and mark so skip
-                const pending = await tx
-                    .select({ id: article.id })
-                    .from(article)
-                    .where(
-                        or(
-                            eq(article.status, "pending"),
-                            and(
-                                eq(article.status, "processing"),
-                                eq(article.processingBatchId, event.id),
-                            ),
-                        ),
-                    )
-                    .orderBy(
-                        sql`CASE WHEN ${article.processingBatchId} = ${event.id} THEN 0 ELSE 1 END`,
-                    )
-                    .limit(batchSize)
-                    .for("update", { skipLocked: true });
+    for (const failedDispatch of failedDispatches) {
+      console.error(
+        `Article dispatch failed for ${failedDispatch.articleId}:`,
+        failedDispatch.reason,
+      );
+    }
 
-                if (!pending.length) return [];
+    if (failedDispatches.length > 0) {
+      const failedArticleIds = failedDispatches.map(
+        ({ articleId }) => articleId,
+      );
+      await step.run("requeue-failed-dispatches", async () => {
+        await db
+          .update(article)
+          .set({
+            status: "pending",
+            processingBatchId: null,
+            processingLeaseExpiresAt: null,
+          })
+          .where(
+            and(
+              eq(article.status, "processing"),
+              eq(article.processingBatchId, batchId),
+              inArray(article.id, failedArticleIds),
+            ),
+          );
 
-                const ids = pending.map(({ id }) => id);
+        const failedReservedCount = failedDispatches.filter(({ articleId }) =>
+          claimed.reservedArticleIds.includes(articleId),
+        ).length;
 
-                return tx
-                    .update(article)
-                    .set({
-                        status: "processing",
-                        processingBatchId: event.id,
-                    })
-                    .where(inArray(article.id, ids))
-                    .returning();
-            });
-
-        });
-
-        //* no pending articles to process — exit early
-        if (!processingArticles.length) {
-            return { status: "success", data: "no pending articles" };
+        if (failedReservedCount > 0) {
+          const today = new Date().toISOString().slice(0, 10);
+          await db
+            .update(aiUsage)
+            .set({
+              used: sql`GREATEST(${aiUsage.used} - ${failedReservedCount}, 0)`,
+            })
+            .where(eq(aiUsage.day, today));
         }
+      });
 
-        //? step 3: trigger article processing job
-        const dispatchResults = await Promise.allSettled(
-            processingArticles.map((processingArticle) =>
-                step.sendEvent(`article-processing-${processingArticle.id}`, {
-                    name: "app/ArticleProcessing",
-                    data: {
-                        articleId: processingArticle.id,
-                        articleUrl: processingArticle.originalUrl
-                    }
-                })
-            )
-        );
-        const failedDispatches = dispatchResults.flatMap((result, index) =>
-            result.status === "rejected"
-                ? [{ articleId: processingArticles[index].id, reason: result.reason }]
-                : []
-        );
+      throw new Error(
+        `Failed to dispatch ${failedDispatches.length} article processing events`,
+      );
+    }
 
-        for (const failedDispatch of failedDispatches) {
-            console.error(`Article dispatch failed for ${failedDispatch.articleId}:`, failedDispatch.reason);
-        }
-
-        if (failedDispatches.length > 0) {
-            const failedArticleIds = failedDispatches.map(({ articleId }) => articleId);
-
-            await step.run("requeue-failed-dispatches", async () => {
-                await db
-                    .update(article)
-                    .set({ status: "pending", processingBatchId: null })
-                    .where(
-                        and(
-                            eq(article.status, "processing"),
-                            eq(article.processingBatchId, event.id),
-                            inArray(article.id, failedArticleIds),
-                        ),
-                    );
-            });
-
-            throw new Error(`Failed to dispatch ${failedDispatches.length} article processing events`);
-        }
-
-        const processingArticleIds = processingArticles.map(({ id }) => id);
-        await step.run("mark-dispatched-articles-processing", async () => {
-            await db
-                .update(article)
-                .set({
-                    status: "processing",
-                    processingBatchId: event.id,
-                })
-                .where(
-                    and(
-                        eq(article.status, "pending"),
-                        inArray(article.id, processingArticleIds),
-                    ),
-                );
-        });
-
-        return { status: "success" }
-    })
+    return { status: "success", data: { processed: claimed.articles.length } };
+  },
+);

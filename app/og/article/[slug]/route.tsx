@@ -3,10 +3,18 @@ import { NextResponse } from "next/server";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 import { sql } from "drizzle-orm";
-import { eq } from "drizzle-orm";
-import { article, articleCategory, articleMetaData, category, source } from "@/db/schema";
+import { and, eq } from "drizzle-orm";
+import {
+  article,
+  articleCategory,
+  articleMetaData,
+  category,
+  source,
+} from "@/db/schema";
 import { db } from "@/db";
-import ArticleOgImage, { type OgArticleImageData } from "@/features/og/article-og-image";
+import ArticleOgImage, {
+  type OgArticleImageData,
+} from "@/features/og/article-og-image";
 
 export const dynamic = "force-dynamic";
 
@@ -75,7 +83,9 @@ async function getLogoDataUri(): Promise<string | undefined> {
   }
 }
 
-async function getArticleData(slug: string): Promise<OgArticleImageData | null> {
+async function getArticleData(
+  slug: string,
+): Promise<OgArticleImageData | null> {
   try {
     const [row] = await db
       .select({
@@ -99,7 +109,7 @@ async function getArticleData(slug: string): Promise<OgArticleImageData | null> 
       .from(article)
       .innerJoin(source, eq(article.sourceId, source.id))
       .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
-      .where(eq(article.slug, slug));
+      .where(and(eq(article.slug, slug), eq(article.status, "done")));
 
     if (!row) return null;
 

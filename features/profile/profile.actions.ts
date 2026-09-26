@@ -5,6 +5,8 @@
 import { AppResponse } from "@/lib/types";
 import { db } from "@/db";
 import {
+  article,
+  articleMetaData,
   bookmark,
   category,
   source,
@@ -12,8 +14,9 @@ import {
   userCategory,
   userTag,
 } from "@/db/schema";
-import { eq, sql } from "drizzle-orm";
+import { and, eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
+import { revalidateTag } from "next/cache";
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
 import type {
@@ -26,6 +29,9 @@ const configuredCategories = articleCategories.map(({ value, label }) => ({
   slug: value,
   name: label,
 }));
+const configuredCategorySlugs = new Set<string>(
+  configuredCategories.map(({ slug }) => slug),
+);
 
 //? only predefined tags from config/tags.ts are allowed as profile tags
 const predefinedTagNames = new Set<string>(userTags.map((tag) => tag.label));
@@ -64,15 +70,23 @@ export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
         .orderBy(userTag.createdAt),
 
       db
-        .select({ count: sql<number>`count(*)` })
+        .select({ count: sql<number>`count(${article.id})` })
         .from(bookmark)
-        .where(eq(bookmark.userId, authUser.id)),
+        .innerJoin(article, eq(bookmark.articleId, article.id))
+        .innerJoin(articleMetaData, eq(articleMetaData.articleId, article.id))
+        .where(
+          and(eq(bookmark.userId, authUser.id), eq(article.status, "done")),
+        ),
 
       db
         .select({ count: sql<number>`count(*)` })
         .from(source)
         .where(eq(source.isActive, true)),
     ]);
+
+    const visibleInterests = interests.filter(({ slug }) =>
+      configuredCategorySlugs.has(slug),
+    );
 
     return {
       success: true,
@@ -85,12 +99,12 @@ export const getProfileData = async (): Promise<AppResponse<ProfileData>> => {
           experienceLevel: authUser.experienceLevel ?? null,
           createdAt: authUser.createdAt ?? null,
         },
-        interests,
+        interests: visibleInterests,
         tags: tags.map((tag) => tag.name),
         allCategories: configuredCategories,
         stats: {
           saved: saved[0]?.count ?? 0,
-          interests: interests.length,
+          interests: visibleInterests.length,
           following: following[0]?.count ?? 0,
         },
       },
@@ -227,6 +241,8 @@ export const saveProfileSelections = async (
         );
       }
     });
+
+    revalidateTag("personalized-feed-rank", "max");
 
     return { success: true, data: null };
   } catch (error) {
