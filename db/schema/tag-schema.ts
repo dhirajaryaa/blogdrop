@@ -1,6 +1,7 @@
-import { integer, pgTable, primaryKey, text, uuid } from "drizzle-orm/pg-core";
+import { integer, pgTable, primaryKey, text, timestamp, uuid, uniqueIndex } from "drizzle-orm/pg-core";
 import { article } from "./article-schema";
 import { relations } from "drizzle-orm";
+import { user } from "./user-schema";
 
 //! tags 
 export const tag = pgTable("tag", {
@@ -8,6 +9,17 @@ export const tag = pgTable("tag", {
     name: text("name").notNull(),
     slug: text("slug").notNull().unique()
 });
+
+//! user-tag [free-form tags a reader can add to their profile]
+export const userTag = pgTable("user_tag", {
+    userId: text("user_id")
+        .notNull()
+        .references(() => user.id, { onDelete: "cascade" }),
+    name: text("name").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+}, (table) => [
+    uniqueIndex("user_tag_user_name_idx").on(table.userId, table.name),
+]);
 
 //! article-tag
 export const articleTag = pgTable("article_tag", {
@@ -40,4 +52,11 @@ export const articleTagRelations = relations(articleTag, ({ one }) => ({
 
 export const tagRelations = relations(tag, ({ many }) => ({
     articles: many(articleTag),
+}));
+
+export const userTagRelations = relations(userTag, ({ one }) => ({
+    user: one(user, {
+        fields: [userTag.userId],
+        references: [user.id],
+    }),
 }));

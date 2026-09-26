@@ -1,5 +1,5 @@
 import { redirect } from "next/navigation";
-import { getCurrentUser } from "@/lib/auth/get-user";
+import { getCurrentUser } from "@/features/auth/auth.actions";
 
 interface Props {
     searchParams: Promise<{

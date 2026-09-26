@@ -2,8 +2,8 @@ import { db } from "@/db";
 import { IngestResult, inngest } from "../client";
 import { article, source } from "@/db/schema";
 import { and, eq, isNotNull } from "drizzle-orm";
-import { fetchRSS } from "@/lib/harvester/feed-process";
-import { buildArticleSlug } from "@/utils/slug";
+import { fetchRSS } from "@/features/harvester/feed-process";
+import { buildArticleSlug } from "@/features/article/slugCreate";
 
 export const sourceScan = inngest.createFunction(
     {
@@ -12,7 +12,7 @@ export const sourceScan = inngest.createFunction(
         retries: 2,
         triggers: [{ event: "app/allSourceScan" }, { cron: "0 0 * * *" }]
     },
-    async ({ event, step }): Promise<IngestResult> => {
+    async ({ step }): Promise<IngestResult> => {
 
         //? step 1: all active source get from db
         const sources = await step.run("fetch-active-sources", async () => {
@@ -27,21 +27,31 @@ export const sourceScan = inngest.createFunction(
         };
 
         //? step 2: run parallel all sources (individual failures don't block the rest)
-        const rssResults = await Promise.all(
+        const rssResults = await Promise.allSettled(
             sources.map(source =>
                 step.run(`fetch-${source.id}`, async () => {
-                    try {
-                        const articles = await fetchRSS(source.rssUrl);
-                        return articles.map((article) => ({ ...article, sourceId: source.id }));
-                    } catch (err) {
-                        //* individual source failure — log and return empty so other sources still process
-                        console.error(`RSS fetch failed for source ${source.id}:`, err);
-                        return [];
-                    }
+                    const articles = await fetchRSS(source.rssUrl);
+                    return articles.map((article) => ({ ...article, sourceId: source.id }));
                 })
             )
         );
-        const articles = rssResults.flat();
+        const failedSources = rssResults.flatMap((result, index) =>
+            result.status === "rejected"
+                ? [{ id: sources[index].id, reason: result.reason }]
+                : []
+        );
+
+        for (const failedSource of failedSources) {
+            console.error(`RSS fetch failed for source ${failedSource.id}:`, failedSource.reason);
+        }
+
+        if (failedSources.length === sources.length) {
+            throw new Error(`RSS fetch failed for all ${sources.length} active sources`);
+        }
+
+        const articles = rssResults.flatMap((result) =>
+            result.status === "fulfilled" ? result.value : []
+        );
 
         //* no articles found from any source
         if (articles.length === 0) {

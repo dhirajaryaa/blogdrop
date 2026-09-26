@@ -1,4 +1,14 @@
-import { pgTable, uuid, text, timestamp, jsonb, index, uniqueIndex, integer, unique, pgEnum } from "drizzle-orm/pg-core";
+import {
+  pgTable,
+  uuid,
+  text,
+  timestamp,
+  index,
+  uniqueIndex,
+  integer,
+  unique,
+  pgEnum,
+} from "drizzle-orm/pg-core";
 import { source } from "./source-schema";
 import { relations } from "drizzle-orm";
 import { user } from "./user-schema";
@@ -6,101 +16,171 @@ import { articleTag } from "./tag-schema";
 import { articleCategory } from "./category-schema";
 
 export const articleStatusEnum = pgEnum("article_status", [
-    "pending",
-    "processing",
-    "done",
-    "failed",
-    "error",
+  "pending",
+  "processing",
+  "done",
+  "failed",
+  "error",
 ]);
 
-//! article 
-export const article = pgTable("article", {
+//! article
+export const article = pgTable(
+  "article",
+  {
     id: uuid("id").primaryKey().defaultRandom(),
     title: text("title").notNull(),
     originalUrl: text("original_url").notNull().unique(),
     sourceId: uuid("source_id")
-        .notNull()
-        .references(() => source.id),
+      .notNull()
+      .references(() => source.id),
     content: text("content").default(""),
     author: text("author").notNull(),
     publicAt: text("public_at").notNull(),
     imageUrl: text("image_url").default(""),
     createdAt: timestamp("created_at").defaultNow().notNull(),
     status: articleStatusEnum().default("pending"),
+    processingBatchId: text("processing_batch_id"),
+    processingLeaseExpiresAt: timestamp("processing_lease_expires_at"),
     slug: text("slug").notNull().unique(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
-},
-    (table) => [
-        index("article_source_idx").on(table.sourceId),
-        index("article_published_idx").on(table.publicAt),
-        uniqueIndex("article_url_idx").on(table.originalUrl),
-    ]);
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    index("article_source_idx").on(table.sourceId),
+    index("article_published_idx").on(table.publicAt),
+    index("article_status_batch_idx").on(table.status, table.processingBatchId),
+    index("article_status_lease_idx").on(
+      table.status,
+      table.processingLeaseExpiresAt,
+    ),
+    uniqueIndex("article_url_idx").on(table.originalUrl),
+  ],
+);
 
 //! article metadata
-export const articleMetaData = pgTable("article_metadata", {
+export const articleMetaData = pgTable(
+  "article_metadata",
+  {
     id: uuid("id").primaryKey().defaultRandom(),
     articleId: uuid("article_id")
-        .notNull()
-        .references(() => article.id, {
-            onDelete: "cascade",
-        }),
+      .notNull()
+      .references(() => article.id, {
+        onDelete: "cascade",
+      }),
     summary: text("summary"),
     keyTakeaways: text("key_takeaways").array().default([]),
     difficulty: text("difficulty").default("junior"), //[junior / mid / senior]
     whyRead: text("why_read").default(""),
     readingTime: integer("reading_time").default(2), // in minutes
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
-}, ((table) => [
-    unique("article_metadata_article_id_unique").on(table.articleId),
-]));
-
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [unique("article_metadata_article_id_unique").on(table.articleId)],
+);
 
 //! ai daily usage [free tier RPD cap tracking]
 export const aiUsage = pgTable("ai_usage", {
-    day: text("day").primaryKey(), // "YYYY-MM-DD" (UTC)
-    used: integer("used").default(0).notNull(),
-    apiId: integer("api_id").default(1).notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
+  day: text("day").primaryKey(), // "YYYY-MM-DD" (UTC)
+  used: integer("used").default(0).notNull(),
+  apiId: integer("api_id").default(1).notNull(),
+  updatedAt: timestamp("updated_at")
+    .defaultNow()
+    .$onUpdate(() => new Date())
+    .notNull(),
 });
 
 //! bookmark Articles
-export const bookmark = pgTable("bookmark", {
+export const bookmark = pgTable(
+  "bookmark",
+  {
     id: uuid("id").primaryKey().defaultRandom(),
     articleId: uuid("article_id")
-        .notNull()
-        .references(() => article.id, { onDelete: "cascade" }),
-    userId: text("user_id").notNull().references(() => user.id, { onDelete: "cascade" }),
+      .notNull()
+      .references(() => article.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
     createdAt: timestamp("created_at").defaultNow().notNull(),
-    updatedAt: timestamp("updated_at").defaultNow().$onUpdate(() => new Date()).notNull()
-}, ((table) => [
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
     unique("bookmark_article_unique").on(table.articleId, table.userId),
-]));
+  ],
+);
+
+//! read history: articles the user has already read
+//! (distinct from bookmarks - saved means "want to read later")
+export const readHistory = pgTable(
+  "read_history",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    articleId: uuid("article_id")
+      .notNull()
+      .references(() => article.id, { onDelete: "cascade" }),
+    userId: text("user_id")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at")
+      .defaultNow()
+      .$onUpdate(() => new Date())
+      .notNull(),
+  },
+  (table) => [
+    unique("read_history_article_user_unique").on(
+      table.articleId,
+      table.userId,
+    ),
+    index("read_history_user_idx").on(table.userId),
+  ],
+);
+
+//? read history relations
+export const readHistoryRelations = relations(readHistory, ({ one }) => ({
+  article: one(article, {
+    fields: [readHistory.articleId],
+    references: [article.id],
+  }),
+
+  user: one(user, {
+    fields: [readHistory.userId],
+    references: [user.id],
+  }),
+}));
 
 //? bookmarks relations
 export const bookmarkRelations = relations(bookmark, ({ one }) => ({
-    article: one(article, {
-        fields: [bookmark.articleId],
-        references: [article.id],
-    }),
+  article: one(article, {
+    fields: [bookmark.articleId],
+    references: [article.id],
+  }),
 
-    user: one(user, {
-        fields: [bookmark.userId],
-        references: [user.id],
-    }),
+  user: one(user, {
+    fields: [bookmark.userId],
+    references: [user.id],
+  }),
 }));
 
-//? relation ship 
+//? relation ship
 export const articleRelations = relations(article, ({ one, many }) => ({
-    metadata: one(articleMetaData, {
-        fields: [article.id],
-        references: [articleMetaData.articleId]
-    }),
-    source: one(source, {
-        fields: [article.sourceId],
-        references: [source.id]
-    }),
-    bookmark: many(bookmark),
-    tags: many(articleTag),
-    categories: many(articleCategory)
-}))
+  metadata: one(articleMetaData, {
+    fields: [article.id],
+    references: [articleMetaData.articleId],
+  }),
+  source: one(source, {
+    fields: [article.sourceId],
+    references: [source.id],
+  }),
+  bookmark: many(bookmark),
+  readHistory: many(readHistory),
+  tags: many(articleTag),
+  categories: many(articleCategory),
+}));

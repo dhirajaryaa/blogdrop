@@ -1,19 +1,26 @@
+import type { Metadata } from "next";
+import { Poppins, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { DM_Sans, JetBrains_Mono } from "next/font/google";
-import { cn } from "@/lib/utils";
-import { ThemeProvider } from "next-themes";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import { Toaster } from "@/components/ui/sonner";
-import { GoogleAnalytics } from '@next/third-parties/google';
+import { ThemeProvider } from "next-themes";
+import QueryProvider from "@/components/providers/query-provider";
 
+const fontSans = Poppins({
+  weight: "400",
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
-const dmSans = DM_Sans({ subsets: ["latin"], variable: "--font-sans" });
+const fontMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
+});
 
-const jetbrainsMono = JetBrains_Mono({ subsets: ["latin"], variable: "--font-mono" });
-
-import { constructMetadata } from "@/lib/utils";
-import Script from "next/script";
-
-export const metadata = constructMetadata();
+export const metadata: Metadata = {
+  title: "Blogdrop - All engineering blog in one feed.",
+  description: "AI-powered engineering blog aggregator that helps developers discover, track, and learn from the best engineering content across the web.",
+};
 
 export default function RootLayout({
   children,
@@ -21,39 +28,23 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      data-scroll-behavior="smooth"
-      className={cn(
-        "h-full",
-        "antialiased",
-        "font-sans",
-        dmSans.variable,
-        jetbrainsMono.variable
-      )}
-      suppressHydrationWarning
-    >
-      {/* clarity */}
-      <Script
-        id="clarity"
-        strategy="afterInteractive"
-        dangerouslySetInnerHTML={{
-          __html: `(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window, document, "clarity", "script", "xtalxxfvcl");`,
-        }}
-      />
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${fontSans.variable} ${fontMono.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
-          {children}
-          <Toaster richColors position="top-center" />
+          <QueryProvider>{children}</QueryProvider>
         </ThemeProvider>
+        <Toaster position="top-right" />
+
         {/* google analytics */}
-        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID!} />
+        {process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID && (
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GOOGLE_ANALYTIC_ID} />
+        )}
       </body>
     </html>
   );
-}
+};

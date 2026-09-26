@@ -1,66 +1,57 @@
-import type { Metadata } from "next"
-import GoogleLoginButton from "@/components/auth/GoogleLoginButton"
-import { IconBrandTabler } from "@tabler/icons-react"
-import { getCurrentUser } from "@/lib/auth/get-user";
-import { redirect } from "next/navigation";
-import { authCallbackPath } from "@/config/constant";
-import GoBack from "@/components/common/back-button";
-import Image from "next/image";
-import { track } from "@/lib/analytics";
+import Link from "next/link";
+import LoginBtn from "@/features/auth/login-btn";
+import GoBackBtn from "@/components/common/go-back";
+import Logo from "@/components/common/logo";
+import Container from "@/components/common/container";
 
-export const metadata: Metadata = {
-  title: "Login — BlogDrop",
-  description: "Sign in to BlogDrop with your Google account to access your personalized engineering blog feed.",
-  openGraph: {
-    title: "Login — BlogDrop",
-    description: "Sign in to BlogDrop with your Google account.",
-  },
-  twitter: {
-    title: "Login — BlogDrop",
-    description: "Sign in to BlogDrop with your Google account.",
-  },
-}
-
-export default async function LoginPage() {
-  const user = await getCurrentUser();
-
-  if (user) {
-    if (!user.onboarded) {
-      track("go-to-onboarding", {
-        userId: user.id,
-        name: user.name
-      })
-      redirect("/onboarding");
-    };
-
-    redirect(authCallbackPath);
-  }
-
+function LoginPage() {
   return (
-    <main className="flex-1 flex items-center justify-center px-4">
-      <GoBack className="absolute top-4 left-4" variant={"outline"} />
-      <div className="w-full max-w-md space-y-8">
-        <div className="text-center space-y-2">
-          <div className="flex justify-center">
-            <Image
-              src="/logo.png"
-              alt="BlogDrop"
-              width={64}
-              height={64}
-              className="rounded-lg size-10"
-              priority
-            />
+    <main className="relative">
+      <Container className="relative flex min-h-svh items-center justify-center ">
+
+        {/* Back */}
+        <GoBackBtn className="absolute left-4 top-4" />
+
+        {/* Login */}
+        <div className="w-full max-w-sm">
+          <div className="flex flex-col items-center text-center">
+            <Logo className="size-8 sm:size-10" />
+
+            <h1 className="mt-7 text-xl font-semibold tracking-tight sm:text-2xl">
+              Welcome to Blogdrop
+            </h1>
+
+            <p className="text-muted-foreground mt-2 text-xs sm:text-sm">
+              Sign in to save and follow the stories you care about.
+            </p>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight">Welcome to BlogDrop</h1>
-          <p className="text-sm text-muted-foreground">
-            Sign in to follow engineering blogs from Netflix, Stripe, Uber, and more.
+
+          <div className="mt-8 space-y-3">
+            <LoginBtn type="google" />
+            <LoginBtn type="github" />
+          </div>
+
+          <p className="text-muted-foreground mt-6 text-center text-xs leading-5">
+            By continuing, you agree to BlogDrop&apos;s{" "}
+            <Link
+              href="/terms"
+              className="text-foreground underline underline-offset-4"
+            >
+              Terms
+            </Link>{" "}
+            and{" "}
+            <Link
+              href="/privacy"
+              className="text-foreground underline underline-offset-4"
+            >
+              Privacy Policy
+            </Link>
+            .
           </p>
         </div>
-        <GoogleLoginButton />
-        <p className="text-xs text-center text-muted-foreground">
-          By continuing, you agree to BlogDrop&apos;s Terms of Service and Privacy Policy.
-        </p>
-      </div>
+      </Container>
     </main>
-  )
+  );
 }
+
+export default LoginPage;

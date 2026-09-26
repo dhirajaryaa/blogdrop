@@ -3,14 +3,16 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "studio": "bun drizzle-kit studio",
+    "studio": "pnpm drizzle-kit studio",
+    "migrate": "drizzle-kit migrate",
     "lint": "eslint"
   },
   "dependencies": {
     "@base-ui/react": "^1.6.0",
+    "@better-auth/drizzle-adapter": "^1.7.2",
     "@google/genai": "^2.10.0",
     "@mozilla/readability": "^0.6.0",
     "@next/third-parties": "^16.2.12",
@@ -20,6 +22,7 @@
     "cheerio": "^1.2.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "cn": "^0.2.5",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
     "fuse.js": "^7.4.2",
@@ -58,6 +61,8 @@
     "drizzle-kit": "^0.31.10",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
+    "prettier": "^3.9.6",
+    "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
     "tsx": "^4.22.4",
     "typescript": "^5"
