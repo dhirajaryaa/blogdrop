@@ -5,9 +5,13 @@ import Link from "next/link";
 function ErrorView({
   title = "Something went wrong",
   description = "We couldn't load this page. Please try again in a moment.",
+  onRetry,
 }: {
   title?: string;
   description?: string;
+  //? error boundaries pass Next's `reset`, which re-renders the segment without
+  //? a full reload. Falls back to a hard reload for plain server-rendered usage.
+  onRetry?: () => void;
 }) {
   return (
     <div className="flex w-full flex-col items-center justify-center gap-6 pt-14 sm:pt-24 md:pt-40">
@@ -26,7 +30,7 @@ function ErrorView({
       <div className="flex flex-wrap items-center justify-center gap-3">
         <button
           type="button"
-          onClick={() => window.location.reload()}
+          onClick={onRetry ?? (() => window.location.reload())}
           className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-md px-4 py-2 text-sm font-medium transition-colors"
         >
           Try again
