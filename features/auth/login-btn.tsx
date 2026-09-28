@@ -9,18 +9,25 @@ import { authCallbackPath } from "./auth-client";
 
 type LoginBtnProps = {
   type: "google" | "github";
+  //? where the user was headed before we bounced them to login. carried through
+  //? the provider round-trip as a query param on the callback path.
+  redirectTo?: string;
 };
 
-function LoginBtn({ type }: LoginBtnProps) {
+function LoginBtn({ type, redirectTo }: LoginBtnProps) {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   //? auth function
   async function authHandle({ type }: LoginBtnProps) {
     try {
+      const callbackURL = redirectTo
+        ? `${authCallbackPath}?redirect=${encodeURIComponent(redirectTo)}`
+        : authCallbackPath;
+
       await authClient.signIn.social(
         {
           provider: type,
-          callbackURL: authCallbackPath,
+          callbackURL,
         },
         {
           onRequest: () => {
@@ -45,7 +52,7 @@ function LoginBtn({ type }: LoginBtnProps) {
   return type === "google" ? (
     <>
       <Button
-        onClick={() => authHandle({ type: "google" })}
+        onClick={() => authHandle({ type: "google", redirectTo })}
         disabled={isLoading}
         aria-busy={isLoading}
         className="h-11 w-full gap-2 text-sm"
@@ -66,7 +73,7 @@ function LoginBtn({ type }: LoginBtnProps) {
   ) : (
     <>
       <Button
-        onClick={() => authHandle({ type: "github" })}
+        onClick={() => authHandle({ type: "github", redirectTo })}
         disabled={isLoading}
         aria-busy={isLoading}
         variant="outline"

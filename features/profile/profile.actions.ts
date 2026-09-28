@@ -16,7 +16,7 @@ import {
 } from "@/db/schema";
 import { and, eq, sql } from "drizzle-orm";
 import { getCurrentUser } from "@/features/auth/auth.actions";
-import { revalidateTag } from "next/cache";
+import { updateTag } from "next/cache";
 import { articleCategories } from "@/config/category";
 import { userTags } from "@/config/tags";
 import type {
@@ -242,7 +242,11 @@ export const saveProfileSelections = async (
       }
     });
 
-    revalidateTag("personalized-feed-rank");
+    //? the reader just changed what they follow, so the ranked pool is stale.
+    //? updateTag (not revalidateTag) so the refresh is read-your-own-writes:
+    //? the client cache updates too, so the feed re-ranks on this navigation
+    //? instead of serving the old ranking until the next full reload.
+    updateTag("personalized-feed-rank");
 
     return { success: true, data: null };
   } catch (error) {
