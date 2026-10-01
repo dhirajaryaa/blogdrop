@@ -3,5 +3,5 @@ import { articleBatchProcessor } from "./article-batch"; // claims a batch and p
 
 export {
    sourceScan,
-   articleBatchProcessor
+   // articleBatchProcessor
 };
