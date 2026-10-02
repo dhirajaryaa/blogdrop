@@ -1,162 +1,81 @@
 import { db } from "@/db";
-import { IngestResult, inngest } from "../client";
 import { article } from "@/db/schema";
-import { and, eq } from "drizzle-orm";
-import { extractArticleContent } from "@/features/harvester/extract-article";
-import { convertHtmlToMarkdown } from "@/features/harvester/html-markdown";
-
-export const FETCH_TIMEOUT_MS = 15_000;
-export const PROCESSING_LEASE_MS = 15 * 60 * 1000;
-
-export const USER_AGENT =
-  "BlogdropBot/1.0 (+https://blogdrop.in; contact@blogdrop.in)";
-
-const processingLeaseExpiry = () => new Date(Date.now() + PROCESSING_LEASE_MS);
+import { IngestResult, inngest } from "@/inngest/client";
+import { eq } from "drizzle-orm";
+import { fetchAndExtractArticle, PermanentArticleError } from "@/features/harvester/process-article";
 
 export const articleProcessing = inngest.createFunction(
   {
     id: "article-processing",
-    concurrency: 5,
+    description: "Fetch, extract, clean article and convert to markdown, then dispatch AI processing.",
     retries: 3,
-    idempotency: "event.data.articleId + ':' + event.data.batchId",
-    triggers: { event: "app/ArticleProcessing" },
-    onFailure: async ({ event, error, step }) => {
-      const sourceEvent = event.data.event;
-      const articleId = sourceEvent?.data?.articleId;
-      const batchId = sourceEvent?.data?.batchId;
-      console.error(`Article processing failed for ${articleId}:`, error);
-
-      if (!articleId || !batchId) return;
-
-      await step.run("mark-article-processing-failed", async () => {
-        await db
-          .update(article)
-          .set({
-            status: "failed",
-            processingBatchId: null,
-            processingLeaseExpiresAt: null,
-          })
-          .where(
-            and(
-              eq(article.id, articleId),
-              eq(article.status, "processing"),
-              eq(article.processingBatchId, batchId),
-            ),
-          );
-      });
-
-      await step.sendEvent("article-batch-dispatcher-after-failure", {
-        name: "app/ArticleBatchDispatcher",
-        data: {},
-      });
-    },
+    concurrency: 5,
+    triggers: [{ event: "app/ArticleProcessing" }],
   },
   async ({ step, event }): Promise<IngestResult> => {
-    const { articleId, articleUrl, batchId } = event.data;
-    if (!articleId || !articleUrl || !batchId) {
+    const { articleId, articleUrl } = event.data as {
+      articleId: string;
+      articleUrl: string;
+    };
+
+    if (!(articleId && articleUrl)) {
       return {
         status: "error",
-        reason: "article id, article url, and batch id are required",
+        reason: "article id and article url required to proceed",
       };
     }
 
-    const claimedArticle = await step.run(
-      "claim-article-processing",
-      async () => {
-        const [claimed] = await db
-          .update(article)
-          .set({ processingLeaseExpiresAt: processingLeaseExpiry() })
-          .where(
-            and(
-              eq(article.id, articleId),
-              eq(article.status, "processing"),
-              eq(article.processingBatchId, batchId),
-            ),
-          )
-          .returning({ id: article.id });
-
-        return claimed;
-      },
-    );
-
-    if (!claimedArticle) {
-      return {
-        status: "error",
-        reason: "article not found or processing ownership was lost",
-      };
-    }
+    const markFailed = (reason: string) =>
+      step
+        .run("mark-failed", async () => {
+          await db
+            .update(article)
+            .set({ status: "failed" })
+            .where(eq(article.id, articleId));
+        })
+        .then(() => ({ status: "error" as const, reason }));
 
     try {
-      const response = await step.fetch(articleUrl, {
-        redirect: "follow",
-        headers: {
-          "User-Agent": USER_AGENT,
-          Accept: "text/html,application/xhtml+xml",
-        },
-        signal: AbortSignal.timeout(FETCH_TIMEOUT_MS),
+      // Step 1: Fetch and extract article content
+      const extracted = await step.run("fetch-and-extract", async () => {
+        return await fetchAndExtractArticle(articleUrl);
       });
 
-      if (!response.ok) {
-        throw new Error(
-          `Failed to fetch article: ${response.status} ${response.statusText}`,
-        );
-      }
-
-      const articleData = await step.run("extract-text", async () => {
-        const text = await response.text();
-
-        return extractArticleContent({
-          url: articleUrl,
-          html: text,
-        });
-      });
-
-      if (!articleData) {
-        throw new Error("Article extraction failed");
-      }
-
-      const processed = await step.run("convert-html-to-markdown", async () => {
-        const data = await convertHtmlToMarkdown(articleData.content);
-
+      // Step 2: Save cleaned content, author, image to DB
+      const processed = await step.run("save-cleaned-content", async () => {
         const [updated] = await db
           .update(article)
           .set({
-            content: data?.markdown ?? articleData.textContent,
-            author: articleData.byline ?? data?.author,
-            imageUrl: articleData.image ?? undefined,
-            processingLeaseExpiresAt: processingLeaseExpiry(),
+            content: extracted.markdown,
+            author: extracted.author ?? undefined,
+            imageUrl: extracted.imageUrl ?? undefined,
           })
-          .where(
-            and(
-              eq(article.id, articleId),
-              eq(article.status, "processing"),
-              eq(article.processingBatchId, batchId),
-            ),
-          )
+          .where(eq(article.id, articleId))
           .returning({ id: article.id });
 
         return updated;
       });
 
       if (!processed) {
-        throw new Error("Article processing ownership was lost");
+        return await markFailed("article update returned no row (missing id)");
       }
 
+      // Step 3: Trigger AI processing
       await step.sendEvent("ai-article-processing", {
         name: "article/ai-processing",
         data: {
           articleId: processed.id,
-          batchId,
         },
       });
 
       return { status: "success" };
-    } catch (error) {
-      console.error(
-        `Article processing attempt failed for ${articleId}:`,
-        error,
+    } catch (err) {
+      if (err instanceof PermanentArticleError) {
+        return await markFailed(err.message);
+      }
+      return await markFailed(
+        `unexpected error: ${err instanceof Error ? err.message : String(err)}`,
       );
-      throw error;
     }
   },
 );

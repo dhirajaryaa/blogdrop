@@ -1,90 +1,85 @@
 import { db } from "@/db";
-import { IngestResult, inngest } from "../client";
 import { article, source } from "@/db/schema";
-import { and, eq, isNotNull } from "drizzle-orm";
-import { fetchRSS } from "@/features/harvester/feed-process";
 import { buildArticleSlug } from "@/features/article/slugCreate";
+import { fetchRSS } from "@/features/harvester/feed-process";
+import { IngestResult, inngest } from "@/inngest/client";
+import { eq } from "drizzle-orm";
 
 export const sourceScan = inngest.createFunction(
-    {
-        id: "all-source-scan",
-        description: "Refresh all active sources and get all new articles.",
-        retries: 2,
-        triggers: [{ event: "app/allSourceScan" }, { cron: "0 0 * * *" }]
-    },
-    async ({ step }): Promise<IngestResult> => {
+  {
+    id: "all-source-scan",
+    description: "Refresh all active sources and get all new articles.",
+    retries: 2,
+    triggers: [{ event: "app/allSourceScan" }, { cron: "0 0 * * *" }],
+  },
+  async ({ step }): Promise<IngestResult> => {
+    //Todo: 1. Get select all active source form database
+    const activeSource = await step.run("get-all-active-sources", async () => {
+      return await db.select().from(source).where(eq(source.isActive, true));
+    });
 
-        //? step 1: all active source get from db
-        const sources = await step.run("fetch-active-sources", async () => {
-            return await db
-                .select({ id: source.id, rssUrl: source.rssUrl })
-                .from(source)
-                .where(and(eq(source.isActive, true), isNotNull(source.rssUrl)))
-        });
+    if (activeSource.length === 0) {
+      return { status: "error", reason: "No Active Source found!" };
+    }
 
-        if (sources.length === 0) {
-            return { status: "error", reason: "no active source found" };
-        };
+    //Todo: 2. run Promise.settled to scan all source
 
-        //? step 2: run parallel all sources (individual failures don't block the rest)
-        const rssResults = await Promise.allSettled(
-            sources.map(source =>
-                step.run(`fetch-${source.id}`, async () => {
-                    const articles = await fetchRSS(source.rssUrl);
-                    return articles.map((article) => ({ ...article, sourceId: source.id }));
-                })
-            )
+    const results = await Promise.allSettled(
+      activeSource.map(async (source) => {
+        return await step.run(
+          `fetch-article-from-${source.title}`,
+          async () => {
+            if (!source.rssUrl) return []; // if rss url not found;
+
+            try {
+              const posts = await fetchRSS(source.rssUrl);
+              return posts.map((post) => ({ ...post, sourceId: source.id }));
+            } catch (error) {
+              console.error(`RSS fetch failed for source ${source.id}:`, error);
+              return [];
+            }
+          },
         );
-        const failedSources = rssResults.flatMap((result, index) =>
-            result.status === "rejected"
-                ? [{ id: sources[index].id, reason: result.reason }]
-                : []
-        );
+      }),
+    );
 
-        for (const failedSource of failedSources) {
-            console.error(`RSS fetch failed for source ${failedSource.id}:`, failedSource.reason);
-        }
+    const fetchedArticles = results.flatMap((result) =>
+      result.status === "fulfilled" ? result.value : [],
+    );
 
-        if (failedSources.length === sources.length) {
-            throw new Error(`RSS fetch failed for all ${sources.length} active sources`);
-        }
+    if (!fetchedArticles || fetchedArticles.length === 0) {
+      return {
+        status: "error",
+        reason: "Failed to fetch articles form rss feed!",
+      };
+    }
 
-        const articles = rssResults.flatMap((result) =>
-            result.status === "fulfilled" ? result.value : []
-        );
+    //Todo: 3. all success article save on db
+    const savedArticles = await step.run("save-articles-in-db", async () => {
+      return await db
+        .insert(article)
+        .values(
+          fetchedArticles.map((post) => ({
+            title: post.title,
+            originalUrl: post.link,
+            author: post.author,
+            publicAt: post.pubDate,
+            sourceId: post.sourceId,
+            slug: buildArticleSlug(post.title),
+          })),
+        )
+        .onConflictDoNothing({
+          target: article.originalUrl,
+        })
+        .returning({ articleId: article.id });
+    });
 
-        //* no articles found from any source
-        if (articles.length === 0) {
-            return { status: "success", data: "no new articles found from any source" };
-        }
-
-        //? step 3: all articles save on db
-        const savedArticles = await step.run("save-articles", async () => {
-            return await db
-                .insert(article)
-                .values(
-                    articles.map((item) => ({
-                        title: item.title,
-                        originalUrl: item.link,
-                        author: item.author,
-                        publicAt: item.pubDate,
-                        sourceId: item.sourceId,
-                        slug: buildArticleSlug(item.title)
-                    }))
-                )
-                .onConflictDoNothing({
-                    target: article.originalUrl
-                }) //* so already saved articles ignore it */
-                .returning({ id: article.id });
-        });
-
-        //? step 4: trigger article process-metadata generation
-        if (savedArticles.length > 0) {
-            await step.sendEvent("article-batch-dispatcher", {
-                name: "app/ArticleBatchDispatcher",
-                data: {}
-            });
-        }
-
-        return { status: "success", data: { sourcesScanned: sources.length, articlesFound: articles.length, articlesSaved: savedArticles.length } };
+    //Todo: 4.  Trigger Article Batch Processing
+    await step.sendEvent("article-batch-dispatcher", {
+      name: "app/ArticleBatchDispatcher",
+      data: {},
     })
+
+    return { status: "success", data: savedArticles };
+  },
+);
