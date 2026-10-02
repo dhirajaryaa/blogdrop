@@ -15,7 +15,7 @@ export default function ArticleBanner({
   return (
     <div
       className={cn(
-        "relative aspect-video w-full overflow-hidden rounded-lg shadow-md",
+        "relative aspect-video w-full overflow-hidden rounded-xl shadow-md",
         className,
       )}
     >
@@ -43,7 +43,7 @@ export default function ArticleBanner({
           priority
           src={url}
           alt={title || "Article logo"}
-          className="h-16 w-16 object-contain duration-300 group-hover:scale-105 sm:h-20 sm:w-20"
+          className="h-16 w-16 object-contain duration-300 group-hover:scale-105 sm:h-20 sm:w-20 rounded-3xl"
         />
       </div>
     </div>

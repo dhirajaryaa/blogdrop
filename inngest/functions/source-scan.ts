@@ -74,6 +74,12 @@ export const sourceScan = inngest.createFunction(
         .returning({ articleId: article.id });
     });
 
+    //Todo: 4.  Trigger Article Batch Processing
+    await step.sendEvent("article-batch-dispatcher", {
+      name: "app/ArticleBatchDispatcher",
+      data: {},
+    })
+
     return { status: "success", data: savedArticles };
   },
 );
