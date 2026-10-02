@@ -43,6 +43,90 @@
       "when": 1784044230717,
       "tag": "0005_normal_inhumans",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1788268747800,
+      "tag": "0006_unusual_firebird",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1788275708364,
+      "tag": "0007_wide_barracuda",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1788276239949,
+      "tag": "0008_giant_jasper_sitwell",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1788308638166,
+      "tag": "0009_large_victor_mancha",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1788617327111,
+      "tag": "0010_empty_roland_deschain",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1789446002829,
+      "tag": "0011_wonderful_cassandra_nova",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1789450926436,
+      "tag": "0012_chilly_sugar_man",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1790089019165,
+      "tag": "0013_add-user-tag",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1790136557521,
+      "tag": "0014_add-read-history",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1790321557913,
+      "tag": "0015_add-user-category-primary-key",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1790322149217,
+      "tag": "0016_add-article-processing-batch",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1790328781823,
+      "tag": "0017_add-processing-lease",
+      "breakpoints": true
     }
   ]
 }

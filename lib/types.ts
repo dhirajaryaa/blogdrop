@@ -1,7 +1,8 @@
-export type AppResponse<T> = {
-    success: true,
-    data: T,
+export type AppResponse<T= void> = {
+    success: true;
+    data: T;
 } | {
-    success: false,
-    error: string
+    success: false;
+    reason: string;
+    error?: unknown;
 };

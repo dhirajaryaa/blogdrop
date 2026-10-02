@@ -6,13 +6,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "",
     "/feed",
     "/explore",
-    "/trending",
-    "/about",
-    "/contact",
-    "/terms",
-    "/privacy",
-    "/copyright",
-    "/cookies",
+    "/latest",
+    "/sources",
   ];
 
   return staticPages.map((path) => ({

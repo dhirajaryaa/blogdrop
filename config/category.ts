@@ -53,4 +53,4 @@ export const CategoryAlias: Record<string, string[]> = {
     "tutorial": ["tutorials", "how-to guide", "step-by-step guide", "walkthrough", "getting started guide"],
     "career": ["career growth", "career advice", "learning path", "career development", "interview prep"],
     "product-engineering": ["product eng", "product-minded engineering", "product development", "product thinking"]
-}
+};

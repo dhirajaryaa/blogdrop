@@ -1,40 +1,84 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { IconMoon, IconSun } from "@tabler/icons-react"
-import { useTheme } from "next-themes"
+import { useSyncExternalStore } from "react";
+import { useTheme } from "next-themes";
+import { IconMoon, IconSun } from "@tabler/icons-react";
+import { cn } from "@/lib/utils";
 
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+const emptySubscribe = () => () => { };
+const serverValue = false;
+const clientValue = true;
 
 export function ThemeToggle() {
-  const { setTheme } = useTheme()
+  const { resolvedTheme, setTheme } = useTheme();
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => clientValue,
+    () => serverValue,
+  );
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full shadow-none hover:bg-muted text-muted-foreground hover:text-foreground">
-          <IconSun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <IconMoon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="rounded-xl border-border/50 shadow-none bg-background">
-        <DropdownMenuItem onClick={() => setTheme("light")} className="cursor-pointer">
-          Light
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("dark")} className="cursor-pointer">
-          Dark
-        </DropdownMenuItem>
-        <DropdownMenuItem onClick={() => setTheme("system")} className="cursor-pointer">
-          System
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
-  )
+    <button
+      type="button"
+      aria-label="Toggle theme"
+      onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
+      className="text-muted-foreground hover:text-foreground rounded-xl p-2 transition-colors "
+    >
+      {!mounted ? (
+        <span className="block size-4.75" />
+      ) : resolvedTheme === "dark" ? (
+        <IconSun size={19} stroke={1.75} />
+      ) : (
+        <IconMoon size={19} stroke={1.75} />
+      )}
+    </button>
+  );
+}
+
+export function ThemeSwitch({ className }: { className?: string }) {
+  const { resolvedTheme, setTheme } = useTheme();
+
+  const mounted = useSyncExternalStore(
+    emptySubscribe,
+    () => clientValue,
+    () => serverValue,
+  );
+
+  const options = [
+    { value: "light", label: "Light", icon: IconSun },
+    { value: "dark", label: "Dark", icon: IconMoon },
+  ];
+
+  return (
+    <div
+      className={cn(
+        "bg-muted/60 flex items-center gap-1 rounded-full border p-1",
+        className,
+      )}
+    >
+      {options.map((option) => {
+        const Icon = option.icon;
+        const active = mounted && resolvedTheme === option.value;
+        return (
+          <button
+            key={option.value}
+            type="button"
+            aria-label={`Switch to ${option.label} theme`}
+            onClick={() => setTheme(option.value)}
+            className={cn(
+              "flex items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs transition-colors",
+              active
+                ? "bg-primary text-primary-foreground"
+                : "text-muted-foreground hover:text-foreground",
+            )}
+          >
+            <Icon size={14} stroke={active ? 2 : 1.75} />
+            <span className={active ? "font-medium" : undefined}>
+              {option.label}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
 }

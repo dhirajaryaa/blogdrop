@@ -1,30 +1,28 @@
-import { Inngest, eventType } from "inngest";
-import { z } from "zod";
+import { Inngest } from "inngest";
 
-export const refreshSourceEvent = eventType("cron/refresh-Source");
 
-export const feedProcessEvent = eventType("feed/process", {
-    schema: z.object({
-        id: z.string(),
-        rssUrl: z.string(),
-    }),
-});
+export type IngestResult =
+    | {
+        status: "success";
+        data?: unknown;
+    }
+    | {
+        status: "error";
+        reason: string;
+        error?: unknown;
+    };
 
-export const articleProcessEvent = eventType("article/process", {
-    schema: z.object({
-        articleId: z.string(),
-    }),
-});
 
-export const articleAiProcessingEvent = eventType("article/ai-processing", {
-    schema: z.object({
-        articleId: z.string(),
-    }),
-});
-
+//? inngest app initiation
 export const inngest = new Inngest({
     id: "blogdrop",
     checkpointing: {
         maxRuntime: "45s",
+        //! batch runs perform several steps back to back. buffering them cuts
+        //! the number of blocking round trips to the inngest api.
+        bufferedSteps: 5,
     },
+    ...(process.env.INNGEST_SIGNING_KEY && {
+        signingKey: process.env.INNGEST_SIGNING_KEY,
+    }),
 });

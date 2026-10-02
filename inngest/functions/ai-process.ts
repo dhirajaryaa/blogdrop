@@ -1,157 +1,236 @@
 import { db } from "@/db";
-import { inngest, articleAiProcessingEvent } from "../client";
-import { article, articleMetaData, aiUsage } from "@/db/schema";
-import { and, eq, lt, sql } from "drizzle-orm";
-import { calculateReadingTime } from "@/lib/harvester/reading-time";
-import { llmGeneration } from "@/lib/ai";
-import { categoriesMapping, tagsMapping } from "@/lib/harvester/tag-mapping";
+import {
+  inngest,
+  IngestResult,
+} from "@/inngest/client";
+import {
+  article,
+  articleMetaData,
+  aiUsage,
+  tag,
+  category,
+  articleTag,
+  articleCategory,
+} from "@/db/schema";
+import { and, eq, sql } from "drizzle-orm";
+import { calculateReadingTime } from "@/features/harvester/reading-time";
+import { llmGeneration } from "@/features/ai";
+import { categoriesMapping, tagsMapping } from "@/features/harvester/tag-mapping";
+import { userTags as userInterests } from "@/config/tags";
+import { articleCategories } from "@/config/category";
 
-//! only add for [free tier RPD-500/day limit not fix] if use pro plan simple remove it
-const MAX_AI_PER_DAY = 400;
-
-//? atomic daily quota consume [memoized step so LLM retries never double-count]
-const acquireAiQuota = async (): Promise<boolean> => {
-    const day = new Date().toISOString().slice(0, 10); // "YYYY-MM-DD" UTC
-
-    await db.insert(aiUsage).values({ day }).onConflictDoNothing();
-
-    const [row] = await db.update(aiUsage)
-        .set({ used: sql`${aiUsage.used} + 1` })
-        .where(and(eq(aiUsage.day, day), lt(aiUsage.used, MAX_AI_PER_DAY)))
-        .returning({ used: aiUsage.used });
-
-    return row != null;
-}
-
-const nextUtcMidnight = (): Date => {
-    const now = new Date();
-    return new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() + 1));
-}
-
-export const articleAIProcessing = inngest.createFunction({
+export const articleAIProcessing = inngest.createFunction(
+  {
     id: "ai-article-processing",
     concurrency: 5,
+    retries: 3,
     throttle: { limit: 5, period: "1m" },
-    triggers: { event: articleAiProcessingEvent },
-    onFailure: async ({ event, error }) => {
-        const articleId = event.data.event.data?.articleId;
-        if (!articleId) return;
+    triggers: [{ event: "article/ai-processing" }],
+  },
+  async ({ step, event }): Promise<IngestResult> => {
+    const articleId = event.data.articleId as string;
 
-        await db.update(article)
+    // Helper: terminal-status guard so row never lingers as "processing"
+    const markFailed = (reason: string) =>
+      step
+        .run("mark-ai-failed", async () => {
+          await db
+            .update(article)
             .set({ status: "failed" })
             .where(eq(article.id, articleId));
+        })
+        .then(() => ({ status: "error" as const, reason }));
 
-        console.error(`ai-article-processing failed for ${articleId}:`, error.message);
+    // Step 1: select article from db
+    const [sourceArticle] = await db
+      .select()
+      .from(article)
+      .where(and(eq(article.id, articleId), eq(article.status, "processing")));
+
+    if (!sourceArticle) {
+      return {
+        status: "error",
+        reason: "article not found or not in processing state",
+      };
     }
-},
-    async ({ step, event }) => {
 
-        const sourceArticle = await step.run("load-article", async () => {
-            const [row] = await db.select().from(article).where(eq(article.id, event.data.articleId));
-            return row ?? null;
-        });
+    const rawContent = sourceArticle.content ?? "";
 
-        if (!sourceArticle) return { error: "article not found" };
+    if (!rawContent.trim()) {
+      return await markFailed("article content is empty");
+    }
 
-        //? skip reprocessing on event redelivery
-        if (sourceArticle.status === "completed") {
-            return { status: "skipped: already completed" };
+    const content =
+      rawContent.length > 4500
+        ? [rawContent.slice(0, 3000), "...", rawContent.slice(-1500)].join("\n")
+        : rawContent;
+
+    // Step 2: LLM metadata generation
+    let llmOutput: Awaited<ReturnType<typeof llmGeneration>>;
+    try {
+      llmOutput = await step.run("article-metadata-generation", async () => {
+        return await llmGeneration(content);
+      });
+    } catch (err) {
+      return await markFailed(
+        `LLM call threw: ${err instanceof Error ? err.message : String(err)}`,
+      );
+    }
+
+    if (!llmOutput.success) {
+      return await markFailed(llmOutput.error ?? "AI metadata generation failed");
+    }
+
+    // Promotional article - remove
+    if (llmOutput.data.isPromotional) {
+      await step.run("remove-promotion", async () => {
+        await db.delete(article).where(eq(article.id, sourceArticle.id));
+      });
+
+      return {
+        status: "success",
+        data: "Article removed (promotional)",
+      };
+    }
+
+    const {
+      categories,
+      difficulty,
+      keyTakeaways,
+      summary,
+      tags,
+      whyRead,
+      author,
+    } = llmOutput.data;
+
+    // Step 3: Map to canonical tags/categories
+    const canonicalCategories = categoriesMapping(categories);
+    const canonicalTags = tagsMapping(tags);
+
+    const readingTime = calculateReadingTime(sourceArticle.content ?? "");
+
+    // Step 4: Save in transaction
+    const today = new Date().toISOString().slice(0, 10);
+
+    await step.run("save-metadata-and-tags-update", async () => {
+      return await db.transaction(async (tx) => {
+        // Increment AI usage
+        await tx
+          .update(aiUsage)
+          .set({ used: sql`${aiUsage.used} + 1` })
+          .where(eq(aiUsage.day, today));
+
+        // Save metadata
+        await tx
+          .insert(articleMetaData)
+          .values({
+            articleId: sourceArticle.id,
+            readingTime,
+            difficulty,
+            keyTakeaways,
+            summary,
+            whyRead,
+          })
+          .onConflictDoUpdate({
+            target: articleMetaData.articleId,
+            set: {
+              readingTime,
+              difficulty,
+              keyTakeaways,
+              summary,
+              whyRead,
+            },
+          });
+
+        // Save tags
+        const selectedTags = userInterests.filter((interest) =>
+          canonicalTags.includes(interest.value),
+        );
+
+        if (selectedTags.length > 0) {
+          const savedTags = await tx
+            .insert(tag)
+            .values(
+              selectedTags.map((t) => ({
+                name: t.label,
+                slug: t.value,
+              })),
+            )
+            .onConflictDoUpdate({
+              target: tag.slug,
+              set: {
+                name: sql`excluded.name`,
+              },
+            })
+            .returning({ tagId: tag.id });
+
+          if (savedTags.length > 0) {
+            await tx
+              .insert(articleTag)
+              .values(
+                savedTags.map(({ tagId }) => ({
+                  articleId: sourceArticle.id,
+                  tagId,
+                })),
+              )
+              .onConflictDoNothing();
+          }
         }
 
-        //? head+tail truncation for token saving [full content if short]
-        const rawContent = sourceArticle.content ?? "";
+        // Save categories
+        const selectedCategories = articleCategories.filter((cat) =>
+          canonicalCategories.includes(cat.value),
+        );
 
-        if (!rawContent.trim()) {
-            await step.run("mark-failed-empty-content", async () => {
-                await db.update(article).set({ status: "failed" }).where(eq(article.id, sourceArticle.id));
-            });
-            return { error: "article content is empty" };
+        if (selectedCategories.length > 0) {
+          const savedCategories = await tx
+            .insert(category)
+            .values(
+              selectedCategories.map((cat) => ({
+                name: cat.label,
+                slug: cat.value,
+              })),
+            )
+            .onConflictDoUpdate({
+              target: category.slug,
+              set: {
+                name: sql`excluded.name`,
+              },
+            })
+            .returning({ categoryId: category.id });
+
+          if (savedCategories.length > 0) {
+            await tx
+              .insert(articleCategory)
+              .values(
+                savedCategories.map(({ categoryId }) => ({
+                  articleId: sourceArticle.id,
+                  categoryId,
+                })),
+              )
+              .onConflictDoNothing();
+          }
         }
 
-        const content = rawContent.length > 4500
-            ? [rawContent.slice(0, 3000), "...", rawContent.slice(-1500)].join("\n")
-            : rawContent;
+        // Update article status
+        await tx
+          .update(article)
+          .set({
+            author: sourceArticle.author || author,
+            status: "done",
+          })
+          .where(eq(article.id, sourceArticle.id));
 
-        //? step 0: daily ai quota check [cap reached ho toh utc midnight tak sleep]
-        let acquired = await step.run("acquire-ai-quota", acquireAiQuota);
+        return { saved: true };
+      });
+    });
 
-        if (!acquired) {
-            await step.sleepUntil("wait-for-quota-reset", nextUtcMidnight());
-            acquired = await step.run("acquire-ai-quota-after-reset", acquireAiQuota);
+    // Trigger next batch
+    await step.sendEvent("article-batch-dispatcher", {
+      name: "app/ArticleBatchDispatcher",
+      data: {},
+    });
 
-            if (!acquired) {
-                await step.run("mark-failed-quota", async () => {
-                    await db.update(article).set({ status: "failed" }).where(eq(article.id, sourceArticle.id));
-                });
-                return { status: "skipped: daily AI quota exhausted" };
-            }
-        }
-
-        //? step 1: generate metadata with ai [some time author not catch with regex so ai ask, banner image]
-        //! throw inside step so Inngest retries the actual LLM call with backoff
-        const metadata = await step.run("metadata-generate", async () => {
-            const result = await llmGeneration(content);
-
-            if (!result.success) {
-                throw new Error(result.error ?? "failed to generate metadata");
-            }
-
-            return { data: result.data, tokenUsed: result.tokenUsed };
-        });
-
-        //? step 2: remove promotional article and abort for there steps
-        if (metadata.data.isPromotional) {
-            await step.run("remove-promotion", async () => {
-                return await db.delete(article).where(eq(article.id, sourceArticle.id));
-            });
-            return { status: "Article removed (promotional)" };
-        };
-
-        const { categories, difficulty, keyTakeaways, summary, tags, whyRead, author } = metadata.data;
-
-        //? step 3: tags & categories mapping with predefined tags-categories
-        const canonicalMapping = await step.run("map-original-tags", async () => {
-            const canonicalCategories = categoriesMapping(categories);
-            const canonicalTags = tagsMapping(tags);
-
-            return { categories: canonicalCategories, tags: canonicalTags };
-        });
-
-
-        //? step 4: save metadata on db [idempotent so duplicate events safe]
-
-        await step.run("save-metadata", async () => {
-
-            return await db.transaction(async (tx) => {
-                await tx.insert(articleMetaData).values({
-                    articleId: sourceArticle.id,
-                    summary,
-                    tags: canonicalMapping.tags,
-                    categories: canonicalMapping.categories ?? categories,
-                    keyTakeaways,
-                    difficulty,
-                    whyRead,
-                    readingTime: calculateReadingTime(sourceArticle.content ?? "")
-                }).onConflictDoUpdate({
-                    target: articleMetaData.articleId,
-                    set: {
-                        summary,
-                        tags: canonicalMapping.tags,
-                        categories: canonicalMapping.categories ?? categories,
-                        keyTakeaways,
-                        difficulty,
-                        whyRead,
-                        readingTime: calculateReadingTime(sourceArticle.content ?? "")
-                    }
-                });
-
-                await tx.update(article).set({
-                    status: "completed",
-                    author: sourceArticle.author || author
-                }).where(eq(article.id, sourceArticle.id));
-            });
-
-        });
-
-        return { status: "Article processing Done.", totalTokenUsed: metadata.tokenUsed };
-    })
+    return { status: "success", data: llmOutput };
+  },
+);
