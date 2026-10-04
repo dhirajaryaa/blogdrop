@@ -37,9 +37,27 @@ export const articleProcessing = inngest.createFunction(
 
     try {
       // Step 1: Fetch and extract article content
-      const extracted = await step.run("fetch-and-extract", async () => {
-        return await fetchAndExtractArticle(articleUrl);
+      type ExtractResult =
+        | { ok: true; markdown: string; author?: string; imageUrl?: string }
+        | { ok: false; reason: string };
+
+      const extracted = await step.run("fetch-and-extract", async (): Promise<ExtractResult> => {
+        try {
+          const r = await fetchAndExtractArticle(articleUrl);
+          return { ok: true, markdown: r.markdown, author: r.author, imageUrl: r.imageUrl };
+        } catch (err) {
+          // handle permanent failures (403, too-short body, etc) gracefully so
+          // inngest does not retry or surface the raw error
+          if (err instanceof PermanentArticleError) {
+            return { ok: false, reason: err.message };
+          }
+          throw err;
+        }
       });
+
+      if (!extracted.ok) {
+        return await markFailed(extracted.reason);
+      }
 
       // Step 2: Save cleaned content, author, image to DB
       const processed = await step.run("save-cleaned-content", async () => {

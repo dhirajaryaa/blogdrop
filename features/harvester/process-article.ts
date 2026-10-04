@@ -5,7 +5,7 @@ import { describeError } from "@/lib/pool";
 export const FETCH_TIMEOUT_MS = 15_000;
 
 export const USER_AGENT =
-    "BlogdropBot/1.0 (+https://blogdrop.in; contact@blogdrop.in)";
+    "Mozilla/5.0 (compatible; BlogDropBot/1.0; +https://blogdrop.in)";
 
 //! shortest body we accept as a real article, below this the extraction is junk
 export const MIN_CONTENT_LENGTH = 400;
@@ -46,6 +46,7 @@ export async function fetchAndExtractArticle(
         response = await fetch(url, {
             redirect: "follow",
             headers: {
+                // many engineering blogs 403 any request without a browser-like UA
                 "User-Agent": USER_AGENT,
                 Accept: "text/html,application/xhtml+xml",
             },
@@ -54,7 +55,7 @@ export async function fetchAndExtractArticle(
     } catch (error) {
         // timeouts / dns / connection resets are transient
         throw new Error(`article request failed: ${describeError(error)}`);
-    }
+    };
 
     if (!response.ok) {
         const message = `article fetch returned ${response.status} ${response.statusText}`;
