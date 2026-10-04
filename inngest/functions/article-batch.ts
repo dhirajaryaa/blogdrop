@@ -1,10 +1,10 @@
 import { db } from "@/db";
 import { aiUsage, article } from "@/db/schema";
 import { IngestResult, inngest } from "@/inngest/client";
-import { eq, inArray, sql } from "drizzle-orm";
+import { and, eq, inArray, or, sql } from "drizzle-orm";
 
 const BATCH_SIZE = 100;
-const AI_API_LIMIT = 500; // RPD as requested
+const AI_API_LIMIT = 480; // RPD as requested
 
 export const articleBatchDispatcher = inngest.createFunction(
   {
@@ -39,9 +39,12 @@ export const articleBatchDispatcher = inngest.createFunction(
       const used = credit?.used ?? 0;
       const remaining = AI_API_LIMIT - used;
 
+      console.log("credit left:", remaining);
+
+
       if (remaining <= 0) {
         return { allow: false, remaining: 0 };
-      }
+      };
 
       return { allow: true, remaining };
     });
@@ -52,17 +55,17 @@ export const articleBatchDispatcher = inngest.createFunction(
         reason: "no ai credit remaining",
         error: aiCredit,
       };
-    }
+    };
 
     // Step 2: select pending articles and mark as processing
     const processingArticles = await step.run("select-pending-article", async () => {
-      const batchSize = Math.min(aiCredit.remaining, BATCH_SIZE);
+      const batchSize = Math.min(aiCredit.remaining, BATCH_SIZE);      
 
       return await db.transaction(async (tx) => {
         const pending = await tx
           .select({ id: article.id, originalUrl: article.originalUrl })
           .from(article)
-          .where(eq(article.status, "pending"))
+          .where(or(eq(article.status, "pending"), eq(article.status, "error")))
           .limit(batchSize)
           .for("update", { skipLocked: true });
 
