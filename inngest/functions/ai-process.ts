@@ -81,6 +81,23 @@ export const articleAIProcessing = inngest.createFunction(
       return await markFailed(llmOutput.error ?? "AI metadata generation failed");
     }
 
+    // Step 2.5: Count the AI call.
+    //* done as its own step, right after the LLM call and outside the save
+    //* transaction, so a later write failure can never roll the credit back.
+    //* upsert (not plain update) so it counts even when the dispatcher
+    //* never created today's row.
+    const today = new Date().toISOString().slice(0, 10);
+
+    await step.run("increment-ai-credit", async () => {
+      await db
+        .insert(aiUsage)
+        .values({ day: today, used: 1, apiId: 1 })
+        .onConflictDoUpdate({
+          target: aiUsage.day,
+          set: { used: sql`${aiUsage.used} + 1` },
+        });
+    });
+
     // Promotional article - remove
     if (llmOutput.data.isPromotional) {
       await step.run("remove-promotion", async () => {
@@ -110,16 +127,8 @@ export const articleAIProcessing = inngest.createFunction(
     const readingTime = calculateReadingTime(sourceArticle.content ?? "");
 
     // Step 4: Save in transaction
-    const today = new Date().toISOString().slice(0, 10);
-
     await step.run("save-metadata-and-tags-update", async () => {
       return await db.transaction(async (tx) => {
-        // Increment AI usage
-        await tx
-          .update(aiUsage)
-          .set({ used: sql`${aiUsage.used} + 1` })
-          .where(eq(aiUsage.day, today));
-
         // Save metadata
         await tx
           .insert(articleMetaData)
