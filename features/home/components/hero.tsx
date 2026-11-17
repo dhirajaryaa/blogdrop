@@ -1,3 +1,4 @@
+import dynamic from "next/dynamic";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import {
@@ -6,10 +7,14 @@ import {
   IconSparkles,
 } from "@tabler/icons-react";
 
+const BlogDropHeroDemo = dynamic(
+  () => import("@/components/stageshow/blogdrop-hero/blogdrop-hero"),
+);
+
 function Hero() {
   return (
     <section className="relative flex w-full flex-col items-center overflow-hidden py-16 sm:py-24">
-      <div className="flex flex-col items-center gap-5 text-center">
+      <div className="flex w-full flex-col items-center gap-5 text-center">
         <span className="text-muted-foreground border-border/70 bg-muted/40 inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium">
           <IconSparkles size={13} stroke={1.75} />
           Curated engineering stories, hand-picked daily
@@ -45,6 +50,10 @@ function Hero() {
               <IconCompass stroke={1.75} size={16} /> Explore articles
             </Link>
           </Button>
+        </div>
+
+        <div className="mt-14 w-full">
+          <BlogDropHeroDemo />
         </div>
       </div>
 

@@ -1,0 +1,258 @@
+/* BlogDrop hero demo — the product's feed page in a quiet browser window.
+   All rules belong to this example. The page is the ground: the stage is
+   transparent, the window bleeds off the sides and the bottom. */
+
+.bd-stage {
+  font-family: 'Inter', 'InterVariable', system-ui, -apple-system, sans-serif;
+}
+
+.bd-stage .ss-stage {
+  /* BlogDrop's own tokens */
+  --ss-canvas: #fafbfc;
+  --ss-surface: #ffffff;
+  --ss-chrome: #f4f6fa;
+  --ss-raised: #ffffff;
+  --ss-well: #f2f4f8;
+  --ss-line: #e4e8ef;
+  --ss-line-faint: #eef1f6;
+  --ss-text-strong: #10131f;
+  --ss-text: #697181;
+  --ss-text-faint: #9aa1b0;
+  --ss-accent: #2579f4;
+  --ss-accent-soft: rgba(37, 121, 244, 0.12);
+
+  overflow: hidden;
+  background: transparent;
+}
+
+.bd-stage .ss-stage[data-layout='compact'] {
+  --ss-radius-window: 10px;
+}
+
+/* ---- The window ---- */
+
+.bd-window {
+  position: absolute;
+  top: 28px;
+  left: 28px;
+  width: 1000px;
+  height: 540px;
+  box-shadow: var(--ss-shadow-hero);
+}
+
+.bd-stage .ss-stage[data-layout='compact'] .bd-window {
+  top: 12px;
+  left: 12px;
+  width: 400px;
+  height: 400px;
+}
+
+.bd-body {
+  position: relative;
+  height: 100%;
+  background: var(--ss-surface);
+  overflow: hidden;
+}
+
+.bd-page {
+  padding: 26px 108px 0 44px;
+}
+
+.bd-stage .ss-stage[data-layout='compact'] .bd-page {
+  padding: 18px 64px 0 20px;
+}
+
+/* ---- Toolbar: topic chips, search ---- */
+
+.bd-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.bd-chips {
+  display: flex;
+  gap: 8px;
+}
+
+.bd-chip {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  height: 30px;
+  padding: 0 14px;
+  border: 1px solid var(--ss-line);
+  border-radius: var(--ss-radius-pill);
+  background: transparent;
+  color: var(--ss-text);
+  transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+}
+
+.bd-chip__text {
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1;
+  text-box: trim-both cap alphabetic;
+}
+
+.bd-chip[data-on] {
+  background: var(--ss-text-strong);
+  border-color: var(--ss-text-strong);
+  color: var(--ss-surface);
+}
+
+.bd-search {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  gap: 8px;
+  height: 30px;
+  padding: 0 6px 0 12px;
+  border: 1px solid var(--ss-line);
+  border-radius: var(--ss-radius-pill);
+  color: var(--ss-text-faint);
+}
+
+.bd-search__icon {
+  color: var(--ss-text-faint);
+}
+
+.bd-search__text {
+  font-size: 12px;
+  line-height: 1;
+  text-box: trim-both cap alphabetic;
+}
+
+/* ---- The feed ---- */
+
+.bd-list {
+  margin-top: 24px;
+}
+
+.bd-row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  padding: 20px 0;
+  border-bottom: 1px solid var(--ss-line-faint);
+}
+
+.bd-stage .ss-stage[data-layout='compact'] .bd-row {
+  grid-template-columns: 34px 1fr;
+  padding: 16px 0;
+}
+
+.bd-num {
+  padding-top: 3px;
+}
+
+.bd-num__text {
+  font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, monospace;
+  font-size: 11px;
+  color: var(--ss-text-faint);
+}
+
+.bd-row__main {
+  min-width: 0;
+}
+
+.bd-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.bd-favicon {
+  display: grid;
+  place-items: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 2px;
+  border-radius: 5px;
+  background: var(--ss-canvas);
+  box-shadow: inset 0 0 0 1px var(--ss-line-faint);
+}
+
+.bd-meta__name {
+  font-size: 12px;
+  font-weight: 550;
+  line-height: 1;
+  color: var(--ss-text-strong);
+  text-box: trim-both cap alphabetic;
+}
+
+.bd-meta__dot {
+  color: var(--ss-text-faint);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.bd-title {
+  display: flex;
+  align-items: center;
+  margin-top: 12px;
+  height: 22px;
+}
+
+.bd-stage .ss-stage[data-layout='compact'] .bd-title {
+  margin-top: 10px;
+  height: 20px;
+}
+
+.bd-title__text {
+  font-size: 17px;
+  font-weight: 550;
+  letter-spacing: -0.01em;
+  color: var(--ss-text-strong);
+  white-space: nowrap;
+}
+
+.bd-stage .ss-stage[data-layout='compact'] .bd-title__text {
+  font-size: 15px;
+}
+
+/* ---- Save affordance, as the product draws it: a circle at the row's top right ---- */
+
+.bd-save {
+  position: absolute;
+  top: 26px;
+  right: 0;
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--ss-line);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  color: var(--ss-text);
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+.bd-save__icon {
+  transition: fill 0.15s ease, color 0.15s ease;
+}
+
+.bd-save[data-saved] {
+  border-color: color-mix(in srgb, var(--ss-accent) 30%, transparent);
+  background: var(--ss-accent-soft);
+  color: var(--ss-accent);
+}
+
+.bd-save[data-saved] .bd-save__icon {
+  fill: currentColor;
+}
+
+/* ---- Toast, over the window's lower left where the viewport shows it ---- */
+
+.bd-toast {
+  position: absolute;
+  left: 28px;
+  bottom: 40px;
+  z-index: 3;
+}
+
+.bd-stage .ss-stage[data-layout='compact'] .bd-toast {
+  left: 12px;
+  bottom: 12px;
+}
